@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ resume.name }} - Resume</title>
+  <style>
+    @page {
+      size: letter;
+      margin: 0.45in 0.5in 0.45in 0.5in;
+    }
+    *, *:before, *:after {
+      box-sizing: border-box;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      color: #222222;
+      line-height: 1.35;
+      font-size: 10pt;
+      margin: 0;
+      padding: 0;
+      background-color: #ffffff;
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 12px;
+      border-bottom: 2px solid #1a365d;
+      padding-bottom: 8px;
+    }
+    .header h1 {
+      font-size: 20pt;
+      font-weight: 700;
+      color: #0f172a;
+      margin: 0 0 3px 0;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+    .header .headline {
+      font-size: 10.5pt;
+      font-weight: 600;
+      color: #1e3a8a;
+      margin: 0 0 5px 0;
+    }
+    .contact-info {
+      font-size: 9pt;
+      color: #475569;
+    }
+    .contact-info span:not(:last-child):after {
+      content: " • ";
+      color: #94a3b8;
+      padding: 0 3px;
+    }
+    .contact-info a {
+      color: #1e3a8a;
+      text-decoration: none;
+    }
+    h2.section-title {
+      font-size: 11pt;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: #0f172a;
+      border-bottom: 1px solid #cbd5e1;
+      padding-bottom: 2px;
+      margin: 10px 0 6px 0;
+    }
+    .summary-text {
+      font-size: 9.5pt;
+      color: #334155;
+      margin-bottom: 8px;
+      text-align: justify;
+    }
+    .skills-group {
+      margin-bottom: 3px;
+      font-size: 9.5pt;
+    }
+    .skills-group strong {
+      color: #0f172a;
+      font-weight: 600;
+    }
+    .item-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-top: 6px;
+      margin-bottom: 1px;
+    }
+    .item-title {
+      font-size: 10pt;
+      font-weight: 700;
+      color: #0f172a;
+    }
+    .item-subtitle {
+      font-size: 9.5pt;
+      font-weight: 500;
+      color: #334155;
+      font-style: italic;
+    }
+    .item-date {
+      font-size: 9pt;
+      font-weight: 600;
+      color: #475569;
+      white-space: nowrap;
+    }
+    .item-location {
+      font-size: 9pt;
+      color: #64748b;
+      font-style: italic;
+    }
+    .stack-tags {
+      font-size: 8.5pt;
+      color: #1e3a8a;
+      font-weight: 600;
+      margin-bottom: 3px;
+    }
+    ul.bullet-list {
+      margin: 2px 0 6px 0;
+      padding-left: 18px;
+    }
+    ul.bullet-list li {
+      font-size: 9.2pt;
+      color: #334155;
+      margin-bottom: 2px;
+    }
+    .cert-item {
+      font-size: 9.5pt;
+      margin-bottom: 2px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="header">
+    <h1>{{ resume.name }}</h1>
+    {% if resume.headline %}
+      <div class="headline">{{ resume.headline }}</div>
+    {% endif %}
+    <div class="contact-info">
+      {% if resume.location %}<span>{{ resume.location }}</span>{% endif %}
+      {% if resume.email %}<span><a href="mailto:{{ resume.email }}">{{ resume.email }}</a></span>{% endif %}
+      {% if resume.phone %}<span>{{ resume.phone }}</span>{% endif %}
+      {% if resume.github_url %}<span><a href="{{ resume.github_url }}">GitHub</a></span>{% endif %}
+      {% if resume.linkedin_url %}<span><a href="{{ resume.linkedin_url }}">LinkedIn</a></span>{% endif %}
+    </div>
+  </header>
+
+  <!-- Professional Summary -->
+  {% if resume.summary %}
+  <section>
+    <h2 class="section-title">Professional Summary</h2>
+    <div class="summary-text">{{ resume.summary }}</div>
+  </section>
+  {% endif %}
+
+  <!-- Technical Skills -->
+  {% if resume.skills_by_category %}
+  <section>
+    <h2 class="section-title">Technical Skills</h2>
+    {% for category, skills in resume.skills_by_category.items() %}
+    <div class="skills-group">
+      <strong>{{ category }}:</strong> {{ skills | join(', ') }}
+    </div>
+    {% endfor %}
+  </section>
+  {% endif %}
+
+  <!-- Projects -->
+  {% if resume.projects %}
+  <section>
+    <h2 class="section-title">Technical Projects</h2>
+    {% for project in resume.projects %}
+    <div class="item-block">
+      <div class="item-header">
+        <span class="item-title">{{ project.name }}</span>
+        {% if project.url %}
+        <span class="item-date"><a href="{{ project.url }}" style="color: #1e3a8a; text-decoration: none;">View Code</a></span>
+        {% endif %}
+      </div>
+      {% if project.stack %}
+      <div class="stack-tags">Tech Stack: {{ project.stack | join(' • ') }}</div>
+      {% endif %}
+      {% if project.bullets %}
+      <ul class="bullet-list">
+        {% for bullet in project.bullets %}
+        <li>{{ bullet }}</li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </section>
+  {% endif %}
+
+  <!-- Experience & Leadership -->
+  {% if resume.experience %}
+  <section>
+    <h2 class="section-title">Experience & Leadership</h2>
+    {% for exp in resume.experience %}
+    <div class="item-block">
+      <div class="item-header">
+        <div>
+          <span class="item-title">{{ exp.title }}</span> — <span class="item-subtitle">{{ exp.company }}</span>
+        </div>
+        <div class="item-date">{{ exp.dates }}{% if exp.location %} | {{ exp.location }}{% endif %}</div>
+      </div>
+      {% if exp.bullets %}
+      <ul class="bullet-list">
+        {% for bullet in exp.bullets %}
+        <li>{{ bullet }}</li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </section>
+  {% endif %}
+
+  <!-- Education -->
+  {% if resume.education %}
+  <section>
+    <h2 class="section-title">Education</h2>
+    {% for edu in resume.education %}
+    <div class="item-header">
+      <div>
+        <span class="item-title">{{ edu.school }}</span> — <span class="item-subtitle">{{ edu.degree }}</span>
+      </div>
+      <div class="item-date">{{ edu.dates }}</div>
+    </div>
+    {% if edu.notes %}
+    <div style="font-size: 8.8pt; color: #64748b; margin-top: 1px;">{{ edu.notes }}</div>
+    {% endif %}
+    {% endfor %}
+  </section>
+  {% endif %}
+
+  <!-- Certifications -->
+  {% if resume.certifications %}
+  <section>
+    <h2 class="section-title">Certifications</h2>
+    <ul class="bullet-list" style="margin-top: 4px;">
+      {% for cert in resume.certifications %}
+      <li>{{ cert }}</li>
+      {% endfor %}
+    </ul>
+  </section>
+  {% endif %}
+
+</body>
+</html>

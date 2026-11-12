@@ -13,5 +13,10 @@ class MatchScore(BaseModel):
     llm_score: int = Field(default=0, ge=0, le=100)
     matched_skills: List[str] = Field(default_factory=list)
     missing_skills: List[str] = Field(default_factory=list)
+    skills_worth_learning: List[str] = Field(default_factory=list)
     reason: str
-    recommendation: Literal["strong_match", "good_match", "weak_match", "not_recommended"] = "good_match"
+    recommendation: Literal["top_pick", "strong_match", "good_match", "weak_match", "not_recommended"] = "good_match"
+    is_top_pick: bool = False
+    job_type: str = "internship"
+    stipend_or_salary: Optional[str] = None
+    ats_score: Optional[int] = None

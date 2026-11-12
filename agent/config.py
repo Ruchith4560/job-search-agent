@@ -1,8 +1,8 @@
-"""Configuration loader and schema definitions for the AI Job Application Agent."""
+"""Configuration loader and schema definitions for the AI Job Search Agent."""
 
 import os
 from pathlib import Path
-from typing import List, Optional
+from typing import Dict, List, Optional
 import yaml
 from dotenv import load_dotenv
 from pydantic import BaseModel, Field
@@ -11,15 +11,99 @@ from pydantic import BaseModel, Field
 load_dotenv()
 
 
+class StudentProfileConfig(BaseModel):
+    """Student profile attributes."""
+    name: str = "Ruchith Macha"
+    email: str = "macharuchith1@gmail.com"
+    current_status: str = "B.Tech 3rd-year student"
+    college: str = "Anurag University"
+    branch: str = "Computer Science and Engineering"
+    graduation_year: int = 2028
+    cgpa: Optional[str] = "8.5"
+    github_username: str = "Ruchith4560"
+
+    @property
+    def university(self) -> str:
+        return self.college
+
+
+class StipendConfig(BaseModel):
+    """Stipend and salary expectations."""
+    min_monthly: float = 15000.0
+    preferred_monthly: float = 40000.0
+    full_time_min_lpa: float = 8.0
+
+
+class DealBreakersConfig(BaseModel):
+    """Strict elimination criteria."""
+    max_experience_years: int = 1
+    exclude_unpaid: bool = True
+    exclude_fee_charging: bool = True
+
+
 class PreferencesConfig(BaseModel):
     """User preferences for job searching and profile targeting."""
-    target_roles: List[str] = Field(default_factory=lambda: ["Backend Engineer", "ML Engineer"])
-    experience_level: str = "2 years"
-    locations: List[str] = Field(default_factory=lambda: ["Remote", "Bengaluru", "Hyderabad"])
-    salary_expectation: Optional[str] = None
-    core_skills: List[str] = Field(default_factory=list)
+    target_roles: List[str] = Field(
+        default_factory=lambda: [
+            "Software Engineer Intern",
+            "SDE Intern",
+            "Backend Intern",
+            "Full Stack Intern",
+            "Graduate Engineer",
+            "Associate Engineer",
+            "Trainee",
+        ]
+    )
+    job_types: List[str] = Field(default_factory=lambda: ["internship", "entry_level"])
+    locations: List[str] = Field(
+        default_factory=lambda: [
+            "Hyderabad",
+            "Bengaluru",
+            "Pune",
+            "Chennai",
+            "Remote India",
+            "Remote",
+        ]
+    )
+    stipend: StipendConfig = Field(default_factory=StipendConfig)
+    core_skills: List[str] = Field(
+        default_factory=lambda: [
+            "Java", "Python", "DSA", "React", "SQL", "Git",
+            "Spring Boot", "FastAPI", "Docker", "Node.js", "TypeScript"
+        ]
+    )
     exclude_companies: List[str] = Field(default_factory=list)
-    github_username: str = "octocat"
+    deal_breakers: DealBreakersConfig = Field(default_factory=DealBreakersConfig)
+    github_username: str = "Ruchith4560"
+
+
+class ScoringConfig(BaseModel):
+    """Scoring and ATS thresholds."""
+    min_match_threshold: int = 70
+    top_pick_threshold: int = 90
+    min_ats_score: int = 85
+
+
+class EmailConfig(BaseModel):
+    """Daily email digest notification settings."""
+    recipient: str = "macharuchith1@gmail.com"
+    recipient_email: Optional[str] = None
+    smtp_host: str = Field(default_factory=lambda: os.getenv("SMTP_HOST", "smtp.gmail.com"))
+    smtp_port: int = Field(default_factory=lambda: int(os.getenv("SMTP_PORT", "587")))
+    sender_email: str = Field(default_factory=lambda: os.getenv("GMAIL_USER", "macharuchith1@gmail.com"))
+    smtp_user: Optional[str] = None
+    sender_password: Optional[str] = Field(default_factory=lambda: os.getenv("GMAIL_APP_PASSWORD"))
+    send_email: bool = True
+    enabled: Optional[bool] = None
+    use_tls: bool = True
+
+    def model_post_init(self, __context: Any) -> None:
+        if not self.recipient_email:
+            self.recipient_email = self.recipient
+        if not self.smtp_user:
+            self.smtp_user = self.sender_email
+        if self.enabled is None:
+            self.enabled = self.send_email
 
 
 class LLMConfig(BaseModel):
@@ -44,7 +128,7 @@ class JobDiscoveryConfig(BaseModel):
     """Configuration for job board fetching and filtering."""
     sources: List[str] = Field(default_factory=lambda: ["remotive", "remoteok", "greenhouse", "lever"])
     greenhouse_companies: List[str] = Field(
-        default_factory=lambda: ["stripe", "canonical", "cloudflare", "gitlab", "discord"]
+        default_factory=lambda: ["canonical", "cloudflare", "gitlab", "discord", "stripe"]
     )
     lever_companies: List[str] = Field(
         default_factory=lambda: ["palantir", "netflix", "spotify"]
@@ -52,16 +136,26 @@ class JobDiscoveryConfig(BaseModel):
     max_jobs_per_source: int = 50
     allow_remote: bool = True
     exclude_keywords: List[str] = Field(
-        default_factory=lambda: ["director", "vp", "vice president", "principal", "head of", "recruiter", "sales representative"]
+        default_factory=lambda: [
+            "director", "vp", "vice president", "principal", "head of",
+            "recruiter", "sales representative", "senior", "lead", "staff", "manager"
+        ]
     )
 
 
 class AppConfig(BaseModel):
     """Root configuration for the application."""
+    profile: StudentProfileConfig = Field(default_factory=StudentProfileConfig)
     preferences: PreferencesConfig = Field(default_factory=PreferencesConfig)
+    scoring: ScoringConfig = Field(default_factory=ScoringConfig)
+    email: EmailConfig = Field(default_factory=EmailConfig)
     llm: LLMConfig = Field(default_factory=LLMConfig)
     paths: PathsConfig = Field(default_factory=PathsConfig)
     jobs: JobDiscoveryConfig = Field(default_factory=JobDiscoveryConfig)
+
+    @property
+    def student_profile(self) -> StudentProfileConfig:
+        return self.profile
 
 
 def load_config(config_path: str = "config.yaml") -> AppConfig:
@@ -75,7 +169,6 @@ def load_config(config_path: str = "config.yaml") -> AppConfig:
     """
     path = Path(config_path)
     if not path.is_file():
-        # Fall back to default config if file is not found
         return AppConfig()
 
     with open(path, "r", encoding="utf-8") as f:

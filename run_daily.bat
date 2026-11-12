@@ -7,7 +7,7 @@ echo   (Fetches, Scores, Tailors, Pre-fills, and Asks for Confirmation)
 echo =================================================================
 cd /d "%~dp0"
 
-.\.venv\Scripts\python.exe main.py auto-apply
+.\.venv\Scripts\python.exe main.py daily
 
 echo.
 pause

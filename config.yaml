@@ -1,32 +1,66 @@
-# AI Job Application Agent Configuration
+# AI Job Search Agent Configuration
+# Prepared for: Macharuchith (macharuchith1@gmail.com)
+# B.Tech 3rd-year student | Target: Internships & Entry-Level Roles
+
+profile:
+  name: "Ruchith Macha"
+  email: "macharuchith1@gmail.com"
+  current_status: "B.Tech 3rd-year student"
+  college: "Anurag University"
+  branch: "Computer Science and Engineering"
+  graduation_year: 2028
+  cgpa: "8.5"
+  github_username: "Ruchith4560"
 
 preferences:
   target_roles:
-    - "Backend Engineer"
-    - "Software Engineer"
-    - "Python Engineer"
-    - "Full Stack Engineer"
-    - "Java Developer"
-  experience_level: "2 years"
+    - "Software Engineer Intern"
+    - "SDE Intern"
+    - "Backend Intern"
+    - "Full Stack Intern"
+    - "Web Intern"
+    - "Frontend Intern"
+    - "Python Intern"
+    - "Java Developer Intern"
+    - "Cloud / DevOps Intern"
+    - "Data / ML Intern"
+    - "Graduate Engineer"
+    - "Associate Engineer"
+    - "Trainee"
+    - "Junior Software Engineer"
+  job_types:
+    - "internship"
+    - "entry_level"
   locations:
     - "Hyderabad"
     - "Bengaluru"
+    - "Pune"
+    - "Chennai"
+    - "Remote India"
     - "Remote"
-    - "India"
-  salary_expectation: null
+  stipend:
+    min_monthly: 15000
+    preferred_monthly: 40000
+    full_time_min_lpa: 8.0
   core_skills:
-    - "Python"
     - "Java"
-    - "FastAPI"
-    - "Spring Boot"
+    - "Python"
+    - "DSA"
     - "React"
+    - "SQL"
+    - "Git"
+    - "Spring Boot"
+    - "FastAPI"
+    - "Docker"
     - "Node.js"
     - "TypeScript"
-    - "SQL"
-    - "Docker"
+    - "PostgreSQL"
     - "MongoDB"
   exclude_companies: []
-  github_username: "Ruchith4560"
+  deal_breakers:
+    max_experience_years: 1
+    exclude_unpaid: true
+    exclude_fee_charging: true
 
 jobs:
   sources:
@@ -39,6 +73,7 @@ jobs:
     - "cloudflare"
     - "gitlab"
     - "discord"
+    - "stripe"
   lever_companies:
     - "palantir"
     - "netflix"
@@ -53,6 +88,22 @@ jobs:
     - "head of"
     - "recruiter"
     - "account executive"
+    - "senior"
+    - "lead"
+    - "staff"
+    - "manager"
+
+scoring:
+  min_match_threshold: 70
+  top_pick_threshold: 90
+  min_ats_score: 85
+
+email:
+  recipient: "macharuchith1@gmail.com"
+  smtp_host: "smtp.gmail.com"
+  smtp_port: 587
+  sender_email: "macharuchith1@gmail.com"
+  send_email: true
 
 llm:
   model: "claude-3-5-sonnet-20241022"

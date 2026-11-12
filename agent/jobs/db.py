@@ -1,5 +1,6 @@
 """SQLite database manager for persisting and tracking discovered jobs."""
 
+from datetime import datetime, timezone
 import json
 import logging
 from pathlib import Path
@@ -31,7 +32,7 @@ class JobDatabase:
         return conn
 
     def _init_db(self) -> None:
-        """Create the jobs schema and performance indexes if not already present."""
+        """Create the jobs schema, add new columns if migrating, and build indexes."""
         with self._get_connection() as conn:
             cursor = conn.cursor()
             cursor.execute("""
@@ -50,12 +51,38 @@ class JobDatabase:
                     salary_currency TEXT,
                     posted_at TEXT,
                     status TEXT NOT NULL DEFAULT 'found',
+                    job_type TEXT DEFAULT 'internship',
+                    duration TEXT,
+                    stipend_or_salary TEXT,
+                    match_score INTEGER,
+                    ats_score INTEGER,
+                    is_top_pick INTEGER DEFAULT 0,
+                    emailed_at TEXT,
                     created_at TEXT NOT NULL
                 )
             """)
+
+            # Run safe migrations for any existing databases
+            columns_to_add = [
+                ("job_type", "TEXT DEFAULT 'internship'"),
+                ("duration", "TEXT"),
+                ("stipend_or_salary", "TEXT"),
+                ("match_score", "INTEGER"),
+                ("ats_score", "INTEGER"),
+                ("is_top_pick", "INTEGER DEFAULT 0"),
+                ("emailed_at", "TEXT"),
+            ]
+            for col_name, col_def in columns_to_add:
+                try:
+                    cursor.execute(f"ALTER TABLE jobs ADD COLUMN {col_name} {col_def}")
+                except sqlite3.OperationalError:
+                    pass  # Column already exists
+
             cursor.execute("CREATE INDEX IF NOT EXISTS idx_jobs_status ON jobs (status)")
             cursor.execute("CREATE INDEX IF NOT EXISTS idx_jobs_company ON jobs (company)")
             cursor.execute("CREATE INDEX IF NOT EXISTS idx_jobs_source ON jobs (source)")
+            cursor.execute("CREATE INDEX IF NOT EXISTS idx_jobs_score ON jobs (match_score)")
+            cursor.execute("CREATE INDEX IF NOT EXISTS idx_jobs_emailed ON jobs (emailed_at)")
             conn.commit()
 
     def upsert_job(self, job: Job) -> bool:
@@ -69,7 +96,7 @@ class JobDatabase:
         """
         with self._get_connection() as conn:
             cursor = conn.cursor()
-            cursor.execute("SELECT status FROM jobs WHERE id = ?", (job.id,))
+            cursor.execute("SELECT status, emailed_at FROM jobs WHERE id = ?", (job.id,))
             existing = cursor.fetchone()
 
             tags_json = json.dumps(job.tags)
@@ -79,43 +106,41 @@ class JobDatabase:
                     INSERT INTO jobs (
                         id, title, company, url, source, location, is_remote,
                         description, tags, salary_min, salary_max, salary_currency,
-                        posted_at, status, created_at
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        posted_at, status, job_type, duration, stipend_or_salary,
+                        match_score, ats_score, is_top_pick, emailed_at, created_at
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """, (
                     job.id, job.title, job.company, job.url, job.source,
                     job.location, 1 if job.is_remote else 0, job.description,
                     tags_json, job.salary_min, job.salary_max, job.salary_currency,
-                    job.posted_at, job.status, job.created_at,
+                    job.posted_at, job.status, job.job_type, job.duration, job.stipend_or_salary,
+                    job.match_score, job.ats_score, 1 if job.is_top_pick else 0,
+                    job.emailed_at, job.created_at,
                 ))
                 conn.commit()
                 return True
             else:
-                # Update job fields while preserving existing status
                 cursor.execute("""
                     UPDATE jobs SET
                         title = ?, company = ?, url = ?, source = ?,
                         location = ?, is_remote = ?, description = ?,
                         tags = ?, salary_min = ?, salary_max = ?,
-                        salary_currency = ?, posted_at = ?
+                        salary_currency = ?, posted_at = ?, job_type = ?,
+                        duration = COALESCE(?, duration),
+                        stipend_or_salary = COALESCE(?, stipend_or_salary)
                     WHERE id = ?
                 """, (
                     job.title, job.company, job.url, job.source,
                     job.location, 1 if job.is_remote else 0, job.description,
                     tags_json, job.salary_min, job.salary_max,
-                    job.salary_currency, job.posted_at, job.id,
+                    job.salary_currency, job.posted_at, job.job_type,
+                    job.duration, job.stipend_or_salary, job.id,
                 ))
                 conn.commit()
                 return False
 
     def upsert_jobs(self, jobs: List[Job]) -> Tuple[int, int]:
-        """Batch upsert a list of jobs.
-
-        Args:
-            jobs: List of Job instances.
-
-        Returns:
-            Tuple of (newly_inserted_count, updated_count).
-        """
+        """Batch upsert a list of jobs."""
         inserted = 0
         updated = 0
         for job in jobs:
@@ -141,8 +166,12 @@ class JobDatabase:
         status: Optional[str] = None,
         limit: Optional[int] = None,
         source: Optional[str] = None,
+        min_score: Optional[int] = None,
+        min_match_score: Optional[int] = None,
+        unemailed_only: bool = False,
     ) -> List[Job]:
-        """Retrieve jobs matching filters, ordered by creation date desc."""
+        """Retrieve jobs matching filters, ordered by match_score desc, creation date desc."""
+        effective_min_score = min_match_score if min_match_score is not None else min_score
         query = "SELECT * FROM jobs WHERE 1=1"
         params: List[object] = []
 
@@ -152,8 +181,13 @@ class JobDatabase:
         if source:
             query += " AND source = ?"
             params.append(source)
+        if effective_min_score is not None:
+            query += " AND match_score >= ?"
+            params.append(effective_min_score)
+        if unemailed_only:
+            query += " AND emailed_at IS NULL"
 
-        query += " ORDER BY created_at DESC"
+        query += " ORDER BY COALESCE(match_score, 0) DESC, created_at DESC"
         if limit:
             query += f" LIMIT {int(limit)}"
 
@@ -170,6 +204,49 @@ class JobDatabase:
             cursor.execute("UPDATE jobs SET status = ? WHERE id = ?", (new_status, job_id))
             conn.commit()
             return cursor.rowcount > 0
+
+    def update_scores(
+        self,
+        job_id: str,
+        match_score: Optional[float] = None,
+        ats_score: Optional[float] = None,
+        is_top_pick: Optional[bool] = None,
+    ) -> bool:
+        """Update match and ATS scores for a job."""
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                UPDATE jobs SET
+                    match_score = COALESCE(?, match_score),
+                    ats_score = COALESCE(?, ats_score),
+                    is_top_pick = CASE WHEN ? IS NOT NULL THEN ? ELSE is_top_pick END
+                WHERE id = ?
+            """, (
+                int(round(match_score)) if match_score is not None else None,
+                int(round(ats_score)) if ats_score is not None else None,
+                1 if is_top_pick is not None else None,
+                1 if is_top_pick else 0,
+                job_id,
+            ))
+            conn.commit()
+            return cursor.rowcount > 0
+
+    def mark_as_emailed(self, job_ids: List[str]) -> int:
+        """Mark jobs as emailed with timestamp and status to ensure they are never emailed twice."""
+        if not job_ids:
+            return 0
+        now_iso = datetime.now(timezone.utc).isoformat()
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            placeholders = ",".join("?" for _ in job_ids)
+            cursor.execute(f"""
+                UPDATE jobs SET
+                    emailed_at = ?,
+                    status = CASE WHEN status = 'found' OR status = 'shortlisted' THEN 'emailed' ELSE status END
+                WHERE id IN ({placeholders})
+            """, [now_iso] + job_ids)
+            conn.commit()
+            return cursor.rowcount
 
     def count_by_status(self) -> Dict[str, int]:
         """Count jobs grouped by status."""
@@ -201,6 +278,7 @@ class JobDatabase:
             except Exception:
                 tags = []
 
+        keys = row.keys()
         return Job(
             id=row["id"],
             title=row["title"],
@@ -216,5 +294,12 @@ class JobDatabase:
             salary_currency=row["salary_currency"],
             posted_at=row["posted_at"],
             status=row["status"],
+            job_type=row["job_type"] if "job_type" in keys and row["job_type"] else "internship",
+            duration=row["duration"] if "duration" in keys else None,
+            stipend_or_salary=row["stipend_or_salary"] if "stipend_or_salary" in keys else None,
+            match_score=row["match_score"] if "match_score" in keys else None,
+            ats_score=row["ats_score"] if "ats_score" in keys else None,
+            is_top_pick=bool(row["is_top_pick"]) if "is_top_pick" in keys and row["is_top_pick"] else False,
+            emailed_at=row["emailed_at"] if "emailed_at" in keys else None,
             created_at=row["created_at"],
         )

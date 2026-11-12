@@ -35,6 +35,17 @@ def sanitize_slug(text: str) -> str:
     return slug[:40] if len(slug) > 40 else slug
 
 
+def build_resume_filename(candidate_name: str, role_title: str, company: str, ext: str = "pdf") -> str:
+    """Format resume filename according to Name_Role_Company convention.
+
+    Example: RuchithMacha_FullStackDeveloper_Fluence.pdf
+    """
+    clean_name = re.sub(r"[^a-zA-Z0-9]", "", candidate_name.title()) or "Candidate"
+    clean_role = re.sub(r"[^a-zA-Z0-9]", "", role_title.title()) or "Role"
+    clean_company = re.sub(r"[^a-zA-Z0-9]", "", company.title()) or "Company"
+    return f"{clean_name}_{clean_role}_{clean_company}.{ext}"
+
+
 class ApplicationTailorPipeline:
     """Orchestrates end-to-end resume tailoring, cover letter drafting, and multi-format rendering."""
 
@@ -88,13 +99,24 @@ class ApplicationTailorPipeline:
             profile=profile, job=job, use_llm=use_llm
         )
 
-        # 4. Render Resume Files
+        # 4. Render Resume Files (Named per Section 7: Name_Role_Company.pdf)
+        candidate_name = profile.personal_info.name or "Candidate"
+        std_resume_filename = build_resume_filename(candidate_name, job.title, job.company, ext="pdf")
+        std_docx_filename = build_resume_filename(candidate_name, job.title, job.company, ext="docx")
+
+        resume_named_pdf_path = target_dir / std_resume_filename
         resume_pdf_path = target_dir / "tailored_resume.pdf"
         resume_docx_path = target_dir / "tailored_resume.docx"
+        resume_named_docx_path = target_dir / std_docx_filename
         resume_html_path = target_dir / "tailored_resume.html"
 
+        # Render primary named PDF and copy to tailored_resume.pdf for compatibility
+        render_pdf(tailored_resume, output_path=str(resume_named_pdf_path))
         render_pdf(tailored_resume, output_path=str(resume_pdf_path))
+
+        render_docx(tailored_resume, output_path=str(resume_named_docx_path))
         render_docx(tailored_resume, output_path=str(resume_docx_path))
+
         html_content = render_html(tailored_resume)
         resume_html_path.write_text(html_content, encoding="utf-8")
 
@@ -108,15 +130,26 @@ class ApplicationTailorPipeline:
         render_cover_letter_text(cover_letter, output_path=str(cl_txt_path))
 
         # 6. Build and Save Application Manifest
+        ats_score = metadata.get("ats_score", 0.0)
         manifest = {
             "job_id": job.id,
             "company": job.company,
             "title": job.title,
+            "candidate_name": candidate_name,
+            "resume_filename": std_resume_filename,
+            "ats_score": ats_score,
+            "ats_metrics": {
+                "keyword_score": metadata.get("keyword_score", 0.0),
+                "format_score": metadata.get("format_score", 0.0),
+                "missing_keywords": metadata.get("missing_keywords", []),
+                "skills_worth_learning": metadata.get("skills_worth_learning", []),
+            },
             "tailored_at": datetime.now(timezone.utc).isoformat(),
             "output_directory": str(target_dir.resolve()),
             "matched_skills": metadata["matched_skills"],
             "featured_projects": metadata["selected_projects"],
             "files": {
+                "named_resume_pdf": str(resume_named_pdf_path.resolve()),
                 "tailored_resume_pdf": str(resume_pdf_path.resolve()),
                 "tailored_resume_docx": str(resume_docx_path.resolve()),
                 "tailored_resume_html": str(resume_html_path.resolve()),
@@ -130,10 +163,11 @@ class ApplicationTailorPipeline:
         manifest_path = target_dir / "manifest.json"
         manifest_path.write_text(json.dumps(manifest, indent=2), encoding="utf-8")
 
-        # 7. Update Job Status in SQLite
+        # 7. Update Job Status and ATS Score in SQLite
         if db:
             db.update_status(job.id, "tailored")
-            logger.info(f"Updated status for job {job.id} to 'tailored' in database.")
+            db.update_scores(job.id, ats_score=ats_score)
+            logger.info(f"Updated status for job {job.id} to 'tailored' with ATS score {ats_score}%.")
 
         return {
             "status": "success",
@@ -141,6 +175,8 @@ class ApplicationTailorPipeline:
             "company": job.company,
             "title": job.title,
             "target_dir": target_dir,
+            "resume_pdf_path": resume_named_pdf_path,
+            "ats_score": ats_score,
             "manifest": manifest,
             "matched_skills": metadata["matched_skills"],
             "featured_projects": metadata["selected_projects"],

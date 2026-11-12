@@ -8,8 +8,8 @@ echo.
 echo This script registers a daily Windows Scheduled Task that will
 echo automatically launch your Job Application Agent every morning.
 echo.
-set /p SCHEDULE_TIME="Enter daily run time in 24-hr HH:MM format (default 09:00): "
-if "%SCHEDULE_TIME%"=="" set SCHEDULE_TIME=09:00
+set /p SCHEDULE_TIME="Enter daily run time in 24-hr HH:MM format (default 06:00 IST): "
+if "%SCHEDULE_TIME%"=="" set SCHEDULE_TIME=06:00
 
 echo.
 echo Registering Windows Scheduled Task 'JobApplicationAgent' for %SCHEDULE_TIME% daily...

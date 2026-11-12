@@ -1,4 +1,4 @@
-"""High-level job matching pipeline coordinating vector shortlisting and Claude scoring."""
+"""High-level job matching pipeline coordinating vector shortlisting and student fit scoring."""
 
 import logging
 from typing import List, Optional
@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 
 class MatchPipeline:
-    """End-to-end matching pipeline: Vector shortlist -> Claude scoring -> Threshold filtering -> SQLite update."""
+    """End-to-end matching pipeline: Vector shortlist -> Scoring -> Threshold filtering -> SQLite update."""
 
     def __init__(
         self,
@@ -32,9 +32,9 @@ class MatchPipeline:
         self,
         profile: MasterProfile,
         jobs: List[Job],
-        top_n: int = 15,
-        threshold: int = 65,
-        use_llm: bool = True,
+        top_n: int = 20,
+        threshold: int = 70,
+        use_llm: bool = False,
         db: Optional[JobDatabase] = None,
     ) -> List[MatchScore]:
         """Execute full matching pipeline.
@@ -43,9 +43,9 @@ class MatchPipeline:
             profile: Candidate MasterProfile ground truth.
             jobs: Pool of candidate Job postings.
             top_n: Number of candidates to shortlist via vector similarity.
-            threshold: Minimum score (0-100) to qualify as a match.
+            threshold: Minimum score (0-100) to qualify as a match (default: 70 per requirements).
             use_llm: Whether to invoke Claude for scoring.
-            db: Optional JobDatabase to persist 'shortlisted' state.
+            db: Optional JobDatabase to persist scores and 'shortlisted' state.
 
         Returns:
             Ranked list of MatchScore objects meeting the score threshold.
@@ -60,7 +60,7 @@ class MatchPipeline:
         # 2. Score shortlisted jobs
         scored: List[MatchScore] = []
         for job, sim in shortlisted:
-            score = self.scorer.score_job(
+            score = self.scorer.score(
                 job=job,
                 similarity=sim,
                 profile=profile,
@@ -71,17 +71,25 @@ class MatchPipeline:
         # 3. Sort by score descending
         scored.sort(key=lambda s: s.llm_score, reverse=True)
 
-        # 4. Filter by threshold
+        # 4. Filter by threshold (default: 70+)
         qualified = [s for s in scored if s.llm_score >= threshold]
 
-        # 5. Update SQLite database status to 'shortlisted' for qualified jobs
+        # 5. Update SQLite database with scores and status for qualified jobs
         if db:
+            for s in scored:
+                db.update_scores(
+                    job_id=s.job_id,
+                    match_score=s.llm_score,
+                    ats_score=s.ats_score,
+                    is_top_pick=s.is_top_pick,
+                )
             for q in qualified:
                 db.update_status(q.job_id, "shortlisted")
-            logger.info("Updated %d jobs to 'shortlisted' status in database.", len(qualified))
+
+            logger.info("Updated %d qualified jobs to 'shortlisted' status in database.", len(qualified))
 
         logger.info(
-            "Matching complete: %d shortlisted, %d qualified above threshold %d.",
+            "Matching complete: %d evaluated, %d qualified above threshold %d.",
             len(scored),
             len(qualified),
             threshold,

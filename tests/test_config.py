@@ -10,7 +10,7 @@ def test_default_config_fallback(tmp_path: Path) -> None:
     cfg = load_config(str(non_existent))
     assert isinstance(cfg, AppConfig)
     assert isinstance(cfg.preferences, PreferencesConfig)
-    assert "Backend Engineer" in cfg.preferences.target_roles
+    assert any("Backend" in r or "Intern" in r for r in cfg.preferences.target_roles)
 
 
 def test_load_config_valid(tmp_path: Path) -> None:

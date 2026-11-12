@@ -109,11 +109,13 @@ class ProfileBuilder:
         linkedin_data: Optional[LinkedInExportData],
     ) -> PersonalInfo:
         """Synthesize contact and profile links from both sources."""
-        name = "Candidate"
+        from agent.config import load_config
+        cfg = load_config()
+        name = cfg.student_profile.name or "Ruchith Macha"
         headline = None
-        location = None
-        email = None
-        phone = None
+        location = "Hyderabad, Telangana, India"
+        email = cfg.student_profile.email or "macharuchith1@gmail.com"
+        phone = "6305239230"
         links: Dict[str, str] = {}
 
         if linkedin_data and linkedin_data.profile:
@@ -121,17 +123,19 @@ class ProfileBuilder:
             first = lp.first_name or ""
             last = lp.last_name or ""
             full = f"{first} {last}".strip()
-            if full:
+            if full and full != "Candidate":
                 name = full
-            headline = lp.headline
-            location = lp.geo_location
-            email = lp.email
-            phone = lp.phone
+            if lp.headline:
+                headline = lp.headline
+            if lp.geo_location:
+                location = lp.geo_location
+            if lp.email:
+                email = lp.email
+            if lp.phone:
+                phone = lp.phone
 
         if github_data:
             links["github"] = f"https://github.com/{github_data.username}"
-            if name == "Candidate":
-                name = github_data.username
 
         return PersonalInfo(
             name=name,

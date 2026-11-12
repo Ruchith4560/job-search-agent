@@ -1,6 +1,7 @@
 """Profile management and normalization module."""
 
 from agent.profile.builder import ProfileBuilder
+from agent.profile.sync import ProfileSyncManager
 from agent.profile.schema import (
     AchievementItem,
     CertificationItem,

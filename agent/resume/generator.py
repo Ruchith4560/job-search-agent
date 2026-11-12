@@ -4,6 +4,7 @@ import logging
 from typing import Dict, List, Optional
 from agent.llm import ClaudeClient, LLMError
 from agent.profile.schema import MasterProfile, ProjectItem
+from agent.resume.ats_checker import ATSChecker
 from agent.resume.schema import (
     ResumeData,
     ResumeEducation,
@@ -39,15 +40,18 @@ class ResumeGenerator:
         self,
         claude_client: Optional[ClaudeClient] = None,
         verifier: Optional[ResumeVerifier] = None,
+        ats_checker: Optional[ATSChecker] = None,
     ) -> None:
         """Initialize ResumeGenerator.
 
         Args:
             claude_client: Optional ClaudeClient for polishing achievement bullets.
             verifier: Optional ResumeVerifier instance (defaults to strict=True).
+            ats_checker: Optional ATSChecker to enforce ATS score > 85%.
         """
         self.claude_client = claude_client
         self.verifier = verifier or ResumeVerifier(strict=True)
+        self.ats_checker = ats_checker or ATSChecker(min_passing_score=85)
 
     def generate(
         self,
@@ -159,7 +163,15 @@ class ResumeGenerator:
             certifications=certifications,
         )
 
-        # 8. Strict Verification Pass (Enforce Hard Rule 2)
+        # 8. Strict Verification Pass (Enforce Hard Rule 2: Zero Hallucination)
         self.verifier.verify(resume_data, profile)
+
+        # 9. Guaranteed ATS Optimization Pass (>85% ATS Score)
+        resume_data, ats_res = self.ats_checker.optimize_and_verify(
+            resume=resume_data,
+            job=None,
+            profile=profile,
+        )
+        logger.info(f"Master resume ATS check passed: {ats_res.overall_score}% (Target >85% met).")
 
         return resume_data

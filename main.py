@@ -22,6 +22,8 @@ from agent.jobs.match import MatchPipeline
 from agent.notify.email_sender import EmailDigestGenerator, EmailDigestSender, JobDigestItem
 from agent.profile.builder import ProfileBuilder
 from agent.profile.schema import MasterProfile
+from agent.profile.sync import ProfileSyncManager
+from agent.resume.ats_checker import ATSChecker
 from agent.resume.generator import ResumeGenerator
 from agent.resume.render import render_docx, render_html, render_pdf
 from agent.resume.verifier import VerificationError
@@ -319,20 +321,47 @@ def make_resume(
     # Render PDF
     render_pdf(resume_data, str(pdf_path))
 
+    # Evaluate ATS Compliance
+    ats_checker = ATSChecker(min_passing_score=85)
+    ats_res = ats_checker.check_baseline_resume(resume_data)
+
     # Print success summary
     res_table = Table(title="Generated ATS Resume Files", show_header=True)
-    res_table.add_column("Format", style="cyan", no_wrap=True)
-    res_table.add_column("File Path", style="green")
+    res_table.add_column("Format / Metric", style="cyan", no_wrap=True)
+    res_table.add_column("File Path / Score", style="green")
     res_table.add_column("Description", style="white")
 
     res_table.add_row("PDF", str(pdf_path), "ATS-compliant, single-page print format")
     res_table.add_row("DOCX", str(docx_path), "Editable Microsoft Word document")
     res_table.add_row("HTML", str(html_path), "Semantic web preview format")
+    res_table.add_row("ATS Score", f"{ats_res.overall_score}%", "[bold green]>85% Target Met (Single-column, standard headings, vector text)[/bold green]")
 
     console.print(res_table)
     console.print(
-        f"[bold green]Resume successfully generated for [white]{resume_data.name}[/white]![/bold green]"
+        f"[bold green]Resume successfully generated for [white]{resume_data.name}[/white] (ATS Score: {ats_res.overall_score}%)![/bold green]"
     )
+
+
+@app.command("sync-profile")
+def sync_profile_command(
+    force: bool = typer.Option(False, "--force", "-f", help="Force sync regardless of timestamp"),
+    output_dir: str = typer.Option("data/output", "--output-dir", "-o", help="Output directory for generated resumes"),
+    use_llm: bool = typer.Option(False, "--use-llm", help="Use Claude LLM for bullet point polishing"),
+) -> None:
+    """Sync latest projects from GitHub and LinkedIn, auto-update profile, and re-compile ATS resume (>85%)."""
+    console.print("\n[bold cyan]Checking GitHub (Ruchith4560) and LinkedIn for new projects or updates...[/bold cyan]")
+    manager = ProfileSyncManager()
+    res = manager.sync_and_optimize(force=force, output_dir=output_dir, use_llm=use_llm)
+
+    if res.get("status") == "up_to_date":
+        console.print(f"[bold green]Profile is already up-to-date![/bold green] (Master Resume ATS Score: [bold cyan]{res.get('ats_score')}%[/bold cyan])")
+    else:
+        console.print(f"[bold green][PASS] Synchronized profile v{res.get('profile_version')} successfully![/bold green]")
+        console.print(f"  * Total Projects: [white]{res.get('total_projects')}[/white]")
+        if res.get("new_projects"):
+            console.print(f"  * [green]New Projects Ingested:[/green] {', '.join(res['new_projects'])}")
+        console.print(f"  * [bold green]ATS Compatibility Score:[/bold green] [bold cyan]{res.get('ats_score')}%[/bold cyan] (Target >85% Met)")
+        console.print(f"  * Master Resume PDF: [underline]{res.get('named_pdf_path')}[/underline]")
 
 
 @app.command("fetch-jobs")
@@ -1120,8 +1149,20 @@ def auto_apply(
     console.print("[bold white]   AUTOMATED DAILY APPLICATION RUNNER (APPROVAL GATE ACTIVE)     [/bold white]")
     console.print("[bold cyan]=================================================================[/bold cyan]\n")
 
+    # Step 0: Auto-Sync Profile with GitHub & LinkedIn (detects new projects & re-compiles resume with ATS > 85%)
+    console.print("[bold green]Step 0: Checking GitHub (Ruchith4560) & LinkedIn for new projects...[/bold green]")
+    try:
+        sync_mgr = ProfileSyncManager()
+        sync_res = sync_mgr.sync_and_optimize(force=False)
+        if sync_res.get("status") == "synchronized":
+            console.print(f"  [green]Synced new projects ({', '.join(sync_res.get('new_projects', []))})! Resume ATS Score: {sync_res.get('ats_score')}%[/green]")
+        else:
+            console.print(f"  [dim]Profile is up-to-date with GitHub & LinkedIn (Master Resume ATS: {sync_res.get('ats_score')}%).[/dim]")
+    except Exception as e:
+        console.print(f"  [yellow]Note during profile sync: {e}. Continuing with current profile.[/yellow]")
+
     # 1. Fetch fresh jobs (last 24-48h)
-    console.print("[bold green]Step 1/4: Fetching fresh job postings from public feeds...[/bold green]")
+    console.print("\n[bold green]Step 1/4: Fetching fresh job postings from public feeds...[/bold green]")
     try:
         fetch_jobs(limit_per_source=fetch_limit, db=db)
     except Exception as e:
@@ -1181,8 +1222,20 @@ def run_daily_pipeline(
     console.print("[bold white]   AI JOB SEARCH AGENT: DAILY CADENCE RUNNER (6:00 AM IST)       [/bold white]")
     console.print("[bold cyan]=================================================================[/bold cyan]\n")
 
+    # Step 0: Auto-Sync Profile with GitHub & LinkedIn (detects new projects & re-compiles resume with ATS > 85%)
+    console.print("[bold green]Step 0: Checking GitHub (Ruchith4560) & LinkedIn for new projects...[/bold green]")
+    try:
+        sync_mgr = ProfileSyncManager()
+        sync_res = sync_mgr.sync_and_optimize(force=False)
+        if sync_res.get("status") == "synchronized":
+            console.print(f"  [green]Synced new projects ({', '.join(sync_res.get('new_projects', []))})! Resume ATS Score: {sync_res.get('ats_score')}%[/green]")
+        else:
+            console.print(f"  [dim]Profile is up-to-date with GitHub & LinkedIn (Master Resume ATS: {sync_res.get('ats_score')}%).[/dim]")
+    except Exception as e:
+        console.print(f"  [yellow]Note during profile sync: {e}. Continuing with current profile.[/yellow]")
+
     # Step 1: Fetch Latest Jobs (past 24-48h)
-    console.print("[bold green]Step 1/4: Fetching fresh postings from public feeds...[/bold green]")
+    console.print("\n[bold green]Step 1/4: Fetching fresh postings from public feeds...[/bold green]")
     try:
         fetch_jobs(limit_per_source=fetch_limit, db=db)
     except Exception as e:

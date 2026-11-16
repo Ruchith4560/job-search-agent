@@ -100,6 +100,7 @@ class Job(BaseModel):
     ats_score: Optional[int] = None
     is_top_pick: bool = False
     emailed_at: Optional[str] = None
+    applied_at: Optional[str] = None
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
     @classmethod

@@ -71,6 +71,7 @@ class JobDatabase:
                 ("ats_score", "INTEGER"),
                 ("is_top_pick", "INTEGER DEFAULT 0"),
                 ("emailed_at", "TEXT"),
+                ("applied_at", "TEXT"),
             ]
             for col_name, col_def in columns_to_add:
                 try:
@@ -201,7 +202,14 @@ class JobDatabase:
         """Update the workflow status for a specific job."""
         with self._get_connection() as conn:
             cursor = conn.cursor()
-            cursor.execute("UPDATE jobs SET status = ? WHERE id = ?", (new_status, job_id))
+            if new_status.lower() == "applied":
+                now_iso = datetime.now(timezone.utc).isoformat()
+                cursor.execute(
+                    "UPDATE jobs SET status = ?, applied_at = COALESCE(applied_at, ?) WHERE id = ?",
+                    (new_status, now_iso, job_id),
+                )
+            else:
+                cursor.execute("UPDATE jobs SET status = ? WHERE id = ?", (new_status, job_id))
             conn.commit()
             return cursor.rowcount > 0
 
@@ -301,5 +309,6 @@ class JobDatabase:
             ats_score=row["ats_score"] if "ats_score" in keys else None,
             is_top_pick=bool(row["is_top_pick"]) if "is_top_pick" in keys and row["is_top_pick"] else False,
             emailed_at=row["emailed_at"] if "emailed_at" in keys else None,
+            applied_at=row["applied_at"] if "applied_at" in keys else None,
             created_at=row["created_at"],
         )

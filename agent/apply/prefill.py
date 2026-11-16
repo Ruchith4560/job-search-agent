@@ -9,6 +9,7 @@ from typing import Any, Dict, List, Optional, Tuple
 from playwright.sync_api import Browser, BrowserContext, Page, sync_playwright
 
 from agent.apply.approval import ApprovalDecision, ApprovalGate, FieldDiff, PreFillSummary
+from agent.apply.inquiries import CustomAnswersStore, PendingInquiryManager
 from agent.jobs.schema import Job
 from agent.profile.schema import MasterProfile
 
@@ -51,15 +52,21 @@ class FormPreFiller:
         self,
         approval_gate: Optional[ApprovalGate] = None,
         headless: bool = False,
+        answers_store: Optional[CustomAnswersStore] = None,
+        inquiry_mgr: Optional[PendingInquiryManager] = None,
     ) -> None:
         """Initialize FormPreFiller.
 
         Args:
             approval_gate: ApprovalGate instance (defaults to interactive=True).
             headless: Whether to run the browser headlessly.
+            answers_store: Optional CustomAnswersStore for learned answers.
+            inquiry_mgr: Optional PendingInquiryManager for recording questions.
         """
         self.approval_gate = approval_gate or ApprovalGate(interactive=True)
         self.headless = headless
+        self.answers_store = answers_store or CustomAnswersStore()
+        self.inquiry_mgr = inquiry_mgr or PendingInquiryManager()
 
     def prefill_and_submit(
         self,
@@ -169,7 +176,49 @@ class FormPreFiller:
                     if github_url:
                         summary.filled_fields.append(FieldDiff(field_name="GitHub", value=github_url))
 
-            # 4. Mandatory Approval Gate (Hard Rule 3)
+            # 4. Check for Unanswered Questions & Pending Inquiries
+            if summary.unanswered_questions:
+                logger.info(
+                    f"Application for {job.company} requires {len(summary.unanswered_questions)} additional question(s). "
+                    "Creating inquiry and notifying candidate via email."
+                )
+                self.inquiry_mgr.create_or_update(
+                    job_id=job.id,
+                    company=job.company,
+                    title=job.title,
+                    portal_url=job.url,
+                    questions=summary.unanswered_questions,
+                )
+                try:
+                    from agent.config import load_config
+                    from agent.notify.email_sender import EmailDigestSender
+
+                    cfg = load_config().email
+                    sender = EmailDigestSender(config=cfg)
+                    sender.dispatch_inquiry_email(
+                        job=job,
+                        questions=summary.unanswered_questions,
+                        candidate_name=pi.name,
+                    )
+                except Exception as e:
+                    logger.warning(f"Could not dispatch inquiry email ({e})")
+
+                browser.close()
+                return {
+                    "job_id": job.id,
+                    "company": job.company,
+                    "title": job.title,
+                    "url": job.url,
+                    "decision": "needs_info",
+                    "status": "needs_info",
+                    "unanswered_questions": summary.unanswered_questions,
+                    "screenshot_review": summary.screenshot_path,
+                    "filled_fields": [f.model_dump() for f in summary.filled_fields],
+                    "custom_answers": [a.model_dump() for a in summary.custom_answers],
+                    "sensitive_skipped": summary.sensitive_skipped,
+                }
+
+            # 5. Mandatory Approval Gate (Hard Rule 3)
             decision = self.approval_gate.request_approval(
                 summary=summary,
                 auto_decision=auto_decision,
@@ -312,10 +361,10 @@ class FormPreFiller:
         profile: MasterProfile,
         summary: PreFillSummary,
     ) -> None:
-        """Identify sensitive fields to leave for human attention and answer safe custom questions."""
+        """Identify sensitive fields, match learned custom answers, and collect unanswered queries."""
         try:
             inputs = page.locator("input[type='text'], textarea, select").all()
-            for inp in inputs[:15]:
+            for inp in inputs[:25]:
                 try:
                     name_attr = inp.get_attribute("name") or ""
                     id_attr = inp.get_attribute("id") or ""
@@ -328,21 +377,36 @@ class FormPreFiller:
                             label_text = label_elem.first.inner_text()
 
                     full_context = f"{name_attr} {id_attr} {placeholder} {label_text}".strip()
+                    val = ""
+                    try:
+                        val = inp.input_value()
+                    except Exception:
+                        pass
+                    if val:
+                        continue  # Already filled
 
-                    # Check for sensitive topics
-                    if is_sensitive_field(full_context):
-                        field_display = label_text or placeholder or name_attr or "Compliance Question"
-                        if field_display not in summary.sensitive_skipped:
-                            summary.sensitive_skipped.append(field_display)
-                        continue
+                    # 1. Match against known custom answers store
+                    matched_ans = self.answers_store.find_answer(full_context)
+                    if matched_ans:
+                        try:
+                            inp.fill(matched_ans)
+                            summary.custom_answers.append(
+                                FieldDiff(
+                                    field_name=label_text or placeholder or name_attr or "Custom Question",
+                                    value=matched_ans,
+                                    field_type="text",
+                                )
+                            )
+                            continue
+                        except Exception:
+                            pass
 
-                    # Check for technical custom questions (e.g. project / skills experience)
+                    # 2. Check for technical custom questions (e.g. project / skills experience)
                     if any(kw in full_context.lower() for kw in ("experience", "project", "stack", "describe")):
                         if profile.projects:
                             best_proj = profile.projects[0]
                             answer = f"Built {best_proj.name} utilizing {', '.join(best_proj.stack[:4])}."
-                            val = inp.input_value()
-                            if not val:
+                            try:
                                 inp.fill(answer)
                                 summary.custom_answers.append(
                                     FieldDiff(
@@ -351,6 +415,29 @@ class FormPreFiller:
                                         field_type="textarea",
                                     )
                                 )
+                                continue
+                            except Exception:
+                                pass
+
+                    # 3. Check for sensitive questions or required unfilled questions needing candidate input
+                    is_req = False
+                    try:
+                        is_req = inp.get_attribute("required") is not None or inp.get_attribute("aria-required") == "true"
+                    except Exception:
+                        pass
+
+                    if is_sensitive_field(full_context) or is_req:
+                        field_display = label_text or placeholder or name_attr or "Additional Information Required"
+                        if field_display not in summary.sensitive_skipped:
+                            summary.sensitive_skipped.append(field_display)
+
+                        existing_labels = [q.get("label") for q in summary.unanswered_questions]
+                        if field_display not in existing_labels:
+                            summary.unanswered_questions.append({
+                                "id": f"Q{len(summary.unanswered_questions) + 1}",
+                                "label": field_display,
+                                "key": full_context[:40],
+                            })
                 except Exception:
                     continue
         except Exception:

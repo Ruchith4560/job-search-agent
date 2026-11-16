@@ -3,7 +3,7 @@
 from enum import Enum
 import logging
 from pathlib import Path
-from typing import List, Optional
+from typing import Dict, List, Optional
 from pydantic import BaseModel, Field
 from rich.console import Console
 from rich.panel import Panel
@@ -38,6 +38,7 @@ class PreFillSummary(BaseModel):
     filled_fields: List[FieldDiff] = Field(default_factory=list)
     custom_answers: List[FieldDiff] = Field(default_factory=list)
     sensitive_skipped: List[str] = Field(default_factory=list)
+    unanswered_questions: List[Dict[str, str]] = Field(default_factory=list)
     screenshot_path: Optional[str] = None
 
 

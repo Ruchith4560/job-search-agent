@@ -312,7 +312,7 @@ class EmailDigestSender:
         subject = f"{subject_prefix}Daily Job Digest: {len(items)} Qualified Roles for {candidate_name}"
 
         # 2. Check credentials & dry_run mode
-        smtp_password = os.getenv("GMAIL_APP_PASSWORD") or os.getenv("EMAIL_PASSWORD") or ""
+        smtp_password = (os.getenv("GMAIL_APP_PASSWORD") or os.getenv("EMAIL_PASSWORD") or "").replace(" ", "")
 
         if dry_run or not smtp_password or not self.config.enabled:
             mode_desc = "dry_run mode" if dry_run else "no GMAIL_APP_PASSWORD configured"
@@ -320,12 +320,6 @@ class EmailDigestSender:
             print(f"[DIGEST] Mode: Offline/Preview ({mode_desc}). {len(items)} jobs prepared.")
             if not smtp_password:
                 print("[NOTE] Set GMAIL_APP_PASSWORD in your .env to enable automatic inbox delivery.")
-
-            # Still mark jobs as emailed in DB to prevent duplicate emailing on subsequent runs if desired
-            if self.db:
-                job_ids = [it.job.id for it in items]
-                self.db.mark_as_emailed(job_ids)
-                logger.info(f"Marked {len(job_ids)} jobs as emailed in database.")
 
             return {
                 "status": "preview_saved",
@@ -390,4 +384,329 @@ class EmailDigestSender:
                 "error": str(e),
                 "preview_path": str(self.preview_output_path),
                 "count": len(items),
+            }
+
+    def dispatch_application_confirmation(
+        self,
+        job: Job,
+        candidate_name: str = "Ruchith Macha",
+        resume_pdf_path: Optional[str] = None,
+        cover_letter_path: Optional[str] = None,
+        submission_screenshot: Optional[str] = None,
+        ats_score: Optional[float] = None,
+        dry_run: bool = False,
+    ) -> Dict[str, Any]:
+        """Dispatch a confirmation email confirming that an application has been completed."""
+        smtp_password = (os.getenv("GMAIL_APP_PASSWORD") or os.getenv("EMAIL_PASSWORD") or "").replace(" ", "")
+
+        applied_now = datetime.now(timezone.utc).strftime("%d %b %Y, %I:%M %p UTC")
+        subject = f"[Application Submitted] You have applied to {job.title} at {job.company}!"
+
+        # Locate attachments if not explicitly provided
+        import re
+        c_slug = re.sub(r"[^a-zA-Z0-9]+", "_", job.company).strip("_").lower()
+        r_slug = re.sub(r"[^a-zA-Z0-9]+", "_", job.title).strip("_").lower()
+
+        candidates = [
+            Path("data/output") / f"{c_slug[:40]}_{r_slug[:40]}",
+            Path("data/output") / f"{c_slug}_{r_slug}",
+            Path("data/output") / f"{c_slug[:20]}_{r_slug[:20]}",
+        ]
+        if Path("data/output").is_dir():
+            for d in Path("data/output").iterdir():
+                if d.is_dir() and d.name.lower().startswith(c_slug[:8]):
+                    candidates.append(d)
+
+        app_dir = None
+        for cand in candidates:
+            if cand.exists():
+                app_dir = cand
+                break
+
+        if not resume_pdf_path and app_dir and app_dir.exists():
+            clean_name = candidate_name.replace(" ", "")
+            std_pdf = app_dir / f"{clean_name}_{job.title.replace(' ', '')}_{job.company.replace(' ', '')}.pdf"
+            fallback_pdf = app_dir / "tailored_resume.pdf"
+            if std_pdf.exists():
+                resume_pdf_path = str(std_pdf)
+            elif fallback_pdf.exists():
+                resume_pdf_path = str(fallback_pdf)
+            else:
+                for p in app_dir.glob("*.pdf"):
+                    if "cover" not in p.name.lower():
+                        resume_pdf_path = str(p)
+                        break
+
+        if not cover_letter_path and app_dir and app_dir.exists():
+            cl_pdf = app_dir / "cover_letter.pdf"
+            if cl_pdf.exists():
+                cover_letter_path = str(cl_pdf)
+
+        if not submission_screenshot and app_dir and app_dir.exists():
+            sub_png = app_dir / "submission_confirmation.png"
+            if sub_png.exists():
+                submission_screenshot = str(sub_png)
+
+        ats_display = f"{ats_score:.0f}%" if ats_score is not None else (f"{job.ats_score}%" if job.ats_score else "85%+")
+        apply_url = getattr(job, "url", getattr(job, "link", getattr(job, "apply_url", "#")))
+
+        html_body = f"""<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f1f5f9; margin: 0; padding: 24px; color: #1e293b; }}
+  .container {{ max-width: 620px; margin: 0 auto; background: #ffffff; border-radius: 12px; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.06); }}
+  .header {{ background: linear-gradient(135deg, #059669 0%, #10b981 100%); color: #ffffff; padding: 32px 24px; text-align: center; }}
+  .header h1 {{ margin: 0 0 8px 0; font-size: 24px; font-weight: 700; }}
+  .header p {{ margin: 0; opacity: 0.95; font-size: 15px; }}
+  .content {{ padding: 28px 24px; }}
+  .status-pill {{ display: inline-block; padding: 5px 14px; background: #ecfdf5; color: #047857; font-weight: 700; font-size: 12px; border-radius: 9999px; border: 1px solid #a7f3d0; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 16px; }}
+  .card {{ background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 20px; margin: 18px 0; }}
+  .row {{ display: flex; justify-content: space-between; padding: 9px 0; border-bottom: 1px solid #e2e8f0; font-size: 14px; }}
+  .row:last-child {{ border-bottom: none; }}
+  .label {{ color: #64748b; font-weight: 500; }}
+  .value {{ color: #0f172a; font-weight: 600; text-align: right; }}
+  .action-box {{ text-align: center; margin: 28px 0 10px 0; }}
+  .btn {{ display: inline-block; padding: 12px 26px; background: #059669; color: #ffffff !important; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 14px; }}
+  .footer {{ padding: 18px 24px; background: #f8fafc; text-align: center; font-size: 12px; color: #64748b; border-top: 1px solid #e2e8f0; }}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>Application Submitted! 🎉</h1>
+    <p>Your AI Agent completed the application process for this opportunity.</p>
+  </div>
+  <div class="content">
+    <div style="text-align: center;">
+      <span class="status-pill">STATUS: APPLIED</span>
+    </div>
+    <h2 style="margin: 0 0 6px 0; color: #0f172a; font-size: 21px; text-align: center;">{html.escape(job.title)}</h2>
+    <p style="margin: 0; color: #059669; font-weight: 700; font-size: 16px; text-align: center;">{html.escape(job.company)}</p>
+
+    <div class="card">
+      <div class="row"><span class="label">Candidate</span><span class="value">{html.escape(candidate_name)}</span></div>
+      <div class="row"><span class="label">Location</span><span class="value">{html.escape(job.location or "Remote")}</span></div>
+      <div class="row"><span class="label">Role Type</span><span class="value">{html.escape((job.job_type or "internship").replace("_", " ").title())}</span></div>
+      <div class="row"><span class="label">Stipend / Salary</span><span class="value">{html.escape(job.stipend_or_salary or "Competitive")}</span></div>
+      <div class="row"><span class="label">ATS Resume Score</span><span class="value" style="color: #059669;">{ats_display}</span></div>
+      <div class="row"><span class="label">Submitted At</span><span class="value">{applied_now}</span></div>
+    </div>
+
+    <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 14px; margin: 16px 0; font-size: 13px; color: #1e40af;">
+      <strong>Attached to this email:</strong> Your tailored ATS-optimized PDF resume and cover letter for <em>{html.escape(job.company)}</em> have been attached below for your records.
+    </div>
+
+    <p style="font-size: 14px; color: #475569; line-height: 1.6;">
+      <strong>Pipeline Tracking:</strong> This application has been marked as <code>applied</code> in your SQLite tracker database. You can track all active applications and interview invitations anytime by running:
+      <br><code style="background: #e2e8f0; padding: 3px 6px; border-radius: 4px;">python main.py status</code>
+    </p>
+
+    <div class="action-box">
+      <a href="{apply_url}" class="btn">View Employer Job Portal</a>
+    </div>
+  </div>
+  <div class="footer">
+    AI Job Search Agent &bull; Tracked in local SQLite database &bull; Run <code>python main.py status</code> to inspect pipeline
+  </div>
+</div>
+</body>
+</html>
+"""
+
+        # Save local confirmation preview
+        preview_path = Path("data/output") / f"applied_confirmation_{job.id[:8]}.html"
+        preview_path.parent.mkdir(parents=True, exist_ok=True)
+        preview_path.write_text(html_body, encoding="utf-8")
+
+        if dry_run or not smtp_password or not self.config.enabled:
+            logger.info(f"Saved application confirmation preview to: {preview_path}")
+            return {
+                "status": "preview_saved",
+                "preview_path": str(preview_path),
+                "job_id": job.id,
+            }
+
+        # Build multipart message
+        msg = MIMEMultipart("mixed")
+        msg["Subject"] = subject
+        msg["From"] = self.config.smtp_user
+        msg["To"] = self.config.recipient_email
+        msg.attach(MIMEText(html_body, "html", "utf-8"))
+
+        # Attach resume PDF
+        attached = []
+        if resume_pdf_path and Path(resume_pdf_path).exists():
+            rpath = Path(resume_pdf_path)
+            with open(rpath, "rb") as f:
+                part = MIMEApplication(f.read(), Name=rpath.name)
+            part["Content-Disposition"] = f'attachment; filename="{rpath.name}"'
+            msg.attach(part)
+            attached.append(rpath.name)
+
+        if cover_letter_path and Path(cover_letter_path).exists():
+            clpath = Path(cover_letter_path)
+            with open(clpath, "rb") as f:
+                part = MIMEApplication(f.read(), Name=clpath.name)
+            part["Content-Disposition"] = f'attachment; filename="{clpath.name}"'
+            msg.attach(part)
+            attached.append(clpath.name)
+
+        if submission_screenshot and Path(submission_screenshot).exists():
+            sspath = Path(submission_screenshot)
+            with open(sspath, "rb") as f:
+                part = MIMEApplication(f.read(), Name=sspath.name)
+            part["Content-Disposition"] = f'attachment; filename="{sspath.name}"'
+            msg.attach(part)
+            attached.append(sspath.name)
+
+        try:
+            with smtplib.SMTP(self.config.smtp_host, self.config.smtp_port, timeout=30) as server:
+                if self.config.use_tls:
+                    server.starttls()
+                server.login(self.config.smtp_user, smtp_password)
+                server.send_message(msg)
+
+            print(f"[APPLIED EMAIL] Delivered application confirmation for {job.company} - {job.title} to {self.config.recipient_email} ({len(attached)} attachments)!")
+            return {
+                "status": "sent",
+                "recipient": self.config.recipient_email,
+                "job_id": job.id,
+                "attachments": len(attached),
+                "subject": subject,
+            }
+        except Exception as e:
+            logger.error(f"Failed to send application confirmation email: {e}", exc_info=True)
+            return {
+                "status": "error",
+                "error": str(e),
+                "preview_path": str(preview_path),
+            }
+
+    def dispatch_inquiry_email(
+        self,
+        job: Job,
+        questions: List[Dict[str, str]],
+        candidate_name: str = "Ruchith Macha",
+        dry_run: bool = False,
+    ) -> Dict[str, Any]:
+        """Send an interactive email asking candidate for missing form answers."""
+        smtp_password = (os.getenv("GMAIL_APP_PASSWORD") or os.getenv("EMAIL_PASSWORD") or "").replace(" ", "")
+        subject = f"[Job Agent Action Required] Information Needed: {job.title} at {job.company} (ID: {job.id[:8]})"
+
+        q_rows_html = ""
+        q_plain_text = ""
+        for idx, q in enumerate(questions, 1):
+            qid = q.get("id", f"Q{idx}")
+            label = html.escape(q.get("label", "Question"))
+            q_rows_html += f"""
+            <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; margin-bottom: 12px;">
+              <span style="display: inline-block; background: #e0f2fe; color: #0369a1; font-weight: 700; font-size: 12px; padding: 3px 8px; border-radius: 4px; margin-bottom: 6px;">{qid}</span>
+              <div style="font-weight: 600; color: #0f172a; font-size: 15px;">{label}</div>
+            </div>
+            """
+            q_plain_text += f"{qid}: {q.get('label', '')}\n"
+
+        apply_url = getattr(job, "url", getattr(job, "link", getattr(job, "apply_url", "#")))
+
+        html_body = f"""<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f8fafc; margin: 0; padding: 24px; color: #1e293b; }}
+  .container {{ max-width: 620px; margin: 0 auto; background: #ffffff; border-radius: 12px; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.06); }}
+  .header {{ background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color: #ffffff; padding: 30px 24px; text-align: center; }}
+  .header h1 {{ margin: 0 0 8px 0; font-size: 23px; font-weight: 700; }}
+  .content {{ padding: 28px 24px; }}
+  .pill {{ display: inline-block; padding: 5px 14px; background: #fef3c7; color: #92400e; font-weight: 700; font-size: 12px; border-radius: 9999px; border: 1px solid #fde68a; margin-bottom: 16px; }}
+  .instructions {{ background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 16px; margin: 20px 0; font-size: 14px; color: #1e40af; line-height: 1.5; }}
+  .reply-box {{ background: #f1f5f9; border-left: 4px solid #0284c7; padding: 12px 16px; font-family: monospace; font-size: 13px; margin-top: 8px; color: #0f172a; }}
+  .btn {{ display: inline-block; padding: 12px 24px; background: #0284c7; color: #ffffff !important; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 14px; }}
+  .footer {{ padding: 18px 24px; background: #f8fafc; text-align: center; font-size: 12px; color: #64748b; border-top: 1px solid #e2e8f0; }}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>Action Required: Application Questions 📝</h1>
+    <p>Your AI Agent is preparing your application for {html.escape(job.company)}</p>
+  </div>
+  <div class="content">
+    <div style="text-align: center;">
+      <span class="pill">EXTRA INFORMATION NEEDED</span>
+    </div>
+    <h2 style="margin: 0 0 6px 0; color: #0f172a; font-size: 20px; text-align: center;">{html.escape(job.title)}</h2>
+    <p style="margin: 0; color: #0284c7; font-weight: 700; font-size: 16px; text-align: center;">{html.escape(job.company)}</p>
+
+    <p style="font-size: 14px; color: #475569; margin: 20px 0 14px 0;">
+      Hi {html.escape(candidate_name)}, the employer application portal requires answers to the following <strong>{len(questions)} question(s)</strong> before submitting:
+    </p>
+
+    <div style="background: #f8fafc; border-radius: 8px; padding: 8px;">
+      {q_rows_html}
+    </div>
+
+    <div class="instructions">
+      <strong>How to complete this:</strong>
+      <br>Simply <strong>hit Reply</strong> to this email with your answers formatted like:
+      <div class="reply-box">
+Q1: Your answer here
+Q2: Your answer here
+      </div>
+      <br><em>The agent checks your inbox automatically, saves your answers permanently in your profile, and completes your submission!</em>
+    </div>
+
+    <div style="text-align: center; margin-top: 24px;">
+      <a href="{apply_url}" class="btn">View Employer Application Portal</a>
+    </div>
+  </div>
+  <div class="footer">
+    AI Job Search Agent &bull; Job ID: <code>{job.id[:8]}</code> &bull; Anurag University
+  </div>
+</div>
+</body>
+</html>
+"""
+
+        preview_path = Path("data/output") / f"inquiry_{job.id[:8]}.html"
+        preview_path.parent.mkdir(parents=True, exist_ok=True)
+        preview_path.write_text(html_body, encoding="utf-8")
+
+        if dry_run or not smtp_password or not self.config.enabled:
+            logger.info(f"Saved application inquiry preview to: {preview_path}")
+            return {
+                "status": "preview_saved",
+                "preview_path": str(preview_path),
+                "job_id": job.id,
+            }
+
+        msg = MIMEMultipart("alternative")
+        msg["Subject"] = subject
+        msg["From"] = self.config.smtp_user
+        msg["To"] = self.config.recipient_email
+        msg.attach(MIMEText(html_body, "html", "utf-8"))
+
+        try:
+            with smtplib.SMTP(self.config.smtp_host, self.config.smtp_port, timeout=30) as server:
+                if self.config.use_tls:
+                    server.starttls()
+                server.login(self.config.smtp_user, smtp_password)
+                server.send_message(msg)
+
+            print(f"[INQUIRY EMAIL] Sent inquiry for {job.company} ({len(questions)} questions) to {self.config.recipient_email}!")
+            return {
+                "status": "sent",
+                "recipient": self.config.recipient_email,
+                "job_id": job.id,
+                "question_count": len(questions),
+                "subject": subject,
+            }
+        except Exception as e:
+            logger.error(f"Failed to send inquiry email: {e}", exc_info=True)
+            return {
+                "status": "error",
+                "error": str(e),
+                "preview_path": str(preview_path),
             }

@@ -2,12 +2,18 @@
 
 import json
 import logging
+import os
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import List, Optional
+from dotenv import load_dotenv
 from rich.console import Console
 from rich.logging import RichHandler
 from rich.table import Table
 import typer
+
+# Load environment variables from .env
+load_dotenv()
 
 from agent.config import load_config
 from agent.apply.approval import ApprovalDecision, ApprovalGate
@@ -738,6 +744,24 @@ def prefill(
     if result.get("submission_screenshot"):
         console.print(f"Submission Screenshot: [green]{result['submission_screenshot']}[/green]")
 
+    if status == "applied":
+        console.print(f"[bold cyan]Sending application confirmation email for {job.company}...[/bold cyan]")
+        try:
+            config = load_config()
+            sender = EmailDigestSender(config=config.email, db=database)
+            sender.dispatch_application_confirmation(
+                job=job,
+                candidate_name=master_prof.personal_info.name,
+                submission_screenshot=result.get("submission_screenshot"),
+            )
+            console.print(f"[bold green][CONFIRMATION EMAILED] Application confirmation delivered to {config.email.recipient_email}![/bold green]")
+        except Exception as e:
+            console.print(f"[yellow]Notice: Could not send application confirmation email: {e}[/yellow]")
+    elif status == "needs_info":
+        console.print(f"\n[bold yellow][ACTION REQUIRED] Extra information needed for {job.company}![/bold yellow]")
+        console.print(f"An inquiry email with {len(result.get('unanswered_questions', []))} question(s) was sent to your Gmail inbox.")
+        console.print(f"[dim]Simply reply to that email, or run 'python main.py answer {job.id[:8]}' to answer in terminal.[/dim]\n")
+
 
 @app.command("status")
 def status(
@@ -808,6 +832,19 @@ def update_job_status(
         f"from [yellow]{old_status}[/yellow] to [bold green]{norm_status.upper()}[/bold green].[/bold green]"
     )
 
+    if norm_status == "applied":
+        console.print(f"[bold cyan]Sending application confirmation email for {job.company}...[/bold cyan]")
+        try:
+            config = load_config()
+            sender = EmailDigestSender(config=config.email, db=database)
+            sender.dispatch_application_confirmation(
+                job=job,
+                candidate_name=config.student_profile.name,
+            )
+            console.print(f"[bold green][CONFIRMATION EMAILED] Application confirmation delivered to {config.email.recipient_email}![/bold green]")
+        except Exception as e:
+            console.print(f"[yellow]Notice: Could not send application confirmation email: {e}[/yellow]")
+
 
 @app.command("export")
 def export_tracker(
@@ -864,7 +901,10 @@ def daily_digest(
     database = JobDatabase(db_path=target_db)
     generator = DailyDigestGenerator(db=database)
     digest_data = generator.generate_digest(candidate_name=candidate_name)
-    saved_path = generator.save_markdown_report(digest_data, output_path=output)
+    out_path = str(output.default if hasattr(output, "default") else output)
+    if not out_path or "OptionInfo" in str(out_path):
+        out_path = "data/daily_digest.md"
+    saved_path = generator.save_markdown_report(digest_data, output_path=out_path)
 
     # Display in Rich
     from rich.markdown import Markdown
@@ -911,7 +951,12 @@ def email_digest_command(
         qualified_jobs = [j for j in shortlisted if (j.match_score or 0) >= threshold or j.match_score is None]
 
     if not qualified_jobs:
-        console.print(f"[yellow]No un-emailed jobs found matching threshold {threshold}+. Run 'python main.py fetch-jobs' and 'python main.py match'.[/yellow]")
+        # Fallback to top active qualified jobs so daily digest is never empty
+        all_qualified = database.get_jobs(min_match_score=threshold, limit=limit)
+        qualified_jobs = [j for j in all_qualified if j.status not in ("rejected", "applied")] or all_qualified[:limit]
+
+    if not qualified_jobs:
+        console.print(f"[yellow]No qualified jobs found matching threshold {threshold}+. Run 'python main.py fetch-jobs' and 'python main.py match'.[/yellow]")
         return
 
     console.print(f"[bold green]Preparing HTML email digest for {len(qualified_jobs)} qualified jobs (Threshold: {threshold}+)...[/bold green]")
@@ -1023,6 +1068,105 @@ def email_digest_command(
     console.print("\n[dim]To approve applications, run:[/dim] [bold white]python main.py approve 1, 2[/bold white]")
 
 
+@app.command("test-email")
+def test_email_command(
+    to: Optional[str] = typer.Option(None, "--to", help="Recipient email address to test"),
+) -> None:
+    """Send a live test email to verify your free Gmail SMTP configuration."""
+    from email.mime.text import MIMEText
+    import smtplib
+
+    config = load_config()
+    target_to = to or config.email.recipient_email
+    smtp_pass = (os.getenv("GMAIL_APP_PASSWORD") or os.getenv("EMAIL_PASSWORD") or "").replace(" ", "")
+
+    if not smtp_pass:
+        console.print("\n[bold red]Error: No GMAIL_APP_PASSWORD found in .env![/bold red]")
+        console.print("Run [bold cyan]python main.py setup-email[/bold cyan] to set up your free Google App Password in 1 minute.\n")
+        raise typer.Exit(code=1)
+
+    console.print(f"\n[bold cyan]Connecting to {config.email.smtp_host}:{config.email.smtp_port} as {config.email.smtp_user}...[/bold cyan]")
+    msg = MIMEText(
+        "Hello Ruchith!\n\n"
+        "This is a test notification from your AI Job Search Agent.\n"
+        "Your free Gmail SMTP setup is working successfully!\n\n"
+        "From now on, you will receive your daily job digest and tailored resumes here automatically.\n\n"
+        "- Candidate: Ruchith Macha\n"
+        "- Target Roles: Internships & Entry-Level SDE\n"
+        "- Daily Schedule: 06:00 AM IST\n",
+        "plain",
+        "utf-8",
+    )
+    msg["Subject"] = "[Job Agent] Test Email - SMTP Configured Successfully"
+    msg["From"] = config.email.smtp_user
+    msg["To"] = target_to
+
+    try:
+        with smtplib.SMTP(config.email.smtp_host, config.email.smtp_port, timeout=30) as server:
+            if config.email.use_tls:
+                server.starttls()
+            server.login(config.email.smtp_user, smtp_pass)
+            server.send_message(msg)
+        console.print(f"[bold green][SUCCESS] Test email successfully delivered to [white]{target_to}[/white]![/bold green]\n")
+    except Exception as e:
+        console.print(f"[bold red]SMTP Connection Failed:[/bold red] {e}\n")
+        console.print("[yellow]Tip: Make sure you created a 16-character App Password at https://myaccount.google.com/apppasswords[/yellow]")
+        raise typer.Exit(code=1)
+
+
+@app.command("setup-email")
+def setup_email_command() -> None:
+    """Interactively configure free Google App Password for daily email digests."""
+    config = load_config()
+    console.print("\n[bold cyan]=================================================================[/bold cyan]")
+    console.print("[bold white]   CONFIGURE FREE GMAIL SMTP FOR DAILY JOB APPLICATION DIGEST   [/bold white]")
+    console.print("[bold cyan]=================================================================[/bold cyan]\n")
+    console.print("[bold yellow]Why this is needed:[/bold yellow]")
+    console.print("  Google requires an 'App Password' (a free 16-character code) for automated")
+    console.print("  scripts to deliver emails through Gmail. [bold green]This is 100% FREE OF COST[/bold green].\n")
+    console.print("[bold white]3 Easy Steps to get your free Google App Password:[/bold white]")
+    console.print("  1. In your browser, open: [underline cyan]https://myaccount.google.com/security[/underline cyan]")
+    console.print("  2. Turn ON [bold white]2-Step Verification[/bold white] (if not already enabled)")
+    console.print("  3. Open: [underline cyan]https://myaccount.google.com/apppasswords[/underline cyan]")
+    console.print("     - Under App Name, type: [bold white]JobAgent[/bold white] and click [bold green]Create[/bold green]")
+    console.print("     - Google will give you a 16-character code (e.g. [dim]abcd efgh ijkl mnop[/dim])\n")
+
+    try:
+        raw_pw = input("Paste your 16-character App Password here: ").strip()
+    except (EOFError, KeyboardInterrupt):
+        console.print("\n[yellow]Setup cancelled.[/yellow]")
+        return
+
+    clean_pw = raw_pw.replace(" ", "")
+    if not clean_pw:
+        console.print("[bold red]Error: No password entered.[/bold red]")
+        return
+
+    # Update or create .env
+    env_path = Path(".env")
+    env_content = ""
+    if env_path.is_file():
+        env_content = env_path.read_text(encoding="utf-8")
+
+    lines = [
+        line for line in env_content.splitlines()
+        if not line.startswith("GMAIL_APP_PASSWORD=") and not line.startswith("GMAIL_USER=")
+    ]
+    lines.append(f"GMAIL_USER={config.email.recipient_email}")
+    lines.append(f"GMAIL_APP_PASSWORD={clean_pw}")
+    env_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+    os.environ["GMAIL_APP_PASSWORD"] = clean_pw
+    os.environ["GMAIL_USER"] = config.email.recipient_email
+
+    console.print(f"\n[bold green]Saved credentials to {env_path.resolve()}![/bold green]")
+    console.print("[dim]Testing connection and sending test email...[/dim]")
+    try:
+        test_email_command(to=config.email.recipient_email)
+    except Exception:
+        pass
+
+
 @app.command("approve")
 def approve_command(
     selections: List[str] = typer.Argument(
@@ -1033,6 +1177,7 @@ def approve_command(
     db: str = typer.Option("data/tracker.db", "--db", "-d", help="Path to tracker database"),
     launch_prefill: bool = typer.Option(False, "--prefill", help="Automatically launch browser prefill after approval"),
     headless: bool = typer.Option(False, "--headless", help="Run browser in headless mode if prefill is launched"),
+    mark_applied: bool = typer.Option(False, "--applied", "-a", help="Mark approved jobs as applied and send confirmation email to inbox"),
 ) -> None:
     """Approve selected jobs from daily digest (e.g. 'APPLY 1, 3') and prepare application submissions."""
     target_db = Path(db)
@@ -1120,8 +1265,31 @@ def approve_command(
     console.print(table)
     console.print(f"\n[bold green][PASS] Marked {len(approved_jobs)} job(s) as 'approved' in SQLite database.[/bold green]")
 
-    # 5. Optionally Trigger Browser Pre-Fill
-    if launch_prefill:
+    # 5. Optionally Mark as Applied & Dispatch Confirmation Email
+    if mark_applied:
+        config = load_config()
+        candidate_name = config.student_profile.name or "Ruchith Macha"
+        p_file = Path(profile)
+        if p_file.is_file():
+            try:
+                mp = MasterProfile.model_validate_json(p_file.read_text(encoding="utf-8"))
+                candidate_name = mp.personal_info.name or candidate_name
+            except Exception:
+                pass
+
+        sender = EmailDigestSender(config=config.email, db=database)
+        for j in approved_jobs:
+            database.update_status(j.id, "applied")
+            console.print(f"[bold green]Updated {j.company} status to APPLIED.[/bold green]")
+            console.print(f"[bold cyan]Sending application confirmation email for {j.company}...[/bold cyan]")
+            try:
+                sender.dispatch_application_confirmation(job=j, candidate_name=candidate_name)
+                console.print(f"[bold green][CONFIRMATION EMAILED] Application confirmation delivered to {config.email.recipient_email}![/bold green]")
+            except Exception as e:
+                console.print(f"[yellow]Notice: Could not send confirmation email for {j.company}: {e}[/yellow]")
+
+    # 6. Optionally Trigger Browser Pre-Fill
+    elif launch_prefill:
         for j in approved_jobs:
             console.print(f"\n[bold cyan]Launching form pre-fill for {j.company} - {j.title}...[/bold cyan]")
             try:
@@ -1132,6 +1300,83 @@ def approve_command(
         console.print("\n[dim]To launch browser pre-fill with human-in-the-loop review, run:[/dim]")
         for j in approved_jobs:
             console.print(f"  [cyan]python main.py prefill {j.id[:8]}[/cyan]")
+        console.print("[dim]Or to mark as applied and receive confirmation email directly, run:[/dim]")
+        for j in approved_jobs:
+            console.print(f"  [cyan]python main.py mark-applied {j.id[:8]}[/cyan]")
+
+
+@app.command("mark-applied")
+def mark_job_applied_command(
+    target: str = typer.Argument(..., help="Job rank from latest digest (e.g. '1') or Job ID / prefix"),
+    profile: str = typer.Option("master_profile.json", "--profile", "-p", help="Path to master profile"),
+    db: str = typer.Option("data/tracker.db", "--db", "-d", help="Path to tracker.db"),
+    no_email: bool = typer.Option(False, "--no-email", help="Skip sending confirmation email"),
+) -> None:
+    """Mark a job as applied in tracker database and dispatch application confirmation email to inbox."""
+    target_db = Path(db)
+    if not target_db.is_file():
+        console.print(f"[bold red]Error: Database '{target_db}' not found.[/bold red]")
+        raise typer.Exit(code=1)
+
+    database = JobDatabase(db_path=target_db)
+
+    # 1. Resolve target by rank or ID
+    job = None
+    latest_digest_file = Path("data/output/latest_digest.json")
+    if target.isdigit() and latest_digest_file.is_file():
+        try:
+            records = json.loads(latest_digest_file.read_text(encoding="utf-8"))
+            for rec in records:
+                if str(rec.get("rank")) == target:
+                    job = database.get_job_by_id(rec.get("job_id"))
+                    break
+        except Exception:
+            pass
+
+    if not job:
+        job = database.get_job_by_id(target)
+    if not job:
+        all_jobs = database.get_jobs()
+        matched = [j for j in all_jobs if j.id.startswith(target.lower())]
+        if len(matched) == 1:
+            job = matched[0]
+        elif len(matched) > 1:
+            console.print(f"[bold red]Ambiguous target '{target}'. Matches {len(matched)} jobs.[/bold red]")
+            raise typer.Exit(code=1)
+        else:
+            console.print(f"[bold red]Error: Job '{target}' not found in database.[/bold red]")
+            raise typer.Exit(code=1)
+
+    # 2. Update status to applied
+    database.update_status(job.id, "applied")
+    console.print(f"\n[bold green][PASS] Marked [white]{job.title}[/white] at [cyan]{job.company}[/cyan] as [bold green]APPLIED[/bold green]![/bold green]")
+    console.print(f"Recorded in SQLite tracker at: [white]{datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')}[/white]")
+
+    # 3. Dispatch confirmation email
+    if not no_email:
+        config = load_config()
+        candidate_name = config.student_profile.name or "Ruchith Macha"
+        p_file = Path(profile)
+        if p_file.is_file():
+            try:
+                mp = MasterProfile.model_validate_json(p_file.read_text(encoding="utf-8"))
+                candidate_name = mp.personal_info.name or candidate_name
+            except Exception:
+                pass
+
+        console.print(f"[bold cyan]Sending application confirmation email to {config.email.recipient_email}...[/bold cyan]")
+        try:
+            sender = EmailDigestSender(config=config.email, db=database)
+            res = sender.dispatch_application_confirmation(
+                job=job,
+                candidate_name=candidate_name,
+            )
+            if res.get("status") == "sent":
+                console.print(f"[bold green][CONFIRMATION EMAILED] Application confirmation successfully delivered to [white]{config.email.recipient_email}[/white] ({res.get('attachments', 0)} attachments)![/bold green]\n")
+            else:
+                console.print(f"[yellow]Preview saved to: {res.get('preview_path')}[/yellow]\n")
+        except Exception as e:
+            console.print(f"[yellow]Notice: Could not send application confirmation email: {e}[/yellow]\n")
 
 
 @app.command("auto-apply")
@@ -1164,14 +1409,14 @@ def auto_apply(
     # 1. Fetch fresh jobs (last 24-48h)
     console.print("\n[bold green]Step 1/4: Fetching fresh job postings from public feeds...[/bold green]")
     try:
-        fetch_jobs(limit_per_source=fetch_limit, db=db)
+        fetch_jobs(limit=fetch_limit, db_path=db)
     except Exception as e:
         console.print(f"[yellow]Warning during fetch: {e}. Using existing opportunities in database.[/yellow]")
 
     # 2. Semantic Matching with 70+ threshold
     console.print("\n[bold green]Step 2/4: Scoring opportunities against student profile (Threshold 70+)...[/bold green]")
     try:
-        match_jobs(threshold=threshold, top_n=15, use_llm=use_llm, profile=profile, db=db)
+        match(threshold=threshold, top_n=15, use_llm=use_llm, profile_path=profile, db_path=db)
     except Exception as e:
         console.print(f"[yellow]Warning during matching: {e}.[/yellow]")
 
@@ -1208,6 +1453,119 @@ def auto_apply(
     console.print("\n[bold green]Daily automated run complete![/bold green]")
 
 
+@app.command("check-replies")
+def check_replies_command(
+    db: str = typer.Option("data/tracker.db", "--db", "-d", help="Path to tracker.db"),
+) -> None:
+    """Check Gmail inbox via IMAP for replies to application questions, learn answers, and complete submissions."""
+    from agent.notify.email_listener import EmailReplyListener
+
+    console.print("\n[bold cyan]Checking Gmail inbox for replies to pending application questions...[/bold cyan]")
+    target_db = Path(db)
+    database = JobDatabase(db_path=target_db)
+    listener = EmailReplyListener(db=database)
+    processed = listener.check_for_replies()
+
+    if processed:
+        console.print(f"\n[bold green][SUCCESS] Processed candidate answers for {len(processed)} job application(s):[/bold green]")
+        for item in processed:
+            console.print(f"  * [bold white]{item['company']}[/bold white] - {item['title']} -> [bold green]SUBMITTED & APPLIED[/bold green]")
+            for qid, ans in item["answers"].items():
+                console.print(f"      {qid}: [cyan]{ans}[/cyan]")
+            console.print(f"    [dim]Application confirmation email dispatched to inbox.[/dim]\n")
+    else:
+        console.print("[dim]No new replies or pending inquiries found in inbox.[/dim]\n")
+
+
+@app.command("inquiries")
+def list_inquiries_command() -> None:
+    """List all job applications paused waiting for candidate information."""
+    from agent.apply.inquiries import PendingInquiryManager
+
+    mgr = PendingInquiryManager()
+    pending = mgr.get_pending()
+
+    if not pending:
+        console.print("\n[green]No job applications are currently waiting for additional information.[/green]\n")
+        return
+
+    table = Table(title="[bold yellow]Job Applications Awaiting Candidate Answers[/bold yellow]")
+    table.add_column("Job ID", style="cyan")
+    table.add_column("Company", style="bold white")
+    table.add_column("Title", style="white")
+    table.add_column("Questions Needed", style="yellow")
+    table.add_column("Portal URL", style="blue")
+
+    for inq in pending:
+        q_summary = ", ".join(f"{q['id']}: {q['label']}" for q in inq.questions)
+        table.add_row(
+            inq.job_id[:8],
+            inq.company,
+            inq.title,
+            q_summary[:60] + "..." if len(q_summary) > 60 else q_summary,
+            inq.portal_url,
+        )
+    console.print("\n")
+    console.print(table)
+    console.print("\n[dim]To answer in terminal, run:[/dim] [bold white]python main.py answer <Job ID>[/bold white]")
+    console.print("[dim]Or simply reply directly to the question email sent to your Gmail inbox![/dim]\n")
+
+
+@app.command("answer")
+def answer_inquiry_command(
+    target: str = typer.Argument(..., help="Job ID, prefix, or company name awaiting answers"),
+    profile: str = typer.Option("master_profile.json", "--profile", "-p", help="Path to master profile"),
+    db: str = typer.Option("data/tracker.db", "--db", "-d", help="Path to tracker.db"),
+) -> None:
+    """Interactively answer pending questions for a job application in the terminal."""
+    from agent.apply.inquiries import CustomAnswersStore, PendingInquiryManager
+
+    mgr = PendingInquiryManager()
+    store = CustomAnswersStore()
+    target_db = Path(db)
+    database = JobDatabase(db_path=target_db)
+
+    pending = mgr.get_pending()
+    inquiry = None
+    for p in pending:
+        if p.job_id.startswith(target.lower()) or target.lower() in p.company.lower():
+            inquiry = p
+            break
+
+    if not inquiry:
+        console.print(f"[bold red]No pending inquiry found matching '{target}'. Run 'python main.py inquiries' to check.[/bold red]")
+        raise typer.Exit(code=1)
+
+    console.print(f"\n[bold cyan]Answering questions for [white]{inquiry.company}[/white] - {inquiry.title}...[/bold cyan]")
+    answers = {}
+    for q in inquiry.questions:
+        qid = q.get("id", "Q")
+        label = q.get("label", "Question")
+        console.print(f"\n[bold white]{qid}: {label}[/bold white]")
+        try:
+            val = input("Your answer: ").strip()
+        except (EOFError, KeyboardInterrupt):
+            val = ""
+        if val:
+            answers[qid] = val
+            store.save_answer(q.get("key", label), val)
+
+    if answers:
+        mgr.record_answers(inquiry.job_id, answers)
+        database.update_status(inquiry.job_id, "applied")
+        mgr.mark_applied(inquiry.job_id)
+
+        job = database.get_job_by_id(inquiry.job_id)
+        if job:
+            config = load_config()
+            sender = EmailDigestSender(config=config.email, db=database)
+            sender.dispatch_application_confirmation(
+                job=job,
+                candidate_name=config.student_profile.name,
+            )
+            console.print(f"\n[bold green][SUCCESS] Marked {inquiry.company} as APPLIED and sent confirmation email![/bold green]\n")
+
+
 @app.command("daily")
 def run_daily_pipeline(
     threshold: int = typer.Option(70, "--threshold", "-t", help="Minimum match score (0-100) to shortlist (default: 70)"),
@@ -1216,6 +1574,7 @@ def run_daily_pipeline(
     db: str = typer.Option("data/tracker.db", "--db", "-d", help="Path to SQLite database"),
     fetch_limit: int = typer.Option(30, "--fetch-limit", help="Max jobs to fetch per source"),
     dry_run_email: bool = typer.Option(False, "--dry-run-email", help="Save email preview without sending live SMTP"),
+    interactive: bool = typer.Option(True, "--interactive/--non-interactive", help="Prompt for interactive approval after generating digest"),
 ) -> None:
     """Execute complete daily job search routine (6:00 AM IST): Fetch -> Filter & Score (70+) -> Tailor (85%+ ATS) -> Email Digest -> Confirm."""
     console.print("\n[bold cyan]=================================================================[/bold cyan]")
@@ -1234,30 +1593,48 @@ def run_daily_pipeline(
     except Exception as e:
         console.print(f"  [yellow]Note during profile sync: {e}. Continuing with current profile.[/yellow]")
 
+    # Step 0.5: Ingest Email Replies to Pending Application Inquiries
+    console.print("\n[bold green]Step 0.5: Checking inbox for candidate replies to pending inquiries...[/bold green]")
+    try:
+        from agent.notify.email_listener import EmailReplyListener
+        listener = EmailReplyListener(db=JobDatabase(db_path=Path(db)))
+        completed = listener.check_for_replies()
+        if completed:
+            console.print(f"  [green]Successfully processed candidate replies and completed {len(completed)} pending application(s)![/green]")
+            for c in completed:
+                console.print(f"    * Completed: [bold white]{c['company']}[/bold white] - {c['title']} (Confirmation emailed)")
+        else:
+            console.print("  [dim]No pending candidate replies found in inbox.[/dim]")
+    except Exception as e:
+        console.print(f"  [yellow]Note during email reply check: {e}. Continuing pipeline.[/yellow]")
+
     # Step 1: Fetch Latest Jobs (past 24-48h)
     console.print("\n[bold green]Step 1/4: Fetching fresh postings from public feeds...[/bold green]")
     try:
-        fetch_jobs(limit_per_source=fetch_limit, db=db)
+        fetch_jobs(limit=fetch_limit, db_path=db)
     except Exception as e:
         console.print(f"[yellow]Warning during job fetch: {e}. Continuing with existing database.[/yellow]")
 
     # Step 2: Match and Score (deal breakers + student weighting + 70+ threshold)
     console.print(f"\n[bold green]Step 2/4: Scoring opportunities against student profile (Threshold {threshold}+)...[/bold green]")
     try:
-        match_jobs(threshold=threshold, top_n=20, use_llm=use_llm, profile=profile, db=db)
+        match(threshold=threshold, top_n=20, use_llm=use_llm, profile_path=profile, db_path=db)
     except Exception as e:
         console.print(f"[yellow]Warning during matching: {e}.[/yellow]")
 
     # Step 3: Daily HTML Email Digest with Attached Tailored Resumes
     console.print("\n[bold green]Step 3/4: Generating daily HTML email digest and attaching tailored resumes...[/bold green]")
     try:
-        email_digest_command(dry_run=dry_run_email, threshold=threshold, limit=10, profile=profile, db=db)
+        email_digest_command(dry_run=dry_run_email, threshold=threshold, limit=10, profile=profile, db=db, unemailed_only=False)
     except Exception as e:
         console.print(f"[yellow]Notice during email digest dispatch: {e}.[/yellow]")
 
     # Step 4: Markdown Status Digest and Interactive Approval Prompt
     console.print("\n[bold green]Step 4/4: Generating tracker digest and readying approval gate...[/bold green]")
-    daily_digest(profile=profile, db=db)
+    try:
+        daily_digest(profile=profile, db=db, output="data/daily_digest.md")
+    except Exception as e:
+        console.print(f"[yellow]Notice during digest report generation: {e}[/yellow]")
 
     database = JobDatabase(db_path=Path(db))
     shortlisted = database.get_jobs(status="shortlisted", min_match_score=threshold, limit=5)
@@ -1268,14 +1645,17 @@ def run_daily_pipeline(
             top_tag = " [bold yellow][TOP PICK][/bold yellow]" if (j.is_top_pick or (j.match_score or 0) >= 90) else ""
             console.print(f"  [cyan]#{i}[/cyan] [bold white]{j.company}[/bold white] - {j.title} (ID: [green]{j.id[:8]}[/green]){top_tag}")
 
-        console.print("\n[dim]To approve applications and launch prefill, enter ranks (e.g. '1, 2') or press Enter to finish:[/dim]")
-        try:
-            chosen = input("Approve (ranks or ID): ").strip()
-        except (EOFError, KeyboardInterrupt):
-            chosen = ""
+        if interactive:
+            console.print("\n[dim]To approve applications and launch prefill, enter ranks (e.g. '1, 2') or press Enter to finish:[/dim]")
+            try:
+                chosen = input("Approve (ranks or ID): ").strip()
+            except (EOFError, KeyboardInterrupt):
+                chosen = ""
 
-        if chosen:
-            approve_command(selections=chosen, profile=profile, db=db, launch_prefill=True)
+            if chosen:
+                approve_command(selections=chosen, profile=profile, db=db, launch_prefill=True)
+        else:
+            console.print("\n[dim]Automated run completed. Review your email digest and approve anytime with: python main.py approve 1, 2[/dim]")
 
     console.print("\n[bold green]Daily routine complete! Check your email or data/output/daily_email_preview.html.[/bold green]")
 

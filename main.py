@@ -1494,6 +1494,16 @@ def auto_apply_queue_command(
     status()
 
 
+@app.command("login-session")
+def login_session_command(
+    target: str = typer.Option("google", "--target", "-t", help="Target service to log into ('google' or 'linkedin')"),
+) -> None:
+    """Open a visible browser to log into Google or LinkedIn once and save authenticated session cookies for 1-click SSO."""
+    from agent.apply.auto_apply import login_session
+    console.print(f"\n[bold cyan]Launching visible browser to authenticate with {target.title()}...[/bold cyan]")
+    login_session(target=target.lower())
+
+
 @app.command("check-replies")
 def check_replies_command(
     db: str = typer.Option("data/tracker.db", "--db", "-d", help="Path to tracker.db"),

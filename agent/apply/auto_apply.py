@@ -43,6 +43,9 @@ DATA = Path(os.getenv("AGENT_DATA_DIR", "data"))
 DB_PATH = Path(os.getenv("AGENT_DB_PATH", DATA / "tracker.db"))
 PROFILE_PATH = Path(os.getenv("AGENT_PROFILE_PATH", "master_profile.json" if Path("master_profile.json").exists() else DATA / "master_profile.json"))
 ANSWERS_PATH = DATA / "custom_answers.json"
+AUTH_DIR = DATA / "auth"
+STORAGE_STATE_PATH = AUTH_DIR / "storage_state.json"
+USER_DATA_DIR = DATA / "browser_profile"
 
 USER = os.getenv("GMAIL_USER", "macharuchith1@gmail.com")
 APP_PASSWORD = os.getenv("GMAIL_APP_PASSWORD", "")
@@ -381,6 +384,68 @@ def has_login_wall(page) -> bool:
     return False
 
 
+def handle_oauth_sso(page) -> bool:
+    """Attempts 1-click SSO (Continue with Google / Use LinkedIn) when an active session exists."""
+    import re as _re
+    sso_patterns = [
+        r"continue with google|sign in with google|use google|log in with google",
+        r"use linkedin|sign in with linkedin|continue with linkedin|apply with linkedin",
+    ]
+    for pat in sso_patterns:
+        regex = _re.compile(pat, _re.I)
+        for role in ("button", "link"):
+            btn = page.get_by_role(role, name=regex)
+            if btn.count() and btn.first.is_visible():
+                try:
+                    print(f"  [auth] Triggering 1-click SSO ({pat})...")
+                    btn.first.click()
+                    page.wait_for_load_state("domcontentloaded", timeout=15000)
+                    page.wait_for_timeout(3500)
+                    return True
+                except Exception as e:
+                    print(f"  [auth] SSO click attempt failed: {e}")
+    return False
+
+
+def login_session(target: str = "google"):
+    """Launch a visible browser for candidate to log in once, then save session state.
+    
+    This eliminates the need to type passwords or solve 2FA on every application run.
+    """
+    from playwright.sync_api import sync_playwright
+
+    AUTH_DIR.mkdir(parents=True, exist_ok=True)
+    with sync_playwright() as p:
+        browser = p.chromium.launch(
+            headless=False,
+            args=["--disable-blink-features=AutomationControlled"]
+        )
+        ctx_kwargs = {
+            "viewport": {"width": 1280, "height": 900},
+            "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+        }
+        if STORAGE_STATE_PATH.exists():
+            ctx_kwargs["storage_state"] = str(STORAGE_STATE_PATH)
+        context = browser.new_context(**ctx_kwargs)
+        page = context.new_page()
+        page.add_init_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
+
+        login_url = "https://accounts.google.com" if target == "google" else "https://www.linkedin.com/login"
+        print(f"\n[auth] Opening {login_url} in a visible browser.")
+        print(f"[auth] Please sign into your {target.title()} account in the browser window.")
+        print("[auth] Complete 2-Step Verification if prompted.")
+        page.goto(login_url)
+
+        try:
+            input("\n>>> Press [ENTER] in this terminal AFTER you have logged in successfully in the browser... ")
+        except (EOFError, KeyboardInterrupt):
+            pass
+
+        context.storage_state(path=str(STORAGE_STATE_PATH))
+        print(f"[auth] Successfully captured and saved authenticated session to: {STORAGE_STATE_PATH}\n")
+        browser.close()
+
+
 def click_submit(page) -> bool:
     import re as _re
     btn = page.get_by_role("button", name=_re.compile(r"submit( application)?|send application|apply", _re.I))
@@ -538,25 +603,35 @@ def process(job: dict, submit: bool, headless: bool = True) -> str:
             headless=headless,
             args=["--disable-blink-features=AutomationControlled"]
         )
-        context = browser.new_context(
-            viewport={"width": 1280, "height": 1600},
-            user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
-        )
+        ctx_kwargs = {
+            "viewport": {"width": 1280, "height": 1600},
+            "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+        }
+        if STORAGE_STATE_PATH.exists():
+            ctx_kwargs["storage_state"] = str(STORAGE_STATE_PATH)
+        context = browser.new_context(**ctx_kwargs)
         page = context.new_page()
         page.add_init_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
         try:
             page.goto(job["url"], wait_until="domcontentloaded", timeout=45000)
             page.wait_for_timeout(2500)
             if has_login_wall(page):
-                set_state(job["job_id"], "NEEDS_MANUAL", last_error="login required")
-                return "NEEDS_MANUAL"
+                if STORAGE_STATE_PATH.exists() and handle_oauth_sso(page):
+                    page.wait_for_timeout(3000)
+                if has_login_wall(page):
+                    set_state(job["job_id"], "NEEDS_MANUAL", last_error="login required: OAuth (Google / LinkedIn / account login)")
+                    return "NEEDS_MANUAL"
 
             unknown, filled = fill_form(page, job, profile, answers)
             print(f"  filled {len(filled)} fields, {len(unknown)} unknown required")
 
             if has_login_wall(page):
-                set_state(job["job_id"], "NEEDS_MANUAL", last_error="login required: OAuth (LinkedIn / account login)")
-                return "NEEDS_MANUAL"
+                if STORAGE_STATE_PATH.exists() and handle_oauth_sso(page):
+                    page.wait_for_timeout(3000)
+                    unknown, filled = fill_form(page, job, profile, answers)
+                if has_login_wall(page):
+                    set_state(job["job_id"], "NEEDS_MANUAL", last_error="login required: OAuth (Google / LinkedIn / account login)")
+                    return "NEEDS_MANUAL"
 
             if unknown:
                 token = job["token"] or uuid.uuid4().hex[:8]
@@ -634,14 +709,17 @@ def status():
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
-    ap.add_argument("cmd", choices=["run", "check-replies", "status"])
+    ap.add_argument("cmd", choices=["run", "check-replies", "status", "login"])
     ap.add_argument("--submit", action="store_true", help="really submit (default: dry run)")
     ap.add_argument("--headed", action="store_true")
     ap.add_argument("--limit", type=int, default=10)
+    ap.add_argument("--target", default="google", choices=["google", "linkedin"], help="target service to log into (google or linkedin)")
     a = ap.parse_args()
     if a.cmd == "run":
         run_queue(a.submit, not a.headed, a.limit)
     elif a.cmd == "check-replies":
         print("updated:", check_replies())
+    elif a.cmd == "login":
+        login_session(a.target)
     else:
         status()

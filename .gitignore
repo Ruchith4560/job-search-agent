@@ -40,6 +40,8 @@ master_profile.json
 data/*.json
 data/*.csv
 data/*.md
+data/auth/
+data/browser_profile/
 
 # Testing and Coverage
 .pytest_cache/

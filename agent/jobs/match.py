@@ -54,8 +54,13 @@ class MatchPipeline:
             logger.warning("No jobs provided for matching.")
             return []
 
+        active_jobs = [j for j in jobs if j.status != "rejected"]
+        if not active_jobs:
+            logger.warning("No active non-rejected jobs available for matching.")
+            return []
+
         # 1. Cheap vector similarity filter
-        shortlisted = self.matcher.shortlist(profile, jobs, top_n=top_n)
+        shortlisted = self.matcher.shortlist(profile, active_jobs, top_n=top_n)
 
         # 2. Score shortlisted jobs
         scored: List[MatchScore] = []

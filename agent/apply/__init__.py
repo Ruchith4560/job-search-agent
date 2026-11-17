@@ -38,3 +38,10 @@ __all__ = [
     "render_cover_letter_pdf",
     "render_cover_letter_text",
 ]
+
+
+def __getattr__(name: str):
+    if name in ("enqueue", "run_queue", "check_replies", "process"):
+        import agent.apply.auto_apply as _aa
+        return getattr(_aa, name)
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")

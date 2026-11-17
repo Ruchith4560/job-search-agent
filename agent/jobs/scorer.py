@@ -110,6 +110,12 @@ class JobScorer:
         if is_top_brand:
             score += 5
 
+        # Seniority penalty: B.Tech student cannot qualify for senior/manager/lead roles
+        senior_keywords = ["senior", "lead", "manager", "principal", "director", "vp", "head of", "staff", "architect"]
+        t_lower = job.title.lower()
+        if any(re.search(r"\b" + re.escape(w) + r"\b", t_lower) for w in senior_keywords):
+            score = min(score, 35)
+
         # Cap score between 0 and 100
         score = max(0, min(100, score))
 

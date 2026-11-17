@@ -1265,6 +1265,33 @@ def approve_command(
     console.print(table)
     console.print(f"\n[bold green][PASS] Marked {len(approved_jobs)} job(s) as 'approved' in SQLite database.[/bold green]")
 
+    # Automatically enqueue approved jobs into the auto-apply queue
+    try:
+        from agent.apply.auto_apply import enqueue as auto_apply_enqueue
+        from agent.apply.pipeline import sanitize_slug
+        for j in approved_jobs:
+            comp_slug = sanitize_slug(j.company) or "company"
+            role_slug = sanitize_slug(j.title) or "role"
+            target_dir = Path("data/output") / f"{comp_slug}_{role_slug}"
+            res_path = target_dir / "tailored_resume.pdf"
+            if not res_path.is_file():
+                res_path = Path("data/output/resume.pdf")
+            cov_path = target_dir / "cover_letter.pdf"
+            if not cov_path.is_file():
+                cov_path = target_dir / "cover_letter.txt"
+            job_url = getattr(j, "url", getattr(j, "link", getattr(j, "apply_url", "")))
+            auto_apply_enqueue(
+                job_id=j.id,
+                company=j.company,
+                role=j.title,
+                url=job_url,
+                resume=str(res_path.resolve()) if res_path.is_file() else str(res_path),
+                cover=str(cov_path.resolve()) if cov_path.is_file() else None,
+            )
+        console.print(f"[bold green]Enqueued {len(approved_jobs)} job(s) into auto-apply queue (apply_state table).[/bold green]")
+    except Exception as e:
+        console.print(f"[yellow]Notice: Could not enqueue to auto-apply state: {e}[/yellow]")
+
     # 5. Optionally Mark as Applied & Dispatch Confirmation Email
     if mark_applied:
         config = load_config()
@@ -1451,6 +1478,20 @@ def auto_apply(
         approve_command(selections=choice, profile=profile, db=db, launch_prefill=True, headless=headless)
 
     console.print("\n[bold green]Daily automated run complete![/bold green]")
+
+
+@app.command("auto-apply-queue")
+def auto_apply_queue_command(
+    submit: bool = typer.Option(False, "--submit", "-s", help="Execute real application submissions (default: dry run)"),
+    limit: int = typer.Option(10, "--limit", "-l", help="Maximum jobs to process from queue"),
+    headless: bool = typer.Option(True, "--headless/--headed", help="Run browser in headless mode"),
+) -> None:
+    """Process enqueued job applications (dry run or real submission) using auto_apply."""
+    from agent.apply.auto_apply import run_queue, status
+    console.print(f"\n[bold cyan]Processing Auto-Apply Queue (Submit mode: {submit}, Limit: {limit})...[/bold cyan]")
+    run_queue(submit=submit, headless=headless, limit=limit)
+    console.print("\n[bold green]Current Auto-Apply State Counts:[/bold green]")
+    status()
 
 
 @app.command("check-replies")

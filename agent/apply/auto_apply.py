@@ -549,7 +549,7 @@ def check_replies() -> int:
         return 0
     updated = 0
     try:
-        M = imaplib.IMAP4_SSL("imap.gmail.com", 993)
+        M = imaplib.IMAP4_SSL("imap.gmail.com", 993, timeout=10)
         M.login(USER, APP_PASSWORD)
         M.select("INBOX")
         _, ids = M.search(None, '(UNSEEN SUBJECT "JOB-")')

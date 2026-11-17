@@ -126,12 +126,68 @@ class PathsConfig(BaseModel):
 
 class JobDiscoveryConfig(BaseModel):
     """Configuration for job board fetching and filtering."""
-    sources: List[str] = Field(default_factory=lambda: ["remotive", "remoteok", "greenhouse", "lever"])
+    sources: List[str] = Field(
+        default_factory=lambda: [
+            "linkedin",
+            "internshala",
+            "unstop",
+            "freshersworld",
+            "indian_portals",
+            "enterprise_careers",
+            "smartrecruiters",
+            "remotive",
+            "remoteok",
+            "arbeitnow",
+            "jobicy",
+            "himalayas",
+            "weworkremotely",
+            "python_org",
+            "greenhouse",
+            "lever",
+        ]
+    )
     greenhouse_companies: List[str] = Field(
-        default_factory=lambda: ["canonical", "cloudflare", "gitlab", "discord", "stripe"]
+        default_factory=lambda: [
+            "canonical",
+            "cloudflare",
+            "gitlab",
+            "discord",
+            "stripe",
+            "airbnb",
+            "figma",
+            "elastic",
+            "automattic",
+            "hashicorp",
+            "datadog",
+            "brex",
+            "reddit",
+            "supabase",
+            "postman",
+        ]
     )
     lever_companies: List[str] = Field(
-        default_factory=lambda: ["palantir", "netflix", "spotify"]
+        default_factory=lambda: [
+            "palantir",
+            "netflix",
+            "spotify",
+            "vercel",
+            "swiggy",
+            "twitch",
+            "coinbase",
+            "atlassian",
+            "affirm",
+        ]
+    )
+    smartrecruiters_companies: List[str] = Field(
+        default_factory=lambda: [
+            "visa",
+            "bosch",
+            "square",
+            "ubisoft",
+            "epicgames",
+            "ikea",
+            "publicissapient",
+        ]
     )
     max_jobs_per_source: int = 50
     allow_remote: bool = True

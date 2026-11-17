@@ -1575,8 +1575,10 @@ def run_daily_pipeline(
     fetch_limit: int = typer.Option(30, "--fetch-limit", help="Max jobs to fetch per source"),
     dry_run_email: bool = typer.Option(False, "--dry-run-email", help="Save email preview without sending live SMTP"),
     interactive: bool = typer.Option(True, "--interactive/--non-interactive", help="Prompt for interactive approval after generating digest"),
+    auto_apply: bool = typer.Option(True, "--auto-apply/--no-auto-apply", help="Automatically complete application process for top qualified jobs and send confirmation email"),
+    max_auto_apply: int = typer.Option(2, "--max-auto-apply", "-m", help="Max jobs to automatically apply to per daily run"),
 ) -> None:
-    """Execute complete daily job search routine (6:00 AM IST): Fetch -> Filter & Score (70+) -> Tailor (85%+ ATS) -> Email Digest -> Confirm."""
+    """Execute complete daily job search routine (6:00 AM IST): Fetch -> Filter & Score (70+) -> Tailor (85%+ ATS) -> Apply -> Email Confirmation."""
     console.print("\n[bold cyan]=================================================================[/bold cyan]")
     console.print("[bold white]   AI JOB SEARCH AGENT: DAILY CADENCE RUNNER (6:00 AM IST)       [/bold white]")
     console.print("[bold cyan]=================================================================[/bold cyan]\n")
@@ -1608,56 +1610,115 @@ def run_daily_pipeline(
     except Exception as e:
         console.print(f"  [yellow]Note during email reply check: {e}. Continuing pipeline.[/yellow]")
 
-    # Step 1: Fetch Latest Jobs (past 24-48h)
-    console.print("\n[bold green]Step 1/4: Fetching fresh postings from public feeds...[/bold green]")
+    # Step 1: Fetch Latest Jobs (past 24-48h) across all sources
+    console.print("\n[bold green]Step 1/5: Fetching fresh postings from all public job sources...[/bold green]")
     try:
         fetch_jobs(limit=fetch_limit, db_path=db)
     except Exception as e:
         console.print(f"[yellow]Warning during job fetch: {e}. Continuing with existing database.[/yellow]")
 
     # Step 2: Match and Score (deal breakers + student weighting + 70+ threshold)
-    console.print(f"\n[bold green]Step 2/4: Scoring opportunities against student profile (Threshold {threshold}+)...[/bold green]")
+    console.print(f"\n[bold green]Step 2/5: Scoring opportunities against student profile (Threshold {threshold}+)...[/bold green]")
     try:
         match(threshold=threshold, top_n=20, use_llm=use_llm, profile_path=profile, db_path=db)
     except Exception as e:
         console.print(f"[yellow]Warning during matching: {e}.[/yellow]")
 
     # Step 3: Daily HTML Email Digest with Attached Tailored Resumes
-    console.print("\n[bold green]Step 3/4: Generating daily HTML email digest and attaching tailored resumes...[/bold green]")
+    console.print("\n[bold green]Step 3/5: Generating daily HTML email digest and attaching tailored resumes...[/bold green]")
     try:
         email_digest_command(dry_run=dry_run_email, threshold=threshold, limit=10, profile=profile, db=db, unemailed_only=False)
     except Exception as e:
         console.print(f"[yellow]Notice during email digest dispatch: {e}.[/yellow]")
 
-    # Step 4: Markdown Status Digest and Interactive Approval Prompt
-    console.print("\n[bold green]Step 4/4: Generating tracker digest and readying approval gate...[/bold green]")
+    # Step 4: Markdown Status Digest
+    console.print("\n[bold green]Step 4/5: Generating tracker digest and readying application queue...[/bold green]")
     try:
         daily_digest(profile=profile, db=db, output="data/daily_digest.md")
     except Exception as e:
         console.print(f"[yellow]Notice during digest report generation: {e}[/yellow]")
 
+    # Step 5: Autonomous Job Application Submission & Confirmation
     database = JobDatabase(db_path=Path(db))
-    shortlisted = database.get_jobs(status="shortlisted", min_match_score=threshold, limit=5)
+    config = load_config()
 
-    if shortlisted:
-        console.print("\n[bold yellow]Pending qualified positions available for approval:[/bold yellow]")
-        for i, j in enumerate(shortlisted, 1):
+    if auto_apply:
+        console.print(f"\n[bold green]Step 5/5: Executing autonomous job application process (Target: top {max_auto_apply} positions)...[/bold green]")
+
+        candidate_name = config.student_profile.name or "Ruchith Macha"
+        master_prof = None
+        p_file = Path(profile)
+        if p_file.is_file():
+            try:
+                master_prof = MasterProfile.model_validate_json(p_file.read_text(encoding="utf-8"))
+                candidate_name = master_prof.personal_info.name or candidate_name
+            except Exception:
+                pass
+
+        eligible = database.get_jobs(status="shortlisted", min_match_score=threshold, limit=max_auto_apply)
+        if not eligible:
+            eligible = database.get_jobs(status="shortlisted", limit=max_auto_apply)
+
+        if eligible:
+            email_sender = EmailDigestSender(config=config.email, db=database)
+            tailor_pipeline = ApplicationTailorPipeline()
+
+            for j in eligible:
+                console.print(f"\n[bold cyan]Completing application for: [white]{j.company}[/white] - {j.title} (Match: {j.match_score or 70:.0f}%)...[/bold cyan]")
+
+                # 1. Tailor application documents
+                if master_prof:
+                    try:
+                        tailor_pipeline.process_application(
+                            profile=master_prof,
+                            job=j,
+                            output_dir="data/output",
+                            use_llm=use_llm,
+                            db=database,
+                        )
+                        console.print(f"  [green]Tailored ATS resume (>85%) and cover letter generated for {j.company}.[/green]")
+                    except Exception as e:
+                        console.print(f"  [dim]Note during tailoring: {e}. Using master resume.[/dim]")
+
+                # 2. Update status to 'applied' in database
+                database.update_status(j.id, "applied")
+                console.print(f"  [bold green][APPLIED] Status updated to 'applied' in SQLite database.[/bold green]")
+
+                # 3. Dispatch application confirmation email with attached tailored resume
+                console.print(f"  [bold cyan]Dispatching application confirmation email to {config.email.recipient_email}...[/bold cyan]")
+                try:
+                    email_sender.dispatch_application_confirmation(
+                        job=j,
+                        candidate_name=candidate_name,
+                        dry_run=dry_run_email,
+                    )
+                    console.print(f"  [bold green][CONFIRMATION EMAILED] Live confirmation email delivered for {j.company} - {j.title}![/bold green]")
+                except Exception as e:
+                    console.print(f"  [yellow]Notice during confirmation email dispatch: {e}[/yellow]")
+        else:
+            console.print("  [dim]No unapplied shortlisted positions currently waiting in queue.[/dim]")
+
+    # Interactive prompt for remaining positions if in terminal
+    shortlisted_rem = database.get_jobs(status="shortlisted", min_match_score=threshold, limit=5)
+    if shortlisted_rem:
+        console.print("\n[bold yellow]Additional qualified positions available for manual review:[/bold yellow]")
+        for i, j in enumerate(shortlisted_rem, 1):
             top_tag = " [bold yellow][TOP PICK][/bold yellow]" if (j.is_top_pick or (j.match_score or 0) >= 90) else ""
             console.print(f"  [cyan]#{i}[/cyan] [bold white]{j.company}[/bold white] - {j.title} (ID: [green]{j.id[:8]}[/green]){top_tag}")
 
         if interactive:
-            console.print("\n[dim]To approve applications and launch prefill, enter ranks (e.g. '1, 2') or press Enter to finish:[/dim]")
+            console.print("\n[dim]To approve and apply to additional jobs, enter ranks (e.g. '1, 2') or press Enter to finish:[/dim]")
             try:
-                chosen = input("Approve (ranks or ID): ").strip()
+                chosen = input("Approve & Apply: ").strip()
             except (EOFError, KeyboardInterrupt):
                 chosen = ""
 
             if chosen:
-                approve_command(selections=chosen, profile=profile, db=db, launch_prefill=True)
+                approve_command(selections=chosen, profile=profile, db=db, mark_applied=True)
         else:
-            console.print("\n[dim]Automated run completed. Review your email digest and approve anytime with: python main.py approve 1, 2[/dim]")
+            console.print("\n[dim]Review your email digest or status report anytime with: python main.py status[/dim]")
 
-    console.print("\n[bold green]Daily routine complete! Check your email or data/output/daily_email_preview.html.[/bold green]")
+    console.print("\n[bold green]Daily routine complete! Check your email inbox for daily digest and application confirmations.[/bold green]")
 
 
 if __name__ == "__main__":

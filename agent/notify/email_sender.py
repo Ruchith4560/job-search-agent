@@ -437,6 +437,12 @@ class EmailDigestSender:
                         resume_pdf_path = str(p)
                         break
 
+        if not resume_pdf_path:
+            for fallback in ["data/output/resume.pdf", "data/output/RuchithMacha_Master_Resume.pdf"]:
+                if Path(fallback).exists():
+                    resume_pdf_path = fallback
+                    break
+
         if not cover_letter_path and app_dir and app_dir.exists():
             cl_pdf = app_dir / "cover_letter.pdf"
             if cl_pdf.exists():

@@ -6,11 +6,23 @@ from agent.config import AppConfig
 from agent.jobs.db import JobDatabase
 from agent.jobs.dedupe import deduplicate_jobs
 from agent.jobs.fetchers.adzuna import AdzunaFetcher
+from agent.jobs.fetchers.arbeitnow import ArbeitnowFetcher
 from agent.jobs.fetchers.base import BaseJobFetcher
+from agent.jobs.fetchers.enterprise_careers import EnterpriseCareersFetcher
+from agent.jobs.fetchers.freshersworld import FreshersworldFetcher
 from agent.jobs.fetchers.greenhouse import GreenhouseFetcher
+from agent.jobs.fetchers.himalayas import HimalayasFetcher
+from agent.jobs.fetchers.indian_portals import IndianPortalsFetcher
+from agent.jobs.fetchers.internshala import InternshalaFetcher
+from agent.jobs.fetchers.jobicy import JobicyFetcher
 from agent.jobs.fetchers.lever import LeverFetcher
+from agent.jobs.fetchers.linkedin import LinkedInFetcher
+from agent.jobs.fetchers.python_org import PythonOrgFetcher
 from agent.jobs.fetchers.remotive import RemotiveFetcher
 from agent.jobs.fetchers.remoteok import RemoteOKFetcher
+from agent.jobs.fetchers.smartrecruiters import SmartRecruitersFetcher
+from agent.jobs.fetchers.unstop import UnstopFetcher
+from agent.jobs.fetchers.weworkremotely import WeWorkRemotelyFetcher
 from agent.jobs.filters import apply_hard_filters
 from agent.jobs.schema import Job
 
@@ -18,7 +30,7 @@ logger = logging.getLogger(__name__)
 
 
 class JobAggregator:
-    """Coordinates fetching from Greenhouse, Lever, Remotive, RemoteOK, and Adzuna."""
+    """Coordinates fetching across LinkedIn, Internshala, Unstop, Freshersworld, Indian Portals, Remotive, RemoteOK, Arbeitnow, Jobicy, Himalayas, WWR, Python.org, SmartRecruiters, Greenhouse, and Lever."""
 
     def __init__(self, config: Optional[AppConfig] = None) -> None:
         """Initialize aggregator with fetchers configured according to settings."""
@@ -26,6 +38,20 @@ class JobAggregator:
         self.fetchers: Dict[str, BaseJobFetcher] = {
             "remotive": RemotiveFetcher(),
             "remoteok": RemoteOKFetcher(),
+            "arbeitnow": ArbeitnowFetcher(),
+            "jobicy": JobicyFetcher(),
+            "himalayas": HimalayasFetcher(),
+            "weworkremotely": WeWorkRemotelyFetcher(),
+            "python_org": PythonOrgFetcher(),
+            "linkedin": LinkedInFetcher(),
+            "internshala": InternshalaFetcher(),
+            "unstop": UnstopFetcher(),
+            "freshersworld": FreshersworldFetcher(),
+            "indian_portals": IndianPortalsFetcher(),
+            "enterprise_careers": EnterpriseCareersFetcher(),
+            "smartrecruiters": SmartRecruitersFetcher(
+                companies=getattr(self.config.jobs, "smartrecruiters_companies", None)
+            ),
             "greenhouse": GreenhouseFetcher(companies=self.config.jobs.greenhouse_companies),
             "lever": LeverFetcher(companies=self.config.jobs.lever_companies),
             "adzuna": AdzunaFetcher(),

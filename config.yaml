@@ -9,7 +9,7 @@ profile:
   college: "Anurag University"
   branch: "Computer Science and Engineering"
   graduation_year: 2028
-  cgpa: "8.5"
+  cgpa: "9.05"
   github_username: "Ruchith4560"
 
 preferences:
@@ -64,8 +64,20 @@ preferences:
 
 jobs:
   sources:
+    - "linkedin"
+    - "internshala"
+    - "unstop"
+    - "freshersworld"
+    - "indian_portals"
+    - "enterprise_careers"
+    - "smartrecruiters"
     - "remotive"
     - "remoteok"
+    - "arbeitnow"
+    - "jobicy"
+    - "himalayas"
+    - "weworkremotely"
+    - "python_org"
     - "greenhouse"
     - "lever"
   greenhouse_companies:
@@ -74,10 +86,34 @@ jobs:
     - "gitlab"
     - "discord"
     - "stripe"
+    - "airbnb"
+    - "figma"
+    - "elastic"
+    - "automattic"
+    - "hashicorp"
+    - "datadog"
+    - "brex"
+    - "reddit"
+    - "supabase"
+    - "postman"
   lever_companies:
     - "palantir"
     - "netflix"
     - "spotify"
+    - "vercel"
+    - "swiggy"
+    - "twitch"
+    - "coinbase"
+    - "atlassian"
+    - "affirm"
+  smartrecruiters_companies:
+    - "visa"
+    - "bosch"
+    - "square"
+    - "ubisoft"
+    - "epicgames"
+    - "ikea"
+    - "publicissapient"
   max_jobs_per_source: 40
   allow_remote: true
   exclude_keywords:

@@ -21,7 +21,8 @@ DEFAULT_ANSWERS = {
     "graduation_year": "2028",
     "university": "Anurag University",
     "degree": "B.Tech in Computer Science and Engineering",
-    "cgpa": "8.5 / 10",
+    "cgpa": "9.05 / 10",
+    "gpa": "9.05 / 10",
     "gender": "Male",
     "years_of_experience": "1 year (academic, projects, and club leadership)",
 }

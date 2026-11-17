@@ -366,7 +366,19 @@ def fill_form(page, job, profile, answers):
 
 
 def has_login_wall(page) -> bool:
-    return page.locator("input[type=password]:visible").count() > 0
+    if page.locator("input[type=password]:visible").count() > 0:
+        return True
+    url_lower = page.url.lower()
+    if any(p in url_lower for p in ("/login", "/signin", "/signup", "/auth/")):
+        return True
+    oauth_texts = ["use linkedin", "sign in with linkedin", "continue with google", "log in to apply", "sign in to apply"]
+    for b in page.locator("button, a").all():
+        try:
+            if b.is_visible() and any(p in b.inner_text().lower() for p in oauth_texts):
+                return True
+        except Exception:
+            pass
+    return False
 
 
 def click_submit(page) -> bool:
@@ -522,8 +534,16 @@ def process(job: dict, submit: bool, headless: bool = True) -> str:
     set_state(job["job_id"], "FILLING", attempts=job["attempts"] + 1)
 
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=headless)
-        page = browser.new_context(viewport={"width": 1280, "height": 1600}).new_page()
+        browser = p.chromium.launch(
+            headless=headless,
+            args=["--disable-blink-features=AutomationControlled"]
+        )
+        context = browser.new_context(
+            viewport={"width": 1280, "height": 1600},
+            user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+        )
+        page = context.new_page()
+        page.add_init_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
         try:
             page.goto(job["url"], wait_until="domcontentloaded", timeout=45000)
             page.wait_for_timeout(2500)
@@ -533,6 +553,10 @@ def process(job: dict, submit: bool, headless: bool = True) -> str:
 
             unknown, filled = fill_form(page, job, profile, answers)
             print(f"  filled {len(filled)} fields, {len(unknown)} unknown required")
+
+            if has_login_wall(page):
+                set_state(job["job_id"], "NEEDS_MANUAL", last_error="login required: OAuth (LinkedIn / account login)")
+                return "NEEDS_MANUAL"
 
             if unknown:
                 token = job["token"] or uuid.uuid4().hex[:8]

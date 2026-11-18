@@ -34,10 +34,12 @@ data/raw/*
 !data/raw/.gitkeep
 data/output/*
 !data/output/.gitkeep
-master_profile.json
+!master_profile.json
 *.db
+!data/tracker.db
 *.sqlite3
 data/*.json
+!data/custom_answers.json
 data/*.csv
 data/*.md
 data/auth/

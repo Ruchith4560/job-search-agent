@@ -6,6 +6,9 @@ on:
     - cron: '30 0 * * *'
   workflow_dispatch: # Allows manual trigger from GitHub web anytime
 
+permissions:
+  contents: write
+
 jobs:
   daily_job_run:
     name: Run Daily Job Search & Email Delivery
@@ -14,6 +17,8 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Python 3.11
         uses: actions/setup-python@v5
@@ -40,6 +45,7 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/
+          git add data/ master_profile.json
           git commit -m "Auto-update job tracker and application database [skip ci]" || echo "No changes to commit"
+          git pull --rebase origin main || true
           git push || echo "Push skipped or not needed"

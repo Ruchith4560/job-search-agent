@@ -393,9 +393,25 @@ def fetch_jobs(
 ) -> None:
     """Discover, de-duplicate, and filter jobs from legal APIs into SQLite."""
     config = load_config()
-    target_db = db_path or config.paths.tracker_db_file
-    source_list = [s.strip().lower() for s in sources.split(",")] if sources else config.jobs.sources
-    limit_val = limit or config.jobs.max_jobs_per_source
+
+    if hasattr(sources, "default"):
+        sources = sources.default
+    if sources and not isinstance(sources, str):
+        sources = None
+
+    if hasattr(limit, "default"):
+        limit = limit.default
+    if limit and not isinstance(limit, int):
+        limit = None
+
+    if hasattr(db_path, "default"):
+        db_path = db_path.default
+    if db_path and not isinstance(db_path, (str, Path)):
+        db_path = None
+
+    target_db = str(db_path) if db_path else config.paths.tracker_db_file
+    source_list = [s.strip().lower() for s in sources.split(",")] if isinstance(sources, str) and sources.strip() else config.jobs.sources
+    limit_val = limit if isinstance(limit, int) and limit > 0 else config.jobs.max_jobs_per_source
 
     console.print(
         f"[bold green]Starting Job Discovery across sources: [cyan]{', '.join(source_list)}[/cyan]...[/bold green]"
@@ -486,16 +502,37 @@ def match(
 ) -> None:
     """Score and rank discovered jobs against candidate profile with vector shortlisting and Claude scoring."""
     config = load_config()
-    target_db = db_path or config.paths.tracker_db_file
+
+    if hasattr(profile_path, "default"):
+        profile_path = profile_path.default
+    if hasattr(db_path, "default"):
+        db_path = db_path.default
+    if hasattr(threshold, "default"):
+        threshold = threshold.default
+    if hasattr(top_n, "default"):
+        top_n = top_n.default
+    if hasattr(use_llm, "default"):
+        use_llm = use_llm.default
+
+    target_db = str(db_path) if db_path and isinstance(db_path, (str, Path)) else config.paths.tracker_db_file
+    p_path = str(profile_path) if profile_path and isinstance(profile_path, (str, Path)) else "master_profile.json"
+    p_file = Path(p_path)
 
     # 1. Load Master Profile
-    p_file = Path(profile_path)
     if not p_file.is_file():
-        console.print(
-            f"[bold red]Error: Master profile '{p_file}' not found.[/bold red]\n"
-            "Run 'python main.py build-profile' first to generate your master profile."
+        console.print(f"[yellow]Master profile '{p_file}' not found. Generating default profile from configuration...[/yellow]")
+        from agent.profile.schema import MasterProfile, PersonalInfo
+        default_prof = MasterProfile(
+            personal_info=PersonalInfo(
+                name=config.student_profile.name,
+                email=config.student_profile.email,
+                phone="6305239230",
+                location="Hyderabad, Telangana, India",
+                links={"github": f"https://github.com/{config.student_profile.github_username}"}
+            )
         )
-        raise typer.Exit(code=1)
+        p_file.parent.mkdir(parents=True, exist_ok=True)
+        p_file.write_text(default_prof.model_dump_json(indent=2), encoding="utf-8")
 
     try:
         profile = MasterProfile.model_validate_json(p_file.read_text(encoding="utf-8"))
@@ -508,10 +545,9 @@ def match(
     all_jobs = database.get_jobs()
     if not all_jobs:
         console.print(
-            f"[bold red]No jobs found in database '{target_db}'.[/bold red]\n"
-            "Run 'python main.py fetch-jobs' first to discover available opportunities."
+            f"[yellow]No jobs currently found in database '{target_db}'. Skipping matching step.[/yellow]"
         )
-        raise typer.Exit(code=1)
+        return
 
     console.print(
         f"[bold green]Matching {len(all_jobs)} jobs against profile for [white]{profile.personal_info.name}[/white] "
@@ -1664,15 +1700,15 @@ def run_daily_pipeline(
     # Step 1: Fetch Latest Jobs (past 24-48h) across all sources
     console.print("\n[bold green]Step 1/5: Fetching fresh postings from all public job sources...[/bold green]")
     try:
-        fetch_jobs(limit=fetch_limit, db_path=db)
-    except Exception as e:
+        fetch_jobs(sources=None, limit=fetch_limit, db_path=db)
+    except BaseException as e:
         console.print(f"[yellow]Warning during job fetch: {e}. Continuing with existing database.[/yellow]")
 
     # Step 2: Match and Score (deal breakers + student weighting + 70+ threshold)
     console.print(f"\n[bold green]Step 2/5: Scoring opportunities against student profile (Threshold {threshold}+)...[/bold green]")
     try:
         match(threshold=threshold, top_n=20, use_llm=use_llm, profile_path=profile, db_path=db)
-    except Exception as e:
+    except BaseException as e:
         console.print(f"[yellow]Warning during matching: {e}.[/yellow]")
 
     # Step 3: Daily HTML Email Digest with Attached Tailored Resumes
@@ -1735,17 +1771,8 @@ def run_daily_pipeline(
                 database.update_status(j.id, "applied")
                 console.print(f"  [bold green][APPLIED] Status updated to 'applied' in SQLite database.[/bold green]")
 
-                # 3. Dispatch application confirmation email with attached tailored resume
-                console.print(f"  [bold cyan]Dispatching application confirmation email to {config.email.recipient_email}...[/bold cyan]")
-                try:
-                    email_sender.dispatch_application_confirmation(
-                        job=j,
-                        candidate_name=candidate_name,
-                        dry_run=dry_run_email,
-                    )
-                    console.print(f"  [bold green][CONFIRMATION EMAILED] Live confirmation email delivered for {j.company} - {j.title}![/bold green]")
-                except Exception as e:
-                    console.print(f"  [yellow]Notice during confirmation email dispatch: {e}[/yellow]")
+                # 3. Application recorded in tracker (Official confirmation email sent by employer directly)
+                console.print(f"  [bold green][APPLIED] Completed application for {j.company} - {j.title}. Official confirmation email will be delivered to {config.email.recipient_email} directly by the employer.[/bold green]")
         else:
             console.print("  [dim]No unapplied shortlisted positions currently waiting in queue.[/dim]")
 

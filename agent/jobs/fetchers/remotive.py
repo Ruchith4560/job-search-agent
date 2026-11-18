@@ -1,34 +1,17 @@
-"""Remotive public API job fetcher for remote software roles."""
+"""Remotive public API job fetcher (Disabled: Remotive now requires payment)."""
 
 import html
 import logging
 import re
 from typing import List, Optional
-from agent.jobs.fetchers.base import BaseJobFetcher
+from agent.jobs.fetchers.base import BaseJobFetcher, strip_html_tags
 from agent.jobs.schema import Job
 
 logger = logging.getLogger(__name__)
 
 
-def strip_html_tags(text: str) -> str:
-    """Convert HTML job description to clean plain text."""
-    if not text:
-        return ""
-    # Unescape HTML entities
-    unescaped = html.unescape(text)
-    # Replace breaks and list items with spaces/newlines
-    cleaned = re.sub(r"<(?:p|br|li|div)[^>]*>", "\n", unescaped, flags=re.I)
-    # Strip remaining HTML tags
-    cleaned = re.sub(r"<[^>]+>", " ", cleaned)
-    # Collapse multiple inline spaces
-    cleaned = re.sub(r"[ \t]+", " ", cleaned)
-    # Collapse multiple newlines
-    cleaned = re.sub(r"\n\s*\n+", "\n\n", cleaned)
-    return cleaned.strip()
-
-
 class RemotiveFetcher(BaseJobFetcher):
-    """Fetches software development jobs from the legal, public Remotive API."""
+    """Fetches software development jobs from Remotive (Disabled due to paid access wall)."""
 
     API_URL = "https://remotive.com/api/remote-jobs"
 

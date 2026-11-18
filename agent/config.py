@@ -19,7 +19,7 @@ class StudentProfileConfig(BaseModel):
     college: str = "Anurag University"
     branch: str = "Computer Science and Engineering"
     graduation_year: int = 2028
-    cgpa: Optional[str] = "8.5"
+    cgpa: Optional[str] = "9.05"
     github_username: str = "Ruchith4560"
 
     @property
@@ -135,7 +135,6 @@ class JobDiscoveryConfig(BaseModel):
             "indian_portals",
             "enterprise_careers",
             "smartrecruiters",
-            "remotive",
             "remoteok",
             "arbeitnow",
             "jobicy",

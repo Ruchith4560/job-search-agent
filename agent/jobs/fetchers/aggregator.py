@@ -30,13 +30,12 @@ logger = logging.getLogger(__name__)
 
 
 class JobAggregator:
-    """Coordinates fetching across LinkedIn, Internshala, Unstop, Freshersworld, Indian Portals, Remotive, RemoteOK, Arbeitnow, Jobicy, Himalayas, WWR, Python.org, SmartRecruiters, Greenhouse, and Lever."""
+    """Coordinates fetching across LinkedIn, Internshala, Unstop, Freshersworld, Indian Portals, RemoteOK, Arbeitnow, Jobicy, Himalayas, WWR, Python.org, SmartRecruiters, Greenhouse, and Lever."""
 
     def __init__(self, config: Optional[AppConfig] = None) -> None:
         """Initialize aggregator with fetchers configured according to settings."""
         self.config = config or AppConfig()
         self.fetchers: Dict[str, BaseJobFetcher] = {
-            "remotive": RemotiveFetcher(),
             "remoteok": RemoteOKFetcher(),
             "arbeitnow": ArbeitnowFetcher(),
             "jobicy": JobicyFetcher(),

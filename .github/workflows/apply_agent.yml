@@ -1,26 +1,48 @@
 name: apply_agent
+
 on:
   schedule:
     - cron: "0 */3 * * *"      # every 3 hours (~720 free minutes/month)
   workflow_dispatch:
+
 concurrency: apply-agent       # never run two at once
+
+permissions:
+  contents: write
+
 jobs:
   apply:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with: { python-version: "3.11", cache: pip }
-      - run: pip install -r requirements.txt && python -m playwright install --with-deps chromium
-      - name: Check replies and apply
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          python -m playwright install --with-deps chromium
+
+      - name: Check replies and process auto-apply queue
         env:
-          GMAIL_USER: ${{ secrets.GMAIL_USER }}
+          GMAIL_USER: ${{ secrets.GMAIL_USER || 'macharuchith1@gmail.com' }}
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
         run: python -m agent.apply.auto_apply run --submit
-      - name: Save state
+
+      - name: Save and Push State
         run: |
-          git config user.name "job-agent"; git config user.email "job-agent@users.noreply.github.com"
-          git add data/tracker.db data/custom_answers.json data/output || true
-          git commit -m "apply agent state" || echo "nothing to commit"
-          git push
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/
+          git commit -m "Auto-update apply agent tracker state [skip ci]" || echo "No changes to commit"
+          git pull --rebase origin main || true
+          git push || echo "Push skipped or not needed"

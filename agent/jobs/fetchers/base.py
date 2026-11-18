@@ -1,13 +1,27 @@
 """Base job board fetcher abstract class with retries and rate limit respect."""
 
 from abc import ABC, abstractmethod
+import html
 import logging
+import re
 import time
 from typing import Any, Dict, List, Optional
 import requests
 from agent.jobs.schema import Job
 
 logger = logging.getLogger(__name__)
+
+
+def strip_html_tags(text: str) -> str:
+    """Convert HTML job description to clean plain text."""
+    if not text:
+        return ""
+    unescaped = html.unescape(text)
+    cleaned = re.sub(r"<(?:p|br|li|div)[^>]*>", "\n", unescaped, flags=re.I)
+    cleaned = re.sub(r"<[^>]+>", " ", cleaned)
+    cleaned = re.sub(r"[ \t]+", " ", cleaned)
+    cleaned = re.sub(r"\n\s*\n+", "\n\n", cleaned)
+    return cleaned.strip()
 
 
 class BaseJobFetcher(ABC):

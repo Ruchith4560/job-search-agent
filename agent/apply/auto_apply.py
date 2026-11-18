@@ -94,7 +94,8 @@ CONSENT = re.compile(r"agree|consent|acknowledge|privacy|terms|certify|confirm|a
 CONFIRM = re.compile(
     r"thank you for (applying|your application|your interest)|"
     r"application (has been |was )?(successfully )?(received|submitted|sent)|"
-    r"we.ve received your application|successfully applied|application complete",
+    r"we.ve received your application|successfully applied|application complete|"
+    r"almost there! just one more step to complete your application|applythankyou",
     re.I,
 )
 
@@ -471,6 +472,283 @@ def wait_confirmation(page, timeout=20) -> bool:
     return False
 
 
+def _poll_step(page, step_str: str, timeout: int = 30) -> bool:
+    for _ in range(timeout):
+        page.wait_for_timeout(1000)
+        if step_str.lower() in page.url.lower():
+            return True
+    return False
+
+
+def is_phenom_portal(page, job_url: str = "") -> bool:
+    url_lower = (page.url + " " + job_url).lower()
+    if "phenompeople.com" in url_lower or "careers.mastercard.com" in url_lower:
+        return True
+    try:
+        if page.locator("#phoneWidget, #previousworker, input[name*='cntryFields']").count() > 0:
+            return True
+    except Exception:
+        pass
+    return False
+
+
+def fill_phenom_portal(page, job: dict, profile: dict, answers: dict, submit: bool, out_dir: Path) -> str:
+    """Specialized driver for Phenom People ATS (e.g. Mastercard Launch Program)."""
+    # 1. Landing page check: If URL has /job/ or an Apply Now link/button
+    if "/job/" in page.url.lower():
+        apply_btn = page.get_by_role("link", name=re.compile(r"apply(\s*now)?", re.I))
+        if apply_btn.count():
+            print("  [phenom] Clicking Apply Now on landing page...")
+            apply_btn.first.click()
+            page.wait_for_load_state("domcontentloaded")
+            page.wait_for_timeout(3000)
+
+    # 2. Wait for form controls or file upload input (which is attached, often visually hidden)
+    try:
+        page.wait_for_selector("input[type=file]", state="attached", timeout=25000)
+    except Exception:
+        page.wait_for_selector("select#country", timeout=15000)
+    page.wait_for_timeout(2000)
+    page.evaluate("() => { const el = document.getElementById('onetrust-consent-sdk'); if (el) el.remove(); }")
+
+    # Step 1: Upload resume
+    file_inp = page.locator("input[type=file]")
+    if file_inp.count() and job.get("resume") and Path(job["resume"]).exists():
+        print(f"  [phenom] Uploading resume: {job['resume']}...")
+        file_inp.first.set_input_files(str(Path(job["resume"]).resolve()))
+        page.wait_for_timeout(7000)
+    page.evaluate("() => { const el = document.getElementById('onetrust-consent-sdk'); if (el) el.remove(); }")
+
+    # Step 1: Fill required fields
+    print("  [phenom] Filling Step 1 (Personal Information)...")
+    page.select_option("#country", label="India")
+    page.locator("#country").dispatch_event("change")
+    page.wait_for_timeout(3000)
+
+    phone_code = page.locator("#phoneWidget\\.countryPhoneCode, select[id*='countryPhoneCode']")
+    if phone_code.count():
+        try:
+            phone_code.first.select_option(value="IND_91")
+        except Exception:
+            phone_code.first.select_option(label="India (+91)")
+        phone_code.first.dispatch_event("change")
+
+    dt_sel = page.locator("#deviceType")
+    if dt_sel.count():
+        dt_sel.select_option(value="Mobile")
+        dt_sel.dispatch_event("change")
+
+    src_sel = page.locator("#sourceType")
+    if src_sel.count():
+        src_sel.select_option(value="Job Board")
+        src_sel.dispatch_event("change")
+        page.wait_for_timeout(1000)
+
+    app_src = page.locator("#applicantSource, select[name='applicantSource']")
+    if app_src.count():
+        app_src.first.select_option(label="LinkedIn")
+        app_src.first.dispatch_event("change")
+
+    pw_no = page.locator("#previousworker-No-label")
+    if pw_no.count():
+        pw_no.click(force=True)
+        page.wait_for_timeout(500)
+
+    cb = page.locator("label:has(#emailAgreement), #emailAgreement")
+    if cb.count():
+        cb.first.click(force=True)
+
+    phone_inp = page.locator("input[id='phoneWidget.phoneNumber'], input[name='phoneWidget.phoneNumber']")
+    if phone_inp.count() and not phone_inp.first.input_value():
+        phone_inp.first.fill(profile.get("phone", "6305239230"))
+        phone_inp.first.dispatch_event("input")
+        phone_inp.first.dispatch_event("change")
+
+    fn_inp = page.locator("input[name='cntryFields.firstName'], input#firstName")
+    if fn_inp.count() and not fn_inp.first.input_value():
+        fn_inp.first.fill(profile.get("first_name", "Ruchith"))
+        fn_inp.first.dispatch_event("input")
+        fn_inp.first.dispatch_event("change")
+
+    ln_inp = page.locator("input[name='cntryFields.lastName'], input#lastName")
+    if ln_inp.count() and not ln_inp.first.input_value():
+        ln_inp.first.fill(profile.get("last_name", "Macha"))
+        ln_inp.first.dispatch_event("input")
+        ln_inp.first.dispatch_event("change")
+
+    em_inp = page.locator("input[name='email'], input#email")
+    if em_inp.count() and not em_inp.first.input_value():
+        em_inp.first.fill(profile.get("email", "macharuchith1@gmail.com"))
+        em_inp.first.dispatch_event("input")
+        em_inp.first.dispatch_event("change")
+
+    addr = page.locator("input[name='cntryFields.addressLine1'], input#addressLine1")
+    if addr.count() and not addr.first.input_value():
+        addr.first.fill("Hyderabad, Telangana")
+        addr.first.dispatch_event("input")
+        addr.first.dispatch_event("change")
+
+    page.wait_for_timeout(2000)
+
+    # Next: Step 1 -> Step 2
+    print("  [phenom] Advancing Step 1 -> Step 2...")
+    page.locator("button#next").click(force=True)
+    _poll_step(page, "step=2", timeout=30)
+    page.wait_for_timeout(2000)
+    page.evaluate("() => { const el = document.getElementById('onetrust-consent-sdk'); if (el) el.remove(); }")
+
+    # Step 2: Work & Education
+    print("  [phenom] Filling Step 2 (Work & Education)...")
+    exp1_comp = page.locator("input[id='experienceData[1].companyName']")
+    if exp1_comp.count() and not exp1_comp.input_value():
+        exp1_comp.fill("Malai Club")
+        exp1_comp.dispatch_event("input")
+        exp1_comp.dispatch_event("change")
+
+    deg_sel = page.locator("select[id='educationData[0].degree']")
+    if deg_sel.count():
+        deg_sel.select_option(label="Bachelors")
+        deg_sel.dispatch_event("input")
+        deg_sel.dispatch_event("change")
+        deg_sel.dispatch_event("blur")
+
+    field_sel = page.locator("select[id='educationData[0].fieldOfStudy']")
+    if field_sel.count():
+        try:
+            field_sel.select_option(label="Computer Science")
+            field_sel.dispatch_event("input")
+            field_sel.dispatch_event("change")
+            field_sel.dispatch_event("blur")
+        except Exception:
+            pass
+
+    gpa_inp = page.locator("input[id='educationData[0].gradeAverage']")
+    if gpa_inp.count() and not gpa_inp.input_value():
+        gpa_inp.fill(CGPA)
+        gpa_inp.dispatch_event("input")
+        gpa_inp.dispatch_event("change")
+
+    start_date = page.locator("input[id='educationData[0].fromTo.startDate']")
+    if start_date.count() and not start_date.input_value():
+        start_date.fill("08/2024")
+        start_date.dispatch_event("input")
+        start_date.dispatch_event("change")
+
+    end_date = page.locator("input[id='educationData[0].fromTo.endDate']")
+    if end_date.count() and not end_date.input_value():
+        end_date.fill("06/2028")
+        end_date.dispatch_event("input")
+        end_date.dispatch_event("change")
+
+    page.wait_for_timeout(2000)
+
+    # Next: Step 2 -> Step 3
+    print("  [phenom] Advancing Step 2 -> Step 3...")
+    page.locator("button#next").click(force=True)
+    _poll_step(page, "step=3", timeout=30)
+    page.wait_for_timeout(2000)
+    page.evaluate("() => { const el = document.getElementById('onetrust-consent-sdk'); if (el) el.remove(); }")
+
+    # Step 3: Job specific questions
+    print("  [phenom] Filling Step 3 (Job Specific Questions)...")
+    for q_id, q_val in [
+        ("jsqData.QUESTIONNAIRE-3-308.a", "Yes"),
+        ("jsqData.QUESTIONNAIRE-3-308.b", "No"),
+        ("jsqData.QUESTIONNAIRE-3-308.c", "No"),
+        ("jsqData.QUESTIONNAIRE-3-308.d", "Prefer Not To Self-Identify"),
+        ("jsqData.QUESTIONNAIRE-3-308.e", "No"),
+    ]:
+        sel = page.locator(f"select[id='{q_id}']")
+        if sel.count():
+            sel.select_option(label=q_val)
+            sel.dispatch_event("change")
+
+    page.wait_for_timeout(2000)
+
+    # Next: Step 3 -> Step 4
+    print("  [phenom] Advancing Step 3 -> Step 4...")
+    page.locator("button#next").click(force=True)
+    _poll_step(page, "step=4", timeout=30)
+    page.wait_for_timeout(2000)
+    page.evaluate("() => { const el = document.getElementById('onetrust-consent-sdk'); if (el) el.remove(); }")
+
+    # Step 4: Conflict questionnaire
+    print("  [phenom] Filling Step 4 (Conflict Questionnaire)...")
+    for q_id in [
+        "secondaryJsqData.QUESTIONNAIRE-3-321.a",
+        "secondaryJsqData.QUESTIONNAIRE-3-321.b",
+        "secondaryJsqData.QUESTIONNAIRE-3-321.c",
+        "secondaryJsqData.QUESTIONNAIRE-3-321.d",
+        "secondaryJsqData.QUESTIONNAIRE-3-321.e",
+        "secondaryJsqData.QUESTIONNAIRE-3-321.f",
+    ]:
+        sel = page.locator(f"select[id='{q_id}']")
+        if sel.count():
+            sel.select_option(label="No")
+            sel.dispatch_event("change")
+
+    page.wait_for_timeout(2000)
+
+    # Next: Step 4 -> Step 5
+    print("  [phenom] Advancing Step 4 -> Step 5...")
+    page.locator("button#next").click(force=True)
+    _poll_step(page, "step=5", timeout=30)
+    page.wait_for_timeout(2000)
+    page.evaluate("() => { const el = document.getElementById('onetrust-consent-sdk'); if (el) el.remove(); }")
+
+    # Step 5: Applicant acknowledgment
+    print("  [phenom] Filling Step 5 (Applicant Acknowledgment)...")
+    ack_cb = page.locator("label:has(#termConditions_non_us\\.agreementCheck), #termConditions_non_us\\.agreementCheck")
+    if ack_cb.count():
+        ack_cb.first.click(force=True)
+    page.wait_for_timeout(2000)
+
+    # Next: Step 5 -> Step 6 (Review)
+    print("  [phenom] Advancing Step 5 -> Step 6 (Review)...")
+    page.locator("button#next").click(force=True)
+    _poll_step(page, "step=6", timeout=30)
+    page.wait_for_timeout(4000)
+    page.evaluate("() => { const el = document.getElementById('onetrust-consent-sdk'); if (el) el.remove(); }")
+
+    # Step 6: Review & Final Submission
+    before = out_dir / "before_submit.png"
+    page.screenshot(path=str(before), full_page=True)
+    print(f"  [phenom] Reached Step 6 (Review). Proof screenshot saved: {before}")
+
+    if not submit:
+        set_state(job["job_id"], "READY", last_error="dry-run: filled, not submitted")
+        print("  [phenom dry-run] Reached Step 6 Review successfully without submitting.")
+        return "DRY_RUN_OK"
+
+    # Submit
+    submit_btn = page.locator("button[atm-id='submit-button'], button.btn-submit:not(#ph-search-backdrop), button:has-text('Submit'):not(#ph-search-backdrop)")
+    if not submit_btn.count():
+        submit_btn = page.locator("button#next")
+    if not submit_btn.count():
+        set_state(job["job_id"], "NEEDS_MANUAL", last_error="submit button not found on step 6")
+        return "NEEDS_MANUAL"
+
+    print("  [phenom submit] Clicking final Submit button on Step 6...")
+    submit_btn.first.click(force=True)
+    ok = wait_confirmation(page, timeout=30)
+    after = out_dir / "after_submit.png"
+    page.screenshot(path=str(after), full_page=True)
+
+    if ok or "thank" in page.url.lower() or "applythankyou" in page.url.lower() or "thank" in page.inner_text("body").lower() or "received" in page.inner_text("body").lower():
+        set_state(job["job_id"], "SUBMITTED", last_error=None)
+        send_mail(
+            f"[Application Confirmed] Successfully applied to {job['company']} - {job['role']}",
+            f"<p>Submitted {_now()}<br><a href='{job['url']}'>{job['url']}</a></p>",
+            [job["resume"], str(after)],
+        )
+        print("  [phenom] Application SUBMITTED successfully and confirmed!")
+        return "SUBMITTED"
+
+    state = "NEEDS_MANUAL" if job["attempts"] + 1 >= MAX_ATTEMPTS else "READY"
+    set_state(job["job_id"], state, last_error="confirmation not detected after submit")
+    return state
+
+
 def slug(job) -> str:
     return re.sub(r"[^a-z0-9]+", "_", f"{job['company']}_{job['role']}".lower()).strip("_")[:60]
 
@@ -621,6 +899,10 @@ def process(job: dict, submit: bool, headless: bool = True) -> str:
                 if has_login_wall(page):
                     set_state(job["job_id"], "NEEDS_MANUAL", last_error="login required: OAuth (Google / LinkedIn / account login)")
                     return "NEEDS_MANUAL"
+
+            if is_phenom_portal(page, job.get("url", "")):
+                print(f"  [portal] Detected Phenom People ATS for {job['company']}. Executing multi-step flow...")
+                return fill_phenom_portal(page, job, profile, answers, submit, out_dir)
 
             unknown, filled = fill_form(page, job, profile, answers)
             print(f"  filled {len(filled)} fields, {len(unknown)} unknown required")

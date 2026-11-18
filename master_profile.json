@@ -120,13 +120,13 @@
     {
       "name": "JavaScript",
       "category": "Languages",
-      "evidence": "Listed on LinkedIn profile; Used in 5 GitHub repositories (travel_expense_calculator, NextMail_Ai, servicedesk-pro (+2 more)) with 54,591 bytes of code",
+      "evidence": "Listed on LinkedIn profile; Used in 4 GitHub repositories (travel_expense_calculator, NextMail_Ai, servicedesk-pro (+1 more)) with 17,825 bytes of code",
       "source": "linkedin"
     },
     {
       "name": "Python",
       "category": "Languages",
-      "evidence": "Listed on LinkedIn profile; Used in 4 GitHub repositories (job-search-agent, servicedesk-pro, ai-change-impact-engine (+1 more)) with 1,151,117 bytes of code",
+      "evidence": "Listed on LinkedIn profile; Used in 4 GitHub repositories (job-search-agent, servicedesk-pro, ai-change-impact-engine (+1 more)) with 1,180,548 bytes of code",
       "source": "linkedin"
     },
     {
@@ -636,5 +636,5 @@
   ],
   "conflicts": [],
   "version": "1.1",
-  "last_updated": "2026-11-18T03:02:18.838379+00:00"
+  "last_updated": "2026-11-18T14:16:42.271847+00:00"
 }

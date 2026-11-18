@@ -1,4 +1,4 @@
-"""RemoteOK public API job fetcher."""
+"""RemoteOK job fetcher (Disabled: RemoteOK requires a $30/yr paid subscription)."""
 
 import logging
 from typing import List, Optional
@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 
 class RemoteOKFetcher(BaseJobFetcher):
-    """Fetches remote software development jobs from RemoteOK public JSON API."""
+    """Fetches remote software development jobs from RemoteOK (Disabled due to $30/yr paid access wall)."""
 
     API_URL = "https://remoteok.com/api"
 

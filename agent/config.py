@@ -135,7 +135,7 @@ class JobDiscoveryConfig(BaseModel):
             "indian_portals",
             "enterprise_careers",
             "smartrecruiters",
-            "remoteok",
+            "remotive",
             "arbeitnow",
             "jobicy",
             "himalayas",

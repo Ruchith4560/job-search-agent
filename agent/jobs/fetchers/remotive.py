@@ -1,4 +1,4 @@
-"""Remotive public API job fetcher (Disabled: Remotive now requires payment)."""
+"""Remotive public API job fetcher."""
 
 import html
 import logging
@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 
 class RemotiveFetcher(BaseJobFetcher):
-    """Fetches software development jobs from Remotive (Disabled due to paid access wall)."""
+    """Fetches software development jobs from Remotive public API."""
 
     API_URL = "https://remotive.com/api/remote-jobs"
 

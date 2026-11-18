@@ -32,10 +32,10 @@ class DailyDigestGenerator:
         metrics = self.dashboard.get_summary_metrics()
 
         # 1. Action Items (Shortlisted or Tailored requiring human review / prefill)
-        shortlisted = self.db.get_jobs(status="shortlisted", limit=10)
-        tailored = self.db.get_jobs(status="tailored", limit=10)
-        applied = self.db.get_jobs(status="applied", limit=10)
-        interviews = self.db.get_jobs(status="interview", limit=10)
+        shortlisted = [j for j in self.db.get_jobs(status="shortlisted", limit=10) if (j.source or "").lower() != "remoteok" and "remoteok.com" not in (j.url or "").lower()]
+        tailored = [j for j in self.db.get_jobs(status="tailored", limit=10) if (j.source or "").lower() != "remoteok" and "remoteok.com" not in (j.url or "").lower()]
+        applied = [j for j in self.db.get_jobs(status="applied", limit=10) if (j.source or "").lower() != "remoteok" and "remoteok.com" not in (j.url or "").lower()]
+        interviews = [j for j in self.db.get_jobs(status="interview", limit=10) if (j.source or "").lower() != "remoteok" and "remoteok.com" not in (j.url or "").lower()]
 
         now_str = datetime.now(timezone.utc).strftime("%A, %B %d, %Y")
 

@@ -139,6 +139,12 @@ def apply_hard_filters(
     exclude_unpaid = config.preferences.deal_breakers.exclude_unpaid
 
     for job in jobs:
+        # 0. Exclude fee-charging / paywalled portals (e.g. RemoteOK $30/yr paywall)
+        if getattr(config.preferences.deal_breakers, "exclude_fee_charging", True):
+            if (job.source or "").lower() == "remoteok" or "remoteok.com" in (job.url or "").lower():
+                rejected.append((job, "Excluded fee-charging portal (RemoteOK requires paid subscription)"))
+                continue
+
         # 1. Anti-scam check
         scam_reason = check_for_scam(job)
         if scam_reason:

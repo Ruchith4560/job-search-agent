@@ -27,7 +27,7 @@ from agent.jobs.fetchers.aggregator import JobAggregator
 from agent.jobs.match import MatchPipeline
 from agent.notify.email_sender import EmailDigestGenerator, EmailDigestSender, JobDigestItem
 from agent.profile.builder import ProfileBuilder
-from agent.profile.schema import MasterProfile
+from agent.profile.schema import MasterProfile, PersonalInfo
 from agent.profile.sync import ProfileSyncManager
 from agent.resume.ats_checker import ATSChecker
 from agent.resume.generator import ResumeGenerator
@@ -521,7 +521,6 @@ def match(
     # 1. Load Master Profile
     if not p_file.is_file():
         console.print(f"[yellow]Master profile '{p_file}' not found. Generating default profile from configuration...[/yellow]")
-        from agent.profile.schema import MasterProfile, PersonalInfo
         default_prof = MasterProfile(
             personal_info=PersonalInfo(
                 name=config.student_profile.name,
@@ -542,7 +541,10 @@ def match(
 
     # 2. Load Jobs from Database
     database = JobDatabase(db_path=target_db)
-    all_jobs = database.get_jobs()
+    all_jobs = [
+        j for j in database.get_jobs()
+        if (j.source or "").lower() != "remoteok" and "remoteok.com" not in (j.url or "").lower()
+    ]
     if not all_jobs:
         console.print(
             f"[yellow]No jobs currently found in database '{target_db}'. Skipping matching step.[/yellow]"
@@ -979,17 +981,37 @@ def email_digest_command(
     qualified_jobs = database.get_jobs(
         min_match_score=threshold,
         unemailed_only=unemailed_only,
-        limit=limit,
+        limit=limit * 2 if limit else None,
     )
+    qualified_jobs = [
+        j for j in qualified_jobs
+        if (j.source or "").lower() != "remoteok" and "remoteok.com" not in (j.url or "").lower()
+    ]
+    if limit and len(qualified_jobs) > limit:
+        qualified_jobs = qualified_jobs[:limit]
+
     if not qualified_jobs:
         # Fallback to any shortlisted jobs if no match_score recorded yet
-        shortlisted = database.get_jobs(status="shortlisted", limit=limit)
-        qualified_jobs = [j for j in shortlisted if (j.match_score or 0) >= threshold or j.match_score is None]
+        shortlisted = database.get_jobs(status="shortlisted", limit=limit * 2 if limit else None)
+        qualified_jobs = [
+            j for j in shortlisted
+            if ((j.match_score or 0) >= threshold or j.match_score is None)
+            and (j.source or "").lower() != "remoteok"
+            and "remoteok.com" not in (j.url or "").lower()
+        ]
+        if limit and len(qualified_jobs) > limit:
+            qualified_jobs = qualified_jobs[:limit]
 
     if not qualified_jobs:
         # Fallback to top active qualified jobs so daily digest is never empty
-        all_qualified = database.get_jobs(min_match_score=threshold, limit=limit)
-        qualified_jobs = [j for j in all_qualified if j.status not in ("rejected", "applied")] or all_qualified[:limit]
+        all_qualified = database.get_jobs(min_match_score=threshold, limit=limit * 2 if limit else None)
+        all_qualified = [
+            j for j in all_qualified
+            if (j.source or "").lower() != "remoteok" and "remoteok.com" not in (j.url or "").lower()
+        ]
+        qualified_jobs = [j for j in all_qualified if j.status not in ("rejected", "applied")] or all_qualified
+        if limit and len(qualified_jobs) > limit:
+            qualified_jobs = qualified_jobs[:limit]
 
     if not qualified_jobs:
         console.print(f"[yellow]No qualified jobs found matching threshold {threshold}+. Run 'python main.py fetch-jobs' and 'python main.py match'.[/yellow]")

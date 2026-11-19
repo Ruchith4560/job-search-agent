@@ -1,0 +1,21 @@
+Traceback (most recent call last):
+  File "<frozen runpy>", line 189, in _run_module_as_main
+  File "<frozen runpy>", line 112, in _get_module_details
+  File "/home/runner/work/job-search-agent/job-search-agent/agent/apply/__init__.py", line 9, in <module>
+    from agent.apply.cover_letter import (
+  File "/home/runner/work/job-search-agent/job-search-agent/agent/apply/cover_letter.py", line 9, in <module>
+    from agent.jobs.schema import Job
+  File "/home/runner/work/job-search-agent/job-search-agent/agent/jobs/__init__.py", line 5, in <module>
+    from agent.jobs.embed import EmbeddingMatcher, job_to_text, profile_to_text
+  File "/home/runner/work/job-search-agent/job-search-agent/agent/jobs/embed.py", line 9, in <module>
+    from agent.profile.schema import MasterProfile
+  File "/home/runner/work/job-search-agent/job-search-agent/agent/profile/__init__.py", line 4, in <module>
+    from agent.profile.sync import ProfileSyncManager
+  File "/home/runner/work/job-search-agent/job-search-agent/agent/profile/sync.py", line 10, in <module>
+    from agent.config import AppConfig, load_config
+  File "/home/runner/work/job-search-agent/job-search-agent/agent/config.py", line 87, in <module>
+    class EmailConfig(BaseModel):
+  File "/home/runner/work/job-search-agent/job-search-agent/agent/config.py", line 100, in EmailConfig
+    def model_post_init(self, __context: Any) -> None:
+                                         ^^^
+NameError: name 'Any' is not defined. Did you mean: 'any'?

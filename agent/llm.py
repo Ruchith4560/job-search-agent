@@ -6,7 +6,10 @@ import os
 import re
 import time
 from typing import Any, Dict, List, Optional, Type, TypeVar, Union
-import anthropic
+try:
+    import anthropic
+except ImportError:
+    anthropic = None
 from pydantic import BaseModel, ValidationError
 
 logger = logging.getLogger(__name__)
@@ -86,6 +89,8 @@ class ClaudeClient:
     def client(self) -> anthropic.Anthropic:
         """Lazy initialization of the Anthropic client."""
         if self._client is None:
+            if anthropic is None:
+                raise LLMError("anthropic package is not installed. Please install anthropic to use ClaudeClient.")
             if not self.api_key:
                 raise LLMError(
                     "ANTHROPIC_API_KEY is not set. Please add it to your .env file or environment variables."

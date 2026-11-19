@@ -123,7 +123,7 @@ CONFIRM = re.compile(
 
 def db() -> sqlite3.Connection:
     DATA.mkdir(parents=True, exist_ok=True)
-    c = sqlite3.connect(DB_PATH)
+    c = sqlite3.connect(DB_PATH, timeout=30.0)
     c.row_factory = sqlite3.Row
     c.execute(
         """CREATE TABLE IF NOT EXISTS apply_state(
@@ -972,7 +972,8 @@ def process(job: dict, submit: bool, headless: bool = True) -> str:
         profile, answers = load_profile(), load_answers()
         out_dir = DATA / "output" / slug(job)
         out_dir.mkdir(parents=True, exist_ok=True)
-        set_state(job["job_id"], "FILLING", attempts=job["attempts"] + 1)
+        cur_attempts = (job.get("attempts") or 0) + 1
+        set_state(job["job_id"], "FILLING", attempts=cur_attempts)
 
         # Hydrate storage state from environment variable (e.g. GitHub secret AUTH_STORAGE_STATE) if available
         auth_secret = os.getenv("AUTH_STORAGE_STATE")
@@ -1058,7 +1059,7 @@ def process(job: dict, submit: bool, headless: bool = True) -> str:
                 blocker = "captcha/verification" if page.locator(
                     "iframe[src*='captcha'], iframe[src*='turnstile'], .g-recaptcha, .h-captcha"
                 ).count() else "no confirmation detected (validation error?)"
-                state = "NEEDS_MANUAL" if job["attempts"] + 1 >= MAX_ATTEMPTS else "READY"
+                state = "NEEDS_MANUAL" if cur_attempts >= MAX_ATTEMPTS else "READY"
                 set_state(job["job_id"], state, last_error=blocker)
                 if state == "NEEDS_MANUAL":
                     resume_p = resolve_resume_path(job)
@@ -1076,7 +1077,8 @@ def process(job: dict, submit: bool, headless: bool = True) -> str:
                 except Exception:
                     pass
     except Exception as e:                 # noqa: BLE001
-        state = "NEEDS_MANUAL" if job.get("attempts", 0) + 1 >= MAX_ATTEMPTS else "READY"
+        att = (job.get("attempts") or 0) + 1
+        state = "NEEDS_MANUAL" if att >= MAX_ATTEMPTS else "READY"
         set_state(job["job_id"], state, last_error=str(e)[:300])
         print(f"  [error] Exception in process({job.get('company')}): {e}")
         return "ERROR"
@@ -1092,6 +1094,8 @@ def run_queue(submit=False, headless=True, limit=10):
     if APP_PASSWORD:
         check_replies()
     with db() as c:
+        # Reset any stale FILLING states from prior interrupted/crashed runs back to APPROVED
+        c.execute("UPDATE apply_state SET state='APPROVED' WHERE state='FILLING'")
         rows = [dict(r) for r in c.execute(
             "SELECT * FROM apply_state WHERE state IN ('APPROVED','READY') ORDER BY updated_at LIMIT ?",
             (limit,))]
@@ -1120,18 +1124,23 @@ def status():
 
 
 if __name__ == "__main__":
-    ap = argparse.ArgumentParser()
-    ap.add_argument("cmd", choices=["run", "check-replies", "status", "login"])
-    ap.add_argument("--submit", action="store_true", help="really submit (default: dry run)")
-    ap.add_argument("--headed", action="store_true")
-    ap.add_argument("--limit", type=int, default=10)
-    ap.add_argument("--target", default="google", choices=["google", "linkedin", "all"], help="target service to log into (google, linkedin, or all)")
-    a = ap.parse_args()
-    if a.cmd == "run":
-        run_queue(a.submit, not a.headed, a.limit)
-    elif a.cmd == "check-replies":
-        print("updated:", check_replies())
-    elif a.cmd == "login":
-        login_session(a.target)
-    else:
-        status()
+    try:
+        ap = argparse.ArgumentParser()
+        ap.add_argument("cmd", choices=["run", "check-replies", "status", "login"])
+        ap.add_argument("--submit", action="store_true", help="really submit (default: dry run)")
+        ap.add_argument("--headed", action="store_true")
+        ap.add_argument("--limit", type=int, default=10)
+        ap.add_argument("--target", default="google", choices=["google", "linkedin", "all"], help="target service to log into (google, linkedin, or all)")
+        a = ap.parse_args()
+        if a.cmd == "run":
+            run_queue(a.submit, not a.headed, a.limit)
+        elif a.cmd == "check-replies":
+            print("updated:", check_replies())
+        elif a.cmd == "login":
+            login_session(a.target)
+        else:
+            status()
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        raise

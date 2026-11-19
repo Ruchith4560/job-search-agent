@@ -40,14 +40,25 @@ jobs:
           GMAIL_USER: ${{ secrets.GMAIL_USER || 'macharuchith1@gmail.com' }}
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
           AUTH_STORAGE_STATE: ${{ secrets.AUTH_STORAGE_STATE }}
-        run: python -u -m agent.apply.auto_apply run --submit
+        run: |
+          python -u -m agent.apply.auto_apply run --submit 2>&1 | tee apply_run.log
 
       - name: Save and Push State
         if: always()
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/ master_profile.json
+          git add data/ master_profile.json apply_run.log || true
           git commit -m "Auto-update apply agent tracker state [skip ci]" || echo "No changes to commit"
           git pull --rebase origin main || true
           git push || echo "Push skipped or not needed"
+
+      - name: Upload Run Logs and Artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: apply-agent-artifacts
+          path: |
+            apply_run.log
+            data/output/
+          retention-days: 14

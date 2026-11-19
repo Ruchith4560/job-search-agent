@@ -4,6 +4,9 @@ on:
   schedule:
     - cron: "0 */3 * * *"      # every 3 hours (~720 free minutes/month)
   workflow_dispatch:
+  push:
+    branches:
+      - main
 
 concurrency: apply-agent       # never run two at once
 

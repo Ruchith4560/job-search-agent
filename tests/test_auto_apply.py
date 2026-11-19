@@ -97,3 +97,35 @@ def test_slug_generation():
     s = slug(job)
     assert "google_llc" in s
     assert "software_engineer" in s
+
+
+def test_work_authorization_and_resume_resolution():
+    from agent.apply.auto_apply import resolve_resume_path
+
+    profile = dict(DEFAULTS)
+    answers = {}
+
+    f_auth = {
+        "label": "Are you legally authorized to work in the country you are applying for?",
+        "kind": "radio",
+        "options": [{"label": "Yes"}, {"label": "No"}],
+    }
+    assert resolve(f_auth, profile, answers) == "Yes"
+
+    f_sponsor = {
+        "label": "Will you now or in the future require visa sponsorship?",
+        "kind": "radio",
+        "options": [{"label": "Yes"}, {"label": "No"}],
+    }
+    assert resolve(f_sponsor, profile, answers) == "No"
+
+    job = {
+        "job_id": "test_job_123",
+        "company": "Test Company",
+        "role": "Software Engineer",
+        "resume": "non_existent_path.pdf",
+    }
+    p = resolve_resume_path(job)
+    assert p is not None
+    assert p.exists()
+

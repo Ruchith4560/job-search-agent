@@ -34,6 +34,8 @@ data/raw/*
 !data/raw/.gitkeep
 data/output/*
 !data/output/.gitkeep
+!data/output/resume.pdf
+!data/output/**/*.pdf
 !master_profile.json
 *.db
 !data/tracker.db

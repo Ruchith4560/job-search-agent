@@ -60,13 +60,25 @@ DEFAULTS = {
     "first_name": "Macha",
     "last_name": "Ruchith",
     "email": "macharuchith1@gmail.com",
+    "phone": "+916305239230",
+    "linkedin": "https://linkedin.com/in/ruchith-macha",
     "github": "https://github.com/Ruchith4560",
     "college": "Anurag University",
-    "degree": "B.Tech",
+    "degree": "B.Tech in Computer Science and Engineering",
     "branch": "Computer Science and Engineering",
     "grad_year": "2028",
     "country": "India",
+    "location": "500068, Hyderabad, Telangana, India",
+    "city": "Hyderabad",
+    "state": "Telangana",
+    "postal_code": "500068",
     "cgpa": CGPA,
+    "work_auth": "Yes",
+    "visa_sponsorship": "No",
+    "relocate": "Yes",
+    "notice_period": "Immediately available",
+    "hear_about": "LinkedIn / Company Careers Page",
+    "gender": "Male",
 }
 
 # label regex -> profile key. Order matters. Deliberately conservative:
@@ -80,13 +92,20 @@ RULES = [
     (r"linkedin", "linkedin"),
     (r"github", "github"),
     (r"portfolio|personal (site|website)|website", "portfolio"),
+    (r"authoriz\w* to work|legally (authorized|eligible|permitted)|work authorization|eligible to work", "work_auth"),
+    (r"sponsor\w*|require (visa|sponsorship)|need sponsorship", "visa_sponsorship"),
+    (r"notice period|how soon|earliest (start|available)|availability to join", "notice_period"),
+    (r"relocat\w*|willing to relocate", "relocate"),
+    (r"how did you hear|hear about (us|this)|source", "hear_about"),
     (r"cgpa|gpa|grade point", "cgpa"),
     (r"graduat\w*\s*(year|date)|year of (graduation|passing)|passing year|batch", "grad_year"),
     (r"university|college|institution|school name", "college"),
     (r"degree|qualification", "degree"),
-    (r"branch|major|field of study|specializ", "branch"),
-    (r"\bcity\b|current location|where are you (based|located)", "location"),
-    (r"country", "country"),
+    (r"branch|major|field of study|specializ|discipline", "branch"),
+    (r"postal|zip|pin\s*code", "postal_code"),
+    (r"\bstate\b|province|region", "state"),
+    (r"\bcity\b|current location|where are you (based|located)|current address|street", "location"),
+    (r"\bcountry\b", "country"),
 ]
 DECLINE = re.compile(r"decline|prefer not|do not wish|don.t wish|not to (say|disclose|answer)", re.I)
 SENSITIVE = re.compile(r"gender|race|ethnic|veteran|disabilit|pronoun|sexual|hispanic|caste|religion", re.I)
@@ -265,6 +284,17 @@ def pick_option(value: str, labels: list[str]):
         return next((l for l in labels if DECLINE.search(l)), None)
     v = norm(value)
     nl = {l: norm(l) for l in labels}
+
+    # Direct Yes / No option resolution
+    if v.startswith("yes"):
+        for l, n in nl.items():
+            if n == "yes" or n.startswith("yes"):
+                return l
+    if v.startswith("no"):
+        for l, n in nl.items():
+            if n == "no" or n.startswith("no"):
+                return l
+
     for l, n in nl.items():
         if n == v:
             return l
@@ -341,6 +371,53 @@ def get_fields(page) -> list[dict]:
     return fields
 
 
+def resolve_resume_path(job: dict) -> Path | None:
+    """Resolve a valid, existing PDF resume for the job across Windows and Linux environments."""
+    p_str = job.get("resume")
+    if p_str:
+        p = Path(p_str)
+        if p.exists() and p.is_file():
+            return p
+        # Check normalized relative path if an absolute path from another OS was saved
+        norm_str = str(p_str).replace("\\", "/")
+        if "data/output" in norm_str:
+            rel = Path(norm_str[norm_str.index("data/output"):])
+            if rel.exists() and rel.is_file():
+                return rel
+
+    # Check job-specific tailored directory
+    job_dir = DATA / "output" / slug(job)
+    if job_dir.is_dir():
+        for candidate in [job_dir / "tailored_resume.pdf", *job_dir.glob("*.pdf")]:
+            if candidate.exists() and candidate.is_file():
+                return candidate
+
+    # Check general master resume in data/output or repo root
+    for fb in [DATA / "output" / "resume.pdf", DATA / "resume.pdf", Path("resume.pdf")]:
+        if fb.exists() and fb.is_file():
+            return fb
+
+    # Dynamically generate fallback resume PDF from master_profile.json
+    try:
+        from agent.profile.schema import MasterProfile
+        from agent.resume.generator import ResumeGenerator
+        from agent.resume.render import render_pdf
+        prof_path = PROFILE_PATH if PROFILE_PATH.exists() else Path("master_profile.json")
+        if prof_path.exists():
+            prof = MasterProfile.model_validate_json(prof_path.read_text(encoding="utf-8"))
+            gen = ResumeGenerator()
+            data = gen.generate(prof, target_role=job.get("role", "Software Engineer"))
+            out_pdf = DATA / "output" / "resume.pdf"
+            out_pdf.parent.mkdir(parents=True, exist_ok=True)
+            render_pdf(data, str(out_pdf))
+            if out_pdf.exists():
+                return out_pdf
+    except Exception as e:
+        print(f"  [warn] Could not dynamically build fallback resume: {e}")
+
+    return None
+
+
 def fill_form(page, job, profile, answers):
     """Returns (unknown_required, filled_labels)."""
     unknown, filled = [], []
@@ -348,13 +425,20 @@ def fill_form(page, job, profile, answers):
         label = f["label"]
         if f["kind"] == "file":
             is_cover = bool(re.search(r"cover", label, re.I))
-            path = job["cover"] if is_cover else job["resume"]
-            if not path or not Path(path).exists():
-                if f["required"]:
-                    unknown.append({"label": label, "options": []})
-                continue
-            page.locator(f'[data-aa="{f["aa"]}"]').set_input_files(path)
-            filled.append(label)
+            if is_cover:
+                path = job.get("cover")
+                if not path or not Path(path).exists():
+                    continue
+                page.locator(f'[data-aa="{f["aa"]}"]').set_input_files(str(Path(path).resolve()))
+                filled.append(label)
+            else:
+                resume_file = resolve_resume_path(job)
+                if not resume_file or not resume_file.exists():
+                    if f["required"]:
+                        unknown.append({"label": label, "options": []})
+                    continue
+                page.locator(f'[data-aa="{f["aa"]}"]').set_input_files(str(resume_file.resolve()))
+                filled.append(label)
             continue
         value = resolve(f, profile, answers)
         ok = value is not None and fill_field(page, f, value)
@@ -528,9 +612,10 @@ def fill_phenom_portal(page, job: dict, profile: dict, answers: dict, submit: bo
 
     # Step 1: Upload resume
     file_inp = page.locator("input[type=file]")
-    if file_inp.count() and job.get("resume") and Path(job["resume"]).exists():
-        print(f"  [phenom] Uploading resume: {job['resume']}...")
-        file_inp.first.set_input_files(str(Path(job["resume"]).resolve()))
+    resume_file = resolve_resume_path(job)
+    if file_inp.count() and resume_file and resume_file.exists():
+        print(f"  [phenom] Uploading resume: {resume_file}...")
+        file_inp.first.set_input_files(str(resume_file.resolve()))
         page.wait_for_timeout(7000)
     page.evaluate("() => { const el = document.getElementById('onetrust-consent-sdk'); if (el) el.remove(); }")
 
@@ -881,94 +966,120 @@ def check_replies() -> int:
 
 
 def process(job: dict, submit: bool, headless: bool = True) -> str:
-    from playwright.sync_api import sync_playwright
+    try:
+        from playwright.sync_api import sync_playwright
 
-    profile, answers = load_profile(), load_answers()
-    out_dir = DATA / "output" / slug(job)
-    out_dir.mkdir(parents=True, exist_ok=True)
-    set_state(job["job_id"], "FILLING", attempts=job["attempts"] + 1)
+        profile, answers = load_profile(), load_answers()
+        out_dir = DATA / "output" / slug(job)
+        out_dir.mkdir(parents=True, exist_ok=True)
+        set_state(job["job_id"], "FILLING", attempts=job["attempts"] + 1)
 
-    with sync_playwright() as p:
-        browser = p.chromium.launch(
-            headless=headless,
-            args=["--disable-blink-features=AutomationControlled"]
-        )
-        ctx_kwargs = {
-            "viewport": {"width": 1280, "height": 1600},
-            "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
-        }
-        if STORAGE_STATE_PATH.exists():
-            ctx_kwargs["storage_state"] = str(STORAGE_STATE_PATH)
-        context = browser.new_context(**ctx_kwargs)
-        page = context.new_page()
-        page.add_init_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
-        try:
-            page.goto(job["url"], wait_until="domcontentloaded", timeout=45000)
-            page.wait_for_timeout(2500)
-            if has_login_wall(page):
-                if STORAGE_STATE_PATH.exists() and handle_oauth_sso(page):
-                    page.wait_for_timeout(3000)
+        # Hydrate storage state from environment variable (e.g. GitHub secret AUTH_STORAGE_STATE) if available
+        auth_secret = os.getenv("AUTH_STORAGE_STATE")
+        if auth_secret and not STORAGE_STATE_PATH.exists():
+            try:
+                AUTH_DIR.mkdir(parents=True, exist_ok=True)
+                STORAGE_STATE_PATH.write_text(auth_secret, encoding="utf-8")
+                print("  [auth] Successfully initialized storage_state from AUTH_STORAGE_STATE environment secret.")
+            except Exception as e:
+                print(f"  [auth warn] Could not write AUTH_STORAGE_STATE: {e}")
+
+        with sync_playwright() as p:
+            browser = p.chromium.launch(
+                headless=headless,
+                args=[
+                    "--disable-blink-features=AutomationControlled",
+                    "--no-sandbox",
+                    "--disable-setuid-sandbox",
+                    "--disable-dev-shm-usage",
+                    "--disable-gpu",
+                ],
+            )
+            ctx_kwargs = {
+                "viewport": {"width": 1280, "height": 1600},
+                "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+            }
+            if STORAGE_STATE_PATH.exists():
+                ctx_kwargs["storage_state"] = str(STORAGE_STATE_PATH)
+            context = browser.new_context(**ctx_kwargs)
+            page = context.new_page()
+            page.add_init_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
+            try:
+                page.goto(job["url"], wait_until="domcontentloaded", timeout=45000)
+                page.wait_for_timeout(2500)
                 if has_login_wall(page):
-                    set_state(job["job_id"], "NEEDS_MANUAL", last_error="login required: OAuth (Google / LinkedIn / account login)")
+                    if STORAGE_STATE_PATH.exists() and handle_oauth_sso(page):
+                        page.wait_for_timeout(3000)
+                    if has_login_wall(page):
+                        set_state(job["job_id"], "NEEDS_MANUAL", last_error="login required: OAuth (Google / LinkedIn / account login)")
+                        return "NEEDS_MANUAL"
+
+                if is_phenom_portal(page, job.get("url", "")):
+                    print(f"  [portal] Detected Phenom People ATS for {job['company']}. Executing multi-step flow...")
+                    return fill_phenom_portal(page, job, profile, answers, submit, out_dir)
+
+                unknown, filled = fill_form(page, job, profile, answers)
+                print(f"  filled {len(filled)} fields, {len(unknown)} unknown required")
+
+                if has_login_wall(page):
+                    if STORAGE_STATE_PATH.exists() and handle_oauth_sso(page):
+                        page.wait_for_timeout(3000)
+                        unknown, filled = fill_form(page, job, profile, answers)
+                    if has_login_wall(page):
+                        set_state(job["job_id"], "NEEDS_MANUAL", last_error="login required: OAuth (Google / LinkedIn / account login)")
+                        return "NEEDS_MANUAL"
+
+                if unknown:
+                    token = job["token"] or uuid.uuid4().hex[:8]
+                    set_state(job["job_id"], "WAITING_ANSWER", token=token, pending=json.dumps(unknown))
+                    send_inquiry(job, token, unknown)
+                    return "WAITING_ANSWER"
+
+                before = out_dir / "before_submit.png"
+                page.screenshot(path=str(before), full_page=True)
+                if not submit:
+                    set_state(job["job_id"], "READY", last_error="dry-run: filled, not submitted")
+                    return "DRY_RUN_OK"
+
+                if not click_submit(page):
+                    set_state(job["job_id"], "NEEDS_MANUAL", last_error="submit button not found")
                     return "NEEDS_MANUAL"
 
-            if is_phenom_portal(page, job.get("url", "")):
-                print(f"  [portal] Detected Phenom People ATS for {job['company']}. Executing multi-step flow...")
-                return fill_phenom_portal(page, job, profile, answers, submit, out_dir)
+                ok = wait_confirmation(page)
+                after = out_dir / "after_submit.png"
+                page.screenshot(path=str(after), full_page=True)
+                if ok:
+                    set_state(job["job_id"], "SUBMITTED", last_error=None)
+                    # Suppress synthetic agent emails: the official confirmation email is dispatched
+                    # directly by the employer to candidate's inbox.
+                    print(f"  [submit] Application SUBMITTED and confirmed by {job['company']}! Official confirmation email dispatched by employer to {profile.get('email', USER)}.")
+                    return "SUBMITTED"
 
-            unknown, filled = fill_form(page, job, profile, answers)
-            print(f"  filled {len(filled)} fields, {len(unknown)} unknown required")
-
-            if has_login_wall(page):
-                if STORAGE_STATE_PATH.exists() and handle_oauth_sso(page):
-                    page.wait_for_timeout(3000)
-                    unknown, filled = fill_form(page, job, profile, answers)
-                if has_login_wall(page):
-                    set_state(job["job_id"], "NEEDS_MANUAL", last_error="login required: OAuth (Google / LinkedIn / account login)")
-                    return "NEEDS_MANUAL"
-
-            if unknown:
-                token = job["token"] or uuid.uuid4().hex[:8]
-                set_state(job["job_id"], "WAITING_ANSWER", token=token, pending=json.dumps(unknown))
-                send_inquiry(job, token, unknown)
-                return "WAITING_ANSWER"
-
-            before = out_dir / "before_submit.png"
-            page.screenshot(path=str(before), full_page=True)
-            if not submit:
-                set_state(job["job_id"], "READY", last_error="dry-run: filled, not submitted")
-                return "DRY_RUN_OK"
-
-            if not click_submit(page):
-                set_state(job["job_id"], "NEEDS_MANUAL", last_error="submit button not found")
-                return "NEEDS_MANUAL"
-
-            ok = wait_confirmation(page)
-            after = out_dir / "after_submit.png"
-            page.screenshot(path=str(after), full_page=True)
-            if ok:
-                set_state(job["job_id"], "SUBMITTED", last_error=None)
-                # Suppress synthetic agent emails: the official confirmation email is dispatched
-                # directly by the employer to candidate's inbox.
-                print(f"  [submit] Application SUBMITTED and confirmed by {job['company']}! Official confirmation email dispatched by employer to {profile.get('email', USER)}.")
-                return "SUBMITTED"
-
-            blocker = "captcha/verification" if page.locator(
-                "iframe[src*='captcha'], iframe[src*='turnstile'], .g-recaptcha, .h-captcha"
-            ).count() else "no confirmation detected (validation error?)"
-            state = "NEEDS_MANUAL" if job["attempts"] + 1 >= MAX_ATTEMPTS else "READY"
-            set_state(job["job_id"], state, last_error=blocker)
-            if state == "NEEDS_MANUAL":
-                send_mail(f"[Job Agent] Please finish manually: {job['company']} - {job['role']}",
-                          f"<p>{blocker}</p><a href='{job['url']}'>{job['url']}</a>",
-                          [job["resume"], str(after)])
-            return state
-        except Exception as e:             # noqa: BLE001
-            state = "NEEDS_MANUAL" if job["attempts"] + 1 >= MAX_ATTEMPTS else "READY"
-            set_state(job["job_id"], state, last_error=str(e)[:300])
-            return "ERROR"
-        finally:
-            browser.close()
+                blocker = "captcha/verification" if page.locator(
+                    "iframe[src*='captcha'], iframe[src*='turnstile'], .g-recaptcha, .h-captcha"
+                ).count() else "no confirmation detected (validation error?)"
+                state = "NEEDS_MANUAL" if job["attempts"] + 1 >= MAX_ATTEMPTS else "READY"
+                set_state(job["job_id"], state, last_error=blocker)
+                if state == "NEEDS_MANUAL":
+                    resume_p = resolve_resume_path(job)
+                    send_mail(f"[Job Agent] Please finish manually: {job['company']} - {job['role']}",
+                              f"<p>{blocker}</p><a href='{job['url']}'>{job['url']}</a>",
+                              [str(resume_p) if resume_p else None, str(after)])
+                return state
+            finally:
+                try:
+                    context.close()
+                except Exception:
+                    pass
+                try:
+                    browser.close()
+                except Exception:
+                    pass
+    except Exception as e:                 # noqa: BLE001
+        state = "NEEDS_MANUAL" if job.get("attempts", 0) + 1 >= MAX_ATTEMPTS else "READY"
+        set_state(job["job_id"], state, last_error=str(e)[:300])
+        print(f"  [error] Exception in process({job.get('company')}): {e}")
+        return "ERROR"
 
 
 def submitted_today() -> int:
@@ -984,13 +1095,22 @@ def run_queue(submit=False, headless=True, limit=10):
         rows = [dict(r) for r in c.execute(
             "SELECT * FROM apply_state WHERE state IN ('APPROVED','READY') ORDER BY updated_at LIMIT ?",
             (limit,))]
+    if not rows:
+        print("No applications pending in queue (0 in APPROVED or READY state).")
+        return
+
     for job in rows:
         if submit and submitted_today() >= MAX_SUBMITS_PER_DAY:
             print("daily cap reached")
             break
         print(f"-> {job['company']} | {job['role']}")
-        print("  result:", process(job, submit, headless))
-        time.sleep(random.uniform(20, 60))   # human-like spacing between applications
+        try:
+            res = process(job, submit, headless)
+            print("  result:", res)
+        except Exception as e:
+            print(f"  [error] Uncaught exception processing {job['company']}: {e}")
+            set_state(job["job_id"], "NEEDS_MANUAL", last_error=str(e)[:300])
+        time.sleep(random.uniform(3, 8) if headless else random.uniform(20, 60))
 
 
 def status():

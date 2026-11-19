@@ -1,6 +1,10 @@
 {
   "work_authorization": "Yes, legally authorized to work in India without sponsorship",
   "visa_sponsorship": "No, I do not require visa sponsorship",
+  "are you legally authorized to work in the country you are applying for": "Yes",
+  "are you legally authorized to work in the country for which you are applying": "Yes",
+  "will you now or in the future require visa sponsorship": "No",
+  "will you require visa sponsorship": "No",
   "notice_period": "Immediately available / 15 days",
   "start_date": "Immediately available",
   "current_location": "Hyderabad, Telangana, India",
@@ -9,8 +13,10 @@
   "graduation_year": "2028",
   "university": "Anurag University",
   "degree": "B.Tech in Computer Science and Engineering",
+  "discipline": "Computer Science and Engineering",
   "cgpa": "9.05 / 10",
   "gpa": "9.05 / 10",
   "gender": "Male",
-  "years_of_experience": "1 year (academic, projects, and club leadership)"
+  "years_of_experience": "1 year (academic, projects, and club leadership)",
+  "how did you hear about this job": "LinkedIn / Company Careers Page"
 }

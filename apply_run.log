@@ -1,25 +1,69 @@
-Traceback (most recent call last):
-  File "<frozen runpy>", line 189, in _run_module_as_main
-  File "<frozen runpy>", line 112, in _get_module_details
-  File "/home/runner/work/job-search-agent/job-search-agent/agent/apply/__init__.py", line 9, in <module>
-    from agent.apply.cover_letter import (
-  File "/home/runner/work/job-search-agent/job-search-agent/agent/apply/cover_letter.py", line 9, in <module>
-    from agent.jobs.schema import Job
-  File "/home/runner/work/job-search-agent/job-search-agent/agent/jobs/__init__.py", line 5, in <module>
-    from agent.jobs.embed import EmbeddingMatcher, job_to_text, profile_to_text
-  File "/home/runner/work/job-search-agent/job-search-agent/agent/jobs/embed.py", line 9, in <module>
-    from agent.profile.schema import MasterProfile
-  File "/home/runner/work/job-search-agent/job-search-agent/agent/profile/__init__.py", line 4, in <module>
-    from agent.profile.sync import ProfileSyncManager
-  File "/home/runner/work/job-search-agent/job-search-agent/agent/profile/sync.py", line 15, in <module>
-    from agent.resume.ats_checker import ATSChecker, ATSScoreResult
-  File "/home/runner/work/job-search-agent/job-search-agent/agent/resume/__init__.py", line 3, in <module>
-    from agent.resume.generator import ResumeGenerator
-  File "/home/runner/work/job-search-agent/job-search-agent/agent/resume/generator.py", line 7, in <module>
-    from agent.resume.ats_checker import ATSChecker
-  File "/home/runner/work/job-search-agent/job-search-agent/agent/resume/ats_checker.py", line 32, in <module>
-    class ATSChecker:
-  File "/home/runner/work/job-search-agent/job-search-agent/agent/resume/ats_checker.py", line 228, in ATSChecker
-    ) -> Tuple[ResumeData, ATSScoreResult]:
-         ^^^^^
-NameError: name 'Tuple' is not defined. Did you mean: 'tuple'?
+-> Canonical | Community Engineer (multiple roles and seniority levels)
+  [fill-fail] In which country do you currently work?*: Locator.fill: Timeout 30000ms exceeded.
+Call log:
+  - waiting for locator("[data-aa=\"aa26\"]")
+
+  filled 23 fields, 13 unknown required
+  [warn] Could not deliver email '[Job Agent Action Required] Additional info needed for Canonical - Community Engineer (multiple roles and seniority levels) [JOB-24e0cb57]': Connection unexpectedly closed
+  result: WAITING_ANSWER
+-> Bybit | Animator Intern
+  filled 1 fields, 0 unknown required
+  result: READY
+-> UNICEF | Backend Software Engineering
+  filled 0 fields, 0 unknown required
+  result: READY
+-> Fluence International, Inc. | Full-Stack Developer
+  filled 0 fields, 0 unknown required
+  [error] Exception in process(Fluence International, Inc.): Locator.click: Timeout 30000ms exceeded.
+Call log:
+  - waiting for get_by_role("button", name=re.compile(r"submit( application)?|send application|apply", re.IGNORECASE)).last
+    - locator resolved to <a role="button" job-id="2091165" job-source="job_detail_page" onclick="processApplyClick(this)" class="remotive-btn-chocolate tw-my-2 tw-relative">…</a>
+  - attempting click action
+    2 × waiting for element to be visible, enabled and stable
+      - element is visible, enabled and stable
+      - scrolling into view if needed
+      - done scrolling
+      - <div class="tw-absolute tw-inset-0 tw-bg-gray-500 tw-opacity-75"></div> from <div id="apply-modal-2091165" class="tw-fixed tw-inset-x-0 tw-bottom-0 tw-z-40 tw-flex tw-px-4 tw-pb-4 sm:tw-inset-0 sm:tw-items-center sm:tw-justify-center">…</div> subtree intercepts pointer events
+    - retrying click action
+    - waiting 20ms
+    2 × waiting for element to be visible, enabled and stable
+      - element is visible, enabled and stable
+      - scrolling into view if needed
+      - done scrolling
+      - <div class="tw-absolute tw-inset-0 tw-bg-gray-500 tw-opacity-75"></div> from <div id="apply-modal-2091165" class="tw-fixed tw-inset-x-0 tw-bottom-0 tw-z-40 tw-flex tw-px-4 tw-pb-4 sm:tw-inset-0 sm:tw-items-center sm:tw-justify-center">…</div> subtree intercepts pointer events
+    - retrying click action
+      - waiting 100ms
+    58 × waiting for element to be visible, enabled and stable
+       - element is visible, enabled and stable
+       - scrolling into view if needed
+       - done scrolling
+       - <div class="tw-absolute tw-inset-0 tw-bg-gray-500 tw-opacity-75"></div> from <div id="apply-modal-2091165" class="tw-fixed tw-inset-x-0 tw-bottom-0 tw-z-40 tw-flex tw-px-4 tw-pb-4 sm:tw-inset-0 sm:tw-items-center sm:tw-justify-center">…</div> subtree intercepts pointer events
+     - retrying click action
+       - waiting 500ms
+
+  result: ERROR
+-> TGScope | Research Engineer, Multilingual Semantic Search
+  filled 0 fields, 0 unknown required
+  result: READY
+-> Canonical | Embedded & Desktop Linux Systems Engineer - Optimisation
+  [fill-fail] In which country do you currently work?*: Locator.fill: Timeout 30000ms exceeded.
+Call log:
+  - waiting for locator("[data-aa=\"aa24\"]")
+
+  filled 22 fields, 14 unknown required
+  [warn] Could not deliver email '[Job Agent Action Required] Additional info needed for Canonical - Embedded & Desktop Linux Systems Engineer - Optimisation [JOB-1f62a0ab]': Connection unexpectedly closed
+  result: WAITING_ANSWER
+-> Canonical | Embedded Devices Software Solution Sales - All Roles
+  [fill-fail] In which country do you currently work?*: Locator.fill: Timeout 30000ms exceeded.
+Call log:
+  - waiting for locator("[data-aa=\"aa27\"]")
+
+  filled 22 fields, 15 unknown required
+  [warn] Could not deliver email '[Job Agent Action Required] Additional info needed for Canonical - Embedded Devices Software Solution Sales - All Roles [JOB-13f33c1a]': Connection unexpectedly closed
+  result: WAITING_ANSWER
+-> Micro1 | ML Engineer
+  filled 0 fields, 0 unknown required
+  result: READY
+-> HFT Architecture | Junior Machine Learning Engineer
+  filled 0 fields, 0 unknown required
+  result: READY

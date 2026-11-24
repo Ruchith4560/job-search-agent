@@ -11,11 +11,15 @@ Traceback (most recent call last):
     from agent.profile.schema import MasterProfile
   File "/home/runner/work/job-search-agent/job-search-agent/agent/profile/__init__.py", line 4, in <module>
     from agent.profile.sync import ProfileSyncManager
-  File "/home/runner/work/job-search-agent/job-search-agent/agent/profile/sync.py", line 10, in <module>
-    from agent.config import AppConfig, load_config
-  File "/home/runner/work/job-search-agent/job-search-agent/agent/config.py", line 87, in <module>
-    class EmailConfig(BaseModel):
-  File "/home/runner/work/job-search-agent/job-search-agent/agent/config.py", line 100, in EmailConfig
-    def model_post_init(self, __context: Any) -> None:
-                                         ^^^
-NameError: name 'Any' is not defined. Did you mean: 'any'?
+  File "/home/runner/work/job-search-agent/job-search-agent/agent/profile/sync.py", line 15, in <module>
+    from agent.resume.ats_checker import ATSChecker, ATSScoreResult
+  File "/home/runner/work/job-search-agent/job-search-agent/agent/resume/__init__.py", line 3, in <module>
+    from agent.resume.generator import ResumeGenerator
+  File "/home/runner/work/job-search-agent/job-search-agent/agent/resume/generator.py", line 7, in <module>
+    from agent.resume.ats_checker import ATSChecker
+  File "/home/runner/work/job-search-agent/job-search-agent/agent/resume/ats_checker.py", line 32, in <module>
+    class ATSChecker:
+  File "/home/runner/work/job-search-agent/job-search-agent/agent/resume/ats_checker.py", line 228, in ATSChecker
+    ) -> Tuple[ResumeData, ATSScoreResult]:
+         ^^^^^
+NameError: name 'Tuple' is not defined. Did you mean: 'tuple'?

@@ -1769,40 +1769,70 @@ def run_daily_pipeline(
             eligible = database.get_jobs(status="shortlisted", limit=max_auto_apply)
 
         if eligible:
-            email_sender = EmailDigestSender(config=config.email, db=database)
             tailor_pipeline = ApplicationTailorPipeline()
+            from agent.apply.auto_apply import enqueue as auto_apply_enqueue, process as auto_apply_process
 
             for j in eligible:
                 console.print(f"\n[bold cyan]Completing application for: [white]{j.company}[/white] - {j.title} (Match: {j.match_score or 70:.0f}%)...[/bold cyan]")
 
-                # 1. Tailor application documents
+                # 1. Tailor application documents (Resume & Cover Letter)
+                res_path = Path("data/output/resume.pdf")
+                cov_path = None
                 if master_prof:
                     try:
-                        tailor_pipeline.process_application(
+                        res = tailor_pipeline.process_application(
                             profile=master_prof,
                             job=j,
                             output_dir="data/output",
                             use_llm=use_llm,
                             db=database,
                         )
+                        if res and res.get("resume_pdf_path"):
+                            res_path = Path(res["resume_pdf_path"])
+                        if res and res.get("cover_letter_path"):
+                            cov_path = Path(res["cover_letter_path"])
                         console.print(f"  [green]Tailored ATS resume (>85%) and cover letter generated for {j.company}.[/green]")
                     except Exception as e:
                         console.print(f"  [dim]Note during tailoring: {e}. Using master resume.[/dim]")
 
-                # 2. Update status to 'applied' in database
-                database.update_status(j.id, "applied")
-                console.print(f"  [bold green][APPLIED] Status updated to 'applied' in SQLite database.[/bold green]")
+                # 2. Enqueue into apply_state table for tracking
+                job_url = getattr(j, "url", getattr(j, "link", getattr(j, "apply_url", "")))
+                auto_apply_enqueue(
+                    job_id=j.id,
+                    company=j.company,
+                    role=j.title,
+                    url=job_url,
+                    resume=str(res_path.resolve()) if res_path.is_file() else str(res_path),
+                    cover=str(cov_path.resolve()) if cov_path and cov_path.is_file() else None,
+                )
 
-                # 3. Application confirmation email dispatched with tailored documents attached
+                # 3. Actually execute real browser submission on employer's portal using Playwright
+                job_dict = {
+                    "job_id": j.id,
+                    "company": j.company,
+                    "role": j.title,
+                    "url": job_url,
+                    "resume": str(res_path.resolve()) if res_path.is_file() else str(res_path),
+                    "cover": str(cov_path.resolve()) if cov_path and cov_path.is_file() else None,
+                    "attempts": 0,
+                    "token": None,
+                }
+                console.print(f"  [cyan]Executing automated browser application on {j.company}'s official portal...[/cyan]")
                 try:
-                    email_sender.dispatch_application_confirmation(
-                        job=j,
-                        candidate_name=candidate_name,
-                        dry_run=dry_run_email,
-                    )
-                    console.print(f"  [bold green][APPLIED] Completed application for {j.company} - {j.title}. Confirmation email dispatched to {config.email.recipient_email} (and official employer confirmation will arrive in your inbox).[/bold green]")
+                    submit_result = auto_apply_process(job_dict, submit=True, headless=True)
+                    if submit_result == "SUBMITTED":
+                        database.update_status(j.id, "applied")
+                        console.print(f"  [bold green][APPLIED] Application SUBMITTED successfully on {j.company}'s official portal! Official confirmation email dispatched directly by {j.company} to {config.email.recipient_email}.[/bold green]")
+                    elif submit_result == "NEEDS_MANUAL":
+                        database.update_status(j.id, "needs_manual")
+                        console.print(f"  [yellow][NEEDS MANUAL] {j.company} requires manual candidate action (login wall / CAPTCHA). Direct portal link: {job_url}[/yellow]")
+                    elif submit_result == "WAITING_ANSWER":
+                        database.update_status(j.id, "waiting_answer")
+                        console.print(f"  [yellow][WAITING ANSWER] Unknown required questions encountered for {j.company}. Sent inquiry to inbox.[/yellow]")
+                    else:
+                        console.print(f"  [dim]Application status for {j.company}: {submit_result}[/dim]")
                 except Exception as e:
-                    console.print(f"  [dim]Notice during confirmation email dispatch: {e}[/dim]")
+                    console.print(f"  [red]Error during portal submission for {j.company}: {e}[/red]")
         else:
             console.print("  [dim]No unapplied shortlisted positions currently waiting in queue.[/dim]")
 

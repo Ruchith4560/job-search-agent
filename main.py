@@ -1793,8 +1793,16 @@ def run_daily_pipeline(
                 database.update_status(j.id, "applied")
                 console.print(f"  [bold green][APPLIED] Status updated to 'applied' in SQLite database.[/bold green]")
 
-                # 3. Application recorded in tracker (Official confirmation email sent by employer directly)
-                console.print(f"  [bold green][APPLIED] Completed application for {j.company} - {j.title}. Official confirmation email will be delivered to {config.email.recipient_email} directly by the employer.[/bold green]")
+                # 3. Application confirmation email dispatched with tailored documents attached
+                try:
+                    email_sender.dispatch_application_confirmation(
+                        job=j,
+                        candidate_name=candidate_name,
+                        dry_run=dry_run_email,
+                    )
+                    console.print(f"  [bold green][APPLIED] Completed application for {j.company} - {j.title}. Confirmation email dispatched to {config.email.recipient_email} (and official employer confirmation will arrive in your inbox).[/bold green]")
+                except Exception as e:
+                    console.print(f"  [dim]Notice during confirmation email dispatch: {e}[/dim]")
         else:
             console.print("  [dim]No unapplied shortlisted positions currently waiting in queue.[/dim]")
 

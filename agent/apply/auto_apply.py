@@ -836,9 +836,19 @@ def fill_phenom_portal(page, job: dict, profile: dict, answers: dict, submit: bo
 
     if ok or "thank" in page.url.lower() or "applythankyou" in page.url.lower() or "thank" in page.inner_text("body").lower() or "received" in page.inner_text("body").lower():
         set_state(job["job_id"], "SUBMITTED", last_error=None)
-        # Suppress synthetic agent emails: the official confirmation email is dispatched
-        # directly by the employer (e.g. Mastercard, Workday) to candidate's inbox.
-        print(f"  [phenom] Application SUBMITTED successfully and confirmed! Official confirmation dispatched by {job['company']} to {profile.get('email', USER)}.")
+        print(f"  [phenom] Application SUBMITTED successfully and confirmed! Dispatching confirmation email to {profile.get('email', USER)}.")
+        try:
+            resume_p = resolve_resume_path(job)
+            send_mail(
+                f"[Application Submitted] Applied to {job['company']} - {job['role']}!",
+                f"<p>Great news! Your AI agent successfully submitted your application for <b>{job['role']}</b> at <b>{job['company']}</b>.</p>"
+                f"<p>Portal Link: <a href='{job['url']}'>{job['url']}</a></p>"
+                f"<p>Attached are your tailored resume and the submission confirmation screenshot taken upon completion.</p>"
+                f"<p>The employer's official confirmation email will also arrive in your inbox directly from their portal.</p>",
+                attachments=[str(resume_p) if resume_p else None, str(after)]
+            )
+        except Exception as em_err:
+            print(f"  [warn] Could not send application confirmation email: {em_err}")
         return "SUBMITTED"
 
     state = "NEEDS_MANUAL" if job["attempts"] + 1 >= MAX_ATTEMPTS else "READY"
@@ -1051,9 +1061,19 @@ def process(job: dict, submit: bool, headless: bool = True) -> str:
                 page.screenshot(path=str(after), full_page=True)
                 if ok:
                     set_state(job["job_id"], "SUBMITTED", last_error=None)
-                    # Suppress synthetic agent emails: the official confirmation email is dispatched
-                    # directly by the employer to candidate's inbox.
-                    print(f"  [submit] Application SUBMITTED and confirmed by {job['company']}! Official confirmation email dispatched by employer to {profile.get('email', USER)}.")
+                    print(f"  [submit] Application SUBMITTED and confirmed by {job['company']}! Confirmation email dispatched to {profile.get('email', USER)}.")
+                    try:
+                        resume_p = resolve_resume_path(job)
+                        send_mail(
+                            f"[Application Submitted] Applied to {job['company']} - {job['role']}!",
+                            f"<p>Great news! Your AI agent successfully submitted your application for <b>{job['role']}</b> at <b>{job['company']}</b>.</p>"
+                            f"<p>Portal Link: <a href='{job['url']}'>{job['url']}</a></p>"
+                            f"<p>Attached are your tailored resume and the submission confirmation screenshot taken upon completion.</p>"
+                            f"<p>The employer's official confirmation email will also arrive in your inbox directly from their portal.</p>",
+                            attachments=[str(resume_p) if resume_p else None, str(after)]
+                        )
+                    except Exception as em_err:
+                        print(f"  [warn] Could not send application confirmation email: {em_err}")
                     return "SUBMITTED"
 
                 blocker = "captcha/verification" if page.locator(

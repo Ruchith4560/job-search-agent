@@ -1,9 +1,11 @@
 """Cover letter synthesis engine with strict anti-hallucination verification."""
 
+from __future__ import annotations
+
 from datetime import date
 import logging
 import re
-from typing import Dict, List, Optional, Set
+from typing import Dict, List, Optional, Set, Tuple
 from pydantic import BaseModel, Field
 
 from agent.jobs.schema import Job

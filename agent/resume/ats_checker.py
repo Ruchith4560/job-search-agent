@@ -1,8 +1,10 @@
 """ATS scoring and format compliance verification engine."""
 
+from __future__ import annotations
+
 import logging
 import re
-from typing import Dict, List, Optional, Set
+from typing import Dict, List, Optional, Set, Tuple
 from pydantic import BaseModel, Field
 
 from agent.jobs.schema import Job

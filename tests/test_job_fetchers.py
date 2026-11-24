@@ -13,7 +13,6 @@ from agent.jobs.fetchers.lever import LeverFetcher
 from agent.jobs.fetchers.linkedin import LinkedInFetcher
 from agent.jobs.fetchers.python_org import PythonOrgFetcher
 from agent.jobs.fetchers.remotive import RemotiveFetcher
-from agent.jobs.fetchers.remoteok import RemoteOKFetcher
 from agent.jobs.fetchers.smartrecruiters import SmartRecruitersFetcher
 from agent.jobs.fetchers.unstop import UnstopFetcher
 from agent.jobs.fetchers.weworkremotely import WeWorkRemotelyFetcher
@@ -46,30 +45,6 @@ def test_remotive_fetcher() -> None:
         assert job.is_remote is True
         assert "<p>" not in job.description
         assert "Python dev" in job.description
-
-
-def test_remoteok_fetcher() -> None:
-    mock_payload = [
-        {"legal": "API usage notice"},  # Disclaimer item to skip
-        {
-            "id": "202",
-            "position": "Backend Engineer",
-            "company": "TechStart",
-            "url": "https://remoteok.com/l/202",
-            "location": "Remote",
-            "tags": ["fastapi", "postgres"],
-            "description": "<div>Build high speed APIs</div>",
-            "date": "2026-10-29",
-        },
-    ]
-
-    fetcher = RemoteOKFetcher()
-    with patch.object(fetcher, "_get_json", return_value=mock_payload):
-        jobs = fetcher.fetch(limit=10)
-        assert len(jobs) == 1
-        assert jobs[0].title == "Backend Engineer"
-        assert jobs[0].company == "TechStart"
-        assert jobs[0].source == "remoteok"
 
 
 def test_greenhouse_fetcher() -> None:

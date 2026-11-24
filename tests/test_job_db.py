@@ -54,7 +54,7 @@ def test_batch_upsert_and_filter_by_status(tmp_path: Path) -> None:
     db = JobDatabase(str(db_file))
 
     j1 = Job.create(title="Dev 1", company="Co A", url="http://a.com/1", source="remotive")
-    j2 = Job.create(title="Dev 2", company="Co B", url="http://b.com/2", source="remoteok")
+    j2 = Job.create(title="Dev 2", company="Co B", url="http://b.com/2", source="arbeitnow")
 
     inserted, updated = db.upsert_jobs([j1, j2])
     assert inserted == 2

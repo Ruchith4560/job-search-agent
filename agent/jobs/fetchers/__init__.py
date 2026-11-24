@@ -3,7 +3,6 @@
 from agent.jobs.fetchers.base import BaseJobFetcher
 from agent.jobs.fetchers.enterprise_careers import EnterpriseCareersFetcher
 from agent.jobs.fetchers.remotive import RemotiveFetcher
-from agent.jobs.fetchers.remoteok import RemoteOKFetcher
 from agent.jobs.fetchers.greenhouse import GreenhouseFetcher
 from agent.jobs.fetchers.lever import LeverFetcher
 from agent.jobs.fetchers.adzuna import AdzunaFetcher
@@ -23,7 +22,6 @@ __all__ = [
     "BaseJobFetcher",
     "EnterpriseCareersFetcher",
     "RemotiveFetcher",
-    "RemoteOKFetcher",
     "GreenhouseFetcher",
     "LeverFetcher",
     "AdzunaFetcher",

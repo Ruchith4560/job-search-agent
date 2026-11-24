@@ -28,7 +28,7 @@ def populated_db(tmp_path: Path) -> JobDatabase:
             title="Backend Engineer",
             company="Beta Inc",
             url="https://beta.example.com/jobs/2",
-            source="remoteok",
+            source="remotive",
             location="Remote",
             tags=["Java", "Spring Boot"],
         ),

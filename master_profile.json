@@ -127,7 +127,7 @@
     {
       "name": "Python",
       "category": "Languages",
-      "evidence": "Listed on LinkedIn profile; Used in 4 GitHub repositories (job-search-agent, servicedesk-pro, ai-change-impact-engine (+1 more)) with 1,183,352 bytes of code",
+      "evidence": "Listed on LinkedIn profile; Used in 4 GitHub repositories (job-search-agent, servicedesk-pro, ai-change-impact-engine (+1 more)) with 1,190,391 bytes of code",
       "source": "linkedin"
     },
     {
@@ -637,5 +637,5 @@
   ],
   "conflicts": [],
   "version": "1.1",
-  "last_updated": "2026-11-19T06:05:17.476734+00:00"
+  "last_updated": "2026-11-24T11:07:47.317422+00:00"
 }

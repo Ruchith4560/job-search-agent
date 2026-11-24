@@ -1,8 +1,10 @@
 """Configuration loader and schema definitions for the AI Job Search Agent."""
 
+from __future__ import annotations
+
 import os
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 import yaml
 from dotenv import load_dotenv
 from pydantic import BaseModel, Field

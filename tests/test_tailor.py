@@ -102,7 +102,7 @@ def python_job() -> Job:
         title="Python AI Engineer",
         company="AiCorp",
         url="https://example.com/job/python",
-        source="remoteok",
+        source="remotive",
         description="We need FastAPI, Docker, and Python developers for microservices.",
         tags=["Python", "FastAPI", "Docker"],
     )

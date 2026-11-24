@@ -300,7 +300,7 @@ def build_pdf_report(output_path: str):
         [
             Paragraph("<b>Task 2</b>", table_cell_bold),
             Paragraph("<b>Multi-Source Job Discovery</b><br/>Scrape remote portals, ATS boards, and internship aggregators.", table_cell),
-            Paragraph("RemoteOK, Remotive, Jobicy, Himalayas, Greenhouse, Lever", table_cell),
+            Paragraph("Arbeitnow, Remotive, Jobicy, Himalayas, Greenhouse, Lever", table_cell),
             Paragraph("Raw listings in <code>tracker.db</code> with SHA256 deduplication", table_cell),
             Paragraph("<b>$0.00</b>", badge_success)
         ],
@@ -412,7 +412,7 @@ def build_pdf_report(output_path: str):
     story.append(Paragraph("Task 2: Autonomous Multi-Source Job Discovery &amp; Deduplication", h2_style))
     story.append(Paragraph(
         "<b>Technical Mechanism:</b> Sourcing is performed by modular scrapers located in <code>agent/jobs/scrapers/</code>. "
-        "The agent polls open JSON feeds and public boards: RemoteOK, Remotive, Jobicy, Himalayas, and public Greenhouse/Lever endpoints. "
+        "The agent polls open JSON feeds and public boards: Arbeitnow, Remotive, Jobicy, Himalayas, and public Greenhouse/Lever endpoints. "
         "It avoids paid scrapers or captchas by querying sanctioned, public endpoints.",
         body_style
     ))
@@ -644,7 +644,7 @@ def build_pdf_report(output_path: str):
         ],
         [
             Paragraph("<b>Job Scraping &amp; Sourcing</b>", table_cell_bold),
-            Paragraph("Open JSON APIs &amp; RSS Feeds (RemoteOK, Remotive, Jobicy)", table_cell),
+            Paragraph("Open JSON APIs &amp; RSS Feeds (Arbeitnow, Remotive, Jobicy)", table_cell),
             Paragraph("Apify / ScraperAPI ($49/mo)", table_cell),
             Paragraph("<b>$0.00 (Free)</b>", badge_success)
         ],

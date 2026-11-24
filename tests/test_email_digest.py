@@ -61,7 +61,7 @@ def test_email_digest_offline_preview_and_never_email_twice(tmp_path: Path) -> N
         title="Frontend Intern",
         company="StartupX",
         url="https://startupx.com/jobs/1",
-        source="remoteok",
+        source="remotive",
     )
     job2 = Job.create(
         title="Backend Intern",

@@ -376,7 +376,7 @@ def fetch_jobs(
         None,
         "--sources",
         "-s",
-        help="Comma-separated job board sources (e.g. remotive,remoteok,greenhouse,lever)",
+        help="Comma-separated job board sources (e.g. remotive,arbeitnow,greenhouse,lever)",
     ),
     limit: Optional[int] = typer.Option(
         None,
@@ -808,7 +808,7 @@ def status(
         None, "--status", "-s", help="Filter by status (e.g. shortlisted, tailored, applied, interview)"
     ),
     source: Optional[str] = typer.Option(
-        None, "--source", help="Filter by discovery source (e.g. remotive, remoteok, greenhouse, lever)"
+        None, "--source", help="Filter by discovery source (e.g. remotive, arbeitnow, greenhouse, lever)"
     ),
     limit: int = typer.Option(25, "--limit", "-l", help="Maximum jobs to list"),
 ) -> None:

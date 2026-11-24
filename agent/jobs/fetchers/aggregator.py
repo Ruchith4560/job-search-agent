@@ -19,7 +19,6 @@ from agent.jobs.fetchers.lever import LeverFetcher
 from agent.jobs.fetchers.linkedin import LinkedInFetcher
 from agent.jobs.fetchers.python_org import PythonOrgFetcher
 from agent.jobs.fetchers.remotive import RemotiveFetcher
-from agent.jobs.fetchers.remoteok import RemoteOKFetcher
 from agent.jobs.fetchers.smartrecruiters import SmartRecruitersFetcher
 from agent.jobs.fetchers.unstop import UnstopFetcher
 from agent.jobs.fetchers.weworkremotely import WeWorkRemotelyFetcher

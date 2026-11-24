@@ -415,7 +415,7 @@ def build_role_report(output_path: str):
 
     phases = [
         ("Phase 1: Dual 24/7 Scheduling", "Local Windows Task Scheduler triggers at 06:00 AM IST when the laptop is on. If the machine is powered off, GitHub Actions cloud runner (daily_job_search.yml at 00:30 UTC = 06:00 AM IST) executes 100% reliably in the cloud."),
-        ("Phase 2: Multi-Source Discovery", "Polls all 16 active source engines (LinkedIn, Internshala, Unstop, Freshersworld, Indian Portals, Enterprise Career Pages, Amazon API, Google Careers, Greenhouse, Lever, SmartRecruiters, RemoteOK, Remotive, etc.)."),
+        ("Phase 2: Multi-Source Discovery", "Polls all 16 active source engines (LinkedIn, Internshala, Unstop, Freshersworld, Indian Portals, Enterprise Career Pages, Amazon API, Google Careers, Greenhouse, Lever, SmartRecruiters, Arbeitnow, Remotive, etc.)."),
         ("Phase 3: Anti-Scam & Seniority Gate", "Filters out senior titles ('Senior', 'Manager', 'Lead', 'VP', 'Principal'), unpaid roles, and consultancies charging candidate fees. Purges non-student roles."),
         ("Phase 4: Vector Semantic Matching", "Runs Sentence-Transformers (all-MiniLM-L6-v2) on CPU. Computes 384-dimensional cosine similarity + keyword overlap + student boost (intern/trainee/graduate bonus). Enforces threshold >= 70%."),
         ("Phase 5: ATS Resume & Letter Tailoring", "Synthesizes tailored single-page PDF resume using ReportLab and DOCX via python-docx. Injects target skills and re-ranks project bullets matching the JD. Guarantees ATS Score >85%."),
@@ -453,7 +453,7 @@ def build_role_report(output_path: str):
         ],
         [
             Paragraph("<b>Global Tech &amp; Remote Boards</b>", table_cell_bold),
-            Paragraph("• LinkedIn Jobs (Public India Search)<br/>• Remotive, RemoteOK, Jobicy, Himalayas<br/>• We Work Remotely (WWR Programming RSS)<br/>• Python.org (Official PSF engineering feed)", table_cell),
+            Paragraph("• LinkedIn Jobs (Public India Search)<br/>• Remotive, Arbeitnow, Jobicy, Himalayas<br/>• We Work Remotely (WWR Programming RSS)<br/>• Python.org (Official PSF engineering feed)", table_cell),
             Paragraph("Public JSON APIs + RSS XML syndication feeds", table_cell),
             Paragraph("Full-Stack Developer, Backend Engineer, Python Developer, AI/ML Intern", table_cell)
         ],

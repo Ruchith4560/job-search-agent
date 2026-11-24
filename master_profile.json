@@ -1,20 +1,15 @@
 {
   "personal_info": {
     "name": "Ruchith Macha",
-    "headline": "CONTENT LEAD AT IEEE CS, HOSPTAILITY LEAD AT MALAI ,KRIYA  CLUB MEMBER, 3RD YEAR BTECH STUDENT AT ANURAG UNIVERSITY",
+    "headline": null,
     "email": "macharuchith1@gmail.com",
     "phone": "6305239230",
-    "location": "500068, Hyderabad, Telangana, India",
+    "location": "Hyderabad, Telangana, India",
     "links": {
-      "github": "https://github.com/Ruchith4560",
-      "linkedin": "https://linkedin.com/in/ruchith-macha"
+      "github": "https://github.com/Ruchith4560"
     }
   },
-  "summary": {
-    "text": "I'm a Computer Science undergraduate at Anurag University (Class of 2028) with a passion for full-stack web development and problem-solving. I work across the MERN stack — MongoDB, Express.js, React.js, and Node.js — and have hands-on experience in C++, Python, and Java.Beyond code, I coordinate events for Malai Club and create technical content for the IEEE Computer Society AU CEG Student Branch, which has sharpened my communication and leadership skills alongside my engineering ones.I'm actively looking for internship opportunities in software development and web engineering where I can contribute to real-world products and grow fast.📌 Skills: React.js · Node.js · MongoDB · Express.js · REST APIs · C++ · Python · JavaScript · HTML/CSS📌 Open to: SDE Internships · Full Stack Roles · Remote &amp; On-site",
-    "metrics": null,
-    "source": "linkedin"
-  },
+  "summary": null,
   "skills": [
     {
       "name": "Docker",
@@ -23,112 +18,40 @@
       "source": "github"
     },
     {
-      "name": "MongoDB",
-      "category": "Databases & Cloud",
-      "evidence": "Listed on LinkedIn profile",
-      "source": "linkedin"
-    },
-    {
-      "name": "Data Structures",
-      "category": "Developer Tools & Practices",
-      "evidence": "Listed on LinkedIn profile",
-      "source": "linkedin"
-    },
-    {
-      "name": "Git",
-      "category": "Developer Tools & Practices",
-      "evidence": "Listed on LinkedIn profile",
-      "source": "linkedin"
-    },
-    {
-      "name": "GitHub",
-      "category": "Developer Tools & Practices",
-      "evidence": "Listed on LinkedIn profile",
-      "source": "linkedin"
-    },
-    {
-      "name": "REST APIs",
-      "category": "Developer Tools & Practices",
-      "evidence": "Listed on LinkedIn profile",
-      "source": "linkedin"
-    },
-    {
-      "name": "Software Development Life Cycle (SDLC)",
-      "category": "Developer Tools & Practices",
-      "evidence": "Listed on LinkedIn profile",
-      "source": "linkedin"
-    },
-    {
-      "name": "Express.js",
-      "category": "Frameworks & Libraries",
-      "evidence": "Listed on LinkedIn profile",
-      "source": "linkedin"
-    },
-    {
-      "name": "Node.js",
-      "category": "Frameworks & Libraries",
-      "evidence": "Listed on LinkedIn profile",
-      "source": "linkedin"
-    },
-    {
-      "name": "React.js",
-      "category": "Frameworks & Libraries",
-      "evidence": "Listed on LinkedIn profile",
-      "source": "linkedin"
-    },
-    {
-      "name": "C (Programming Language)",
-      "category": "Languages",
-      "evidence": "Listed on LinkedIn profile",
-      "source": "linkedin"
-    },
-    {
-      "name": "C++",
-      "category": "Languages",
-      "evidence": "Listed on LinkedIn profile",
-      "source": "linkedin"
-    },
-    {
-      "name": "Core Java",
-      "category": "Languages",
-      "evidence": "Listed on LinkedIn profile",
-      "source": "linkedin"
-    },
-    {
       "name": "CSS",
       "category": "Languages",
-      "evidence": "Listed on LinkedIn profile; Used in 5 GitHub repositories (travel_expense_calculator, NextMail_Ai, servicedesk-pro (+2 more)) with 6,120 bytes of code",
-      "source": "linkedin"
+      "evidence": "Used in 8 GitHub repositories (travel_expense_calculator, NextMail_Ai, servicedesk-pro (+5 more)) with 29,394 bytes of code",
+      "source": "github"
     },
     {
       "name": "HTML",
       "category": "Languages",
-      "evidence": "Used in 5 GitHub repositories (travel_expense_calculator, NextMail_Ai, servicedesk-pro (+2 more)) with 5,696 bytes of code",
+      "evidence": "Used in 9 GitHub repositories (travel_expense_calculator, NextMail_Ai, servicedesk-pro (+6 more)) with 8,980 bytes of code",
       "source": "github"
-    },
-    {
-      "name": "HTML5",
-      "category": "Languages",
-      "evidence": "Listed on LinkedIn profile",
-      "source": "linkedin"
     },
     {
       "name": "Java",
       "category": "Languages",
-      "evidence": "Listed on LinkedIn profile; Used in 2 GitHub repositories (travel_expense_calculator, NextMail_Ai) with 496,865 bytes of code",
-      "source": "linkedin"
+      "evidence": "Used in 2 GitHub repositories (travel_expense_calculator, NextMail_Ai) with 496,865 bytes of code",
+      "source": "github"
     },
     {
       "name": "JavaScript",
       "category": "Languages",
-      "evidence": "Listed on LinkedIn profile; Used in 5 GitHub repositories (travel_expense_calculator, NextMail_Ai, servicedesk-pro (+2 more)) with 54,591 bytes of code",
-      "source": "linkedin"
+      "evidence": "Used in 10 GitHub repositories (travel_expense_calculator, NextMail_Ai, servicedesk-pro (+7 more)) with 229,697 bytes of code",
+      "source": "github"
     },
     {
       "name": "Python",
       "category": "Languages",
-      "evidence": "Listed on LinkedIn profile; Used in 4 GitHub repositories (job-search-agent, servicedesk-pro, ai-change-impact-engine (+1 more)) with 1,190,391 bytes of code",
-      "source": "linkedin"
+      "evidence": "Used in 8 GitHub repositories (job-search-agent, servicedesk-pro, ai-change-impact-engine (+5 more)) with 1,494,596 bytes of code",
+      "source": "github"
+    },
+    {
+      "name": "Shell",
+      "category": "Languages",
+      "evidence": "Used in 2 GitHub repositories (ai_resume_analyzer, smart-ai-healthcare-system) with 3,282 bytes of code",
+      "source": "github"
     },
     {
       "name": "TypeScript",
@@ -139,38 +62,8 @@
     {
       "name": "Batchfile",
       "category": "Specialized & Domain Skills",
-      "evidence": "Used in 1 GitHub repositories (job-search-agent) with 1,690 bytes of code",
+      "evidence": "Used in 2 GitHub repositories (job-search-agent, smart-ai-healthcare-system) with 2,351 bytes of code",
       "source": "github"
-    },
-    {
-      "name": "Communication",
-      "category": "Specialized & Domain Skills",
-      "evidence": "Listed on LinkedIn profile",
-      "source": "linkedin"
-    },
-    {
-      "name": "Customer Relationship Management (CRM)",
-      "category": "Specialized & Domain Skills",
-      "evidence": "Listed on LinkedIn profile",
-      "source": "linkedin"
-    },
-    {
-      "name": "Engineering",
-      "category": "Specialized & Domain Skills",
-      "evidence": "Listed on LinkedIn profile",
-      "source": "linkedin"
-    },
-    {
-      "name": "English",
-      "category": "Specialized & Domain Skills",
-      "evidence": "Listed on LinkedIn profile",
-      "source": "linkedin"
-    },
-    {
-      "name": "Event Planning",
-      "category": "Specialized & Domain Skills",
-      "evidence": "Listed on LinkedIn profile",
-      "source": "linkedin"
     },
     {
       "name": "Jinja",
@@ -179,90 +72,19 @@
       "source": "github"
     },
     {
-      "name": "Marketing",
-      "category": "Specialized & Domain Skills",
-      "evidence": "Listed on LinkedIn profile",
-      "source": "linkedin"
-    },
-    {
       "name": "PowerShell",
       "category": "Specialized & Domain Skills",
-      "evidence": "Used in 1 GitHub repositories (job-search-agent) with 1,643 bytes of code",
+      "evidence": "Used in 2 GitHub repositories (job-search-agent, ai_resume_analyzer) with 3,761 bytes of code",
       "source": "github"
     },
     {
       "name": "Procfile",
       "category": "Specialized & Domain Skills",
-      "evidence": "Used in 1 GitHub repositories (ai-change-impact-engine) with 40 bytes of code",
+      "evidence": "Used in 2 GitHub repositories (ai-change-impact-engine, smart-ai-healthcare-system) with 89 bytes of code",
       "source": "github"
-    },
-    {
-      "name": "Team Management",
-      "category": "Specialized & Domain Skills",
-      "evidence": "Listed on LinkedIn profile",
-      "source": "linkedin"
-    },
-    {
-      "name": "Web Development",
-      "category": "Specialized & Domain Skills",
-      "evidence": "Listed on LinkedIn profile",
-      "source": "linkedin"
     }
   ],
-  "experience": [
-    {
-      "company": "IEEE Computer Society AU CEG Student Branch",
-      "title": "Content Specialist",
-      "location": "",
-      "start_date": "Jun 2025",
-      "end_date": null,
-      "is_current": true,
-      "achievements": [
-        {
-          "text": "Create and publish technical articles, event write-ups, and social media content for the IEEE Computer Society AU CEG Student Branch audience of 500+ members.",
-          "metrics": null,
-          "source": "linkedin"
-        },
-        {
-          "text": "Simplify complex CS topics into accessible posts, improving member engagement with branch events and resources.",
-          "metrics": null,
-          "source": "linkedin"
-        },
-        {
-          "text": "Collaborate with the core team to maintain a consistent content calendar across Instagram and LinkedIn.",
-          "metrics": null,
-          "source": "linkedin"
-        }
-      ],
-      "source": "linkedin"
-    },
-    {
-      "company": "Malai_au",
-      "title": "Event Coordinator",
-      "location": "",
-      "start_date": "Jun 2025",
-      "end_date": null,
-      "is_current": true,
-      "achievements": [
-        {
-          "text": "Plan and coordinate cultural and technical events for Malai Club, managing logistics for audiences of 100+ students.",
-          "metrics": null,
-          "source": "linkedin"
-        },
-        {
-          "text": "Handle end-to-end event execution including scheduling, vendor coordination, and on-the-day management.",
-          "metrics": null,
-          "source": "linkedin"
-        },
-        {
-          "text": "Strengthened cross-team communication and stakeholder management skills alongside core development",
-          "metrics": null,
-          "source": "linkedin"
-        }
-      ],
-      "source": "linkedin"
-    }
-  ],
+  "experience": [],
   "projects": [
     {
       "name": "job-search-agent",
@@ -416,10 +238,19 @@
       "name": "mern-full-stack-task-3",
       "url": "https://github.com/Ruchith4560/mern-full-stack-task-3",
       "stack": [
-        "JavaScript"
+        "Express",
+        "JavaScript",
+        "MongoDB",
+        "React"
       ],
-      "description": null,
-      "highlights": [],
+      "description": "> MERN Stack Internship | Alfido Tech Adds signup/login with bcrypt + JWT to the Task 1 API and Task 2 React app. --- ## 📁 Project Structure  task3-auth/ ├── server/                         # Express + MongoDB backend │   ├── src/ │   │   ├── config/ │   │   │   ├── db.js               # MongoDB...",
+      "highlights": [
+        {
+          "text": "> MERN Stack Internship | Alfido Tech Adds signup/login with bcrypt + JWT to the Task 1 API and Task 2 React app. --- ## 📁 Project Structure  task3-auth/ ├── server/                         # Express + MongoDB backend │   ├── src/ │   │   ├── config/ │   │   │   ├── db.js               # MongoDB...",
+          "metrics": null,
+          "source": "github"
+        }
+      ],
       "stars": 0,
       "source": "github"
     },
@@ -427,10 +258,20 @@
       "name": "mern-fullstack-task-2",
       "url": "https://github.com/Ruchith4560/mern-fullstack-task-2",
       "stack": [
-        "JavaScript"
+        "CSS",
+        "HTML",
+        "JavaScript",
+        "REST API",
+        "React"
       ],
-      "description": null,
-      "highlights": [],
+      "description": "> MERN Stack Internship | Alfido Tech A production-quality React Single-Page Application that consumes the Task 1 REST API, featuring full CRUD UI, React Router navigation, loading states, and error handling. --- ## 📁 Project Structure  task2-react-frontend/ ├── public/ │   └── index.html          ...",
+      "highlights": [
+        {
+          "text": "> MERN Stack Internship | Alfido Tech A production-quality React Single-Page Application that consumes the Task 1 REST API, featuring full CRUD UI, React Router navigation, loading states, and error handling. --- ## 📁 Project Structure  task2-react-frontend/ ├── public/ │   └── index.html          ...",
+          "metrics": null,
+          "source": "github"
+        }
+      ],
       "stars": 0,
       "source": "github"
     },
@@ -438,10 +279,20 @@
       "name": "mern-full-stack-task-1",
       "url": "https://github.com/Ruchith4560/mern-full-stack-task-1",
       "stack": [
-        "JavaScript"
+        "Express",
+        "JavaScript",
+        "MongoDB",
+        "Node.js",
+        "REST API"
       ],
-      "description": null,
-      "highlights": [],
+      "description": "> MERN Stack Internship | Alfido Tech A production-ready RESTful API for managing Products, built with: - Runtime: Node.js - Framework: Express.js - Database: MongoDB + Mongoose ODM - Logging: Morgan - Validation: express-validator --- ## 📁 Project Structure  task1-crud-api/ ├── src/ │   ├── config/",
+      "highlights": [
+        {
+          "text": "> MERN Stack Internship | Alfido Tech A production-ready RESTful API for managing Products, built with: - Runtime: Node.js - Framework: Express.js - Database: MongoDB + Mongoose ODM - Logging: Morgan - Validation: express-validator --- ## 📁 Project Structure  task1-crud-api/ ├── src/ │   ├── config/",
+          "metrics": null,
+          "source": "github"
+        }
+      ],
       "stars": 0,
       "source": "github"
     },
@@ -469,10 +320,21 @@
       "name": "INTELLI-CREDIT",
       "url": "https://github.com/Ruchith4560/INTELLI-CREDIT",
       "stack": [
-        "Python"
+        "CSS",
+        "FastAPI",
+        "HTML",
+        "JavaScript",
+        "Python",
+        "React"
       ],
-      "description": null,
-      "highlights": [],
+      "description": "> Automates corporate loan appraisal from 2-3 weeks to under 5 minutes ## Tech Stack Python · FastAPI · React.js · XGBoost · OpenAI GPT · FAISS · JWT ## Quick Start ### Backend bash cd backend python -m venv venv venv\\Scripts\\activate        # Windows pip install -r requirements.txt uvicorn...",
+      "highlights": [
+        {
+          "text": "> Automates corporate loan appraisal from 2-3 weeks to under 5 minutes ## Tech Stack Python · FastAPI · React.js · XGBoost · OpenAI GPT · FAISS · JWT ## Quick Start ### Backend bash cd backend python -m venv venv venv\\Scripts\\activate        # Windows pip install -r requirements.txt uvicorn...",
+          "metrics": null,
+          "source": "github"
+        }
+      ],
       "stars": 0,
       "source": "github"
     },
@@ -480,9 +342,11 @@
       "name": "ai_resume_analyzer",
       "url": "https://github.com/Ruchith4560/ai_resume_analyzer",
       "stack": [
-        "Python"
+        "PowerShell",
+        "Python",
+        "Shell"
       ],
-      "description": null,
+      "description": "",
       "highlights": [],
       "stars": 0,
       "source": "github"
@@ -497,33 +361,26 @@
       "source": "github"
     },
     {
-      "name": "Smart AI Healthcare System",
+      "name": "smart-ai-healthcare-system",
       "url": "https://github.com/Ruchith4560/smart-ai-healthcare-system",
       "stack": [
+        "Batchfile",
+        "CSS",
         "FastAPI",
-        "JWT",
+        "HTML",
         "JavaScript",
+        "Procfile",
         "Python",
-        "REST APIs",
-        "React.js",
-        "Render"
+        "React",
+        "Shell",
+        "Vite"
       ],
-      "description": "React.js, FastAPI, Python, JWT, REST APIs, Render  • Built a full-stack doctor appointment booking application with real-time availability management using React and  FastAPI.  • Implemented secure authentication with JWT and REST APIs; deployed on Render cloud for production-level real-world  usage.  • Achieved sub-200ms API response times through FastAPI async architecture and optimized database query design.",
+      "description": "🏥 Smart AI Healthcare System A full-stack AI-powered healthcare management platform that enables patients to book appointments, interact with an AI medical assistant, and connect with specialized doctors through an intelligent recommendation system. Built using FastAPI, React (Vite), TailwindCSS,...",
       "highlights": [
         {
-          "text": "Built a full-stack doctor appointment booking application with real-time availability management using React and  FastAPI.",
+          "text": "🏥 Smart AI Healthcare System A full-stack AI-powered healthcare management platform that enables patients to book appointments, interact with an AI medical assistant, and connect with specialized doctors through an intelligent recommendation system. Built using FastAPI, React (Vite), TailwindCSS,...",
           "metrics": null,
-          "source": "linkedin"
-        },
-        {
-          "text": "Implemented secure authentication with JWT and REST APIs; deployed on Render cloud for production-level real-world  usage.",
-          "metrics": null,
-          "source": "linkedin"
-        },
-        {
-          "text": "Achieved sub-200ms API response times through FastAPI async architecture and optimized database query design.",
-          "metrics": null,
-          "source": "linkedin"
+          "source": "github"
         }
       ],
       "stars": 0,
@@ -533,9 +390,10 @@
       "name": "coderefine",
       "url": "https://github.com/Ruchith4560/coderefine",
       "stack": [
-        "HTML"
+        "HTML",
+        "Python"
       ],
-      "description": null,
+      "description": "",
       "highlights": [],
       "stars": 0,
       "source": "github"
@@ -547,7 +405,7 @@
       "description": "git course demo",
       "highlights": [
         {
-          "text": "git course demo",
+          "text": "\"# gitcourse\"",
           "metrics": null,
           "source": "github"
         }
@@ -569,73 +427,11 @@
       ],
       "stars": 0,
       "source": "github"
-    },
-    {
-      "name": "MERN Stack Internship Management System",
-      "url": "",
-      "stack": [
-        "MongoDB",
-        "Express.js",
-        "React.js",
-        "Node.js",
-        "JWT",
-        "Tailwind CSS"
-      ],
-      "description": "MongoDB, Express.js, React.js, Node.js, JWT, Tailwind CSS  • Developed a full-stack internship management platform handling student registrations, task submissions, and workflow  automation.  • Implemented secure user authentication and role-based authorization using JWT tokens and bcrypt password hashing.  • Built comprehensive REST APIs for managing students, tasks, submissions, and multi-role internship workflows.  • Designed responsive frontend interfaces using React.js and Tailwind CSS supporting both desktop and mobile  experiences.  • Integrated MongoDB for efficient data storage with optimized queries, indexing, and retrieval for large datasets.",
-      "highlights": [
-        {
-          "text": "Developed a full-stack internship management platform handling student registrations, task submissions, and workflow  automation.",
-          "metrics": null,
-          "source": "linkedin"
-        },
-        {
-          "text": "Implemented secure user authentication and role-based authorization using JWT tokens and bcrypt password hashing.",
-          "metrics": null,
-          "source": "linkedin"
-        },
-        {
-          "text": "Built comprehensive REST APIs for managing students, tasks, submissions, and multi-role internship workflows.",
-          "metrics": null,
-          "source": "linkedin"
-        },
-        {
-          "text": "Designed responsive frontend interfaces using React.js and Tailwind CSS supporting both desktop and mobile  experiences.",
-          "metrics": null,
-          "source": "linkedin"
-        },
-        {
-          "text": "Integrated MongoDB for efficient data storage with optimized queries, indexing, and retrieval for large datasets.",
-          "metrics": null,
-          "source": "linkedin"
-        }
-      ],
-      "stars": 0,
-      "source": "linkedin"
     }
   ],
-  "education": [
-    {
-      "school": "Anurag University",
-      "degree": "Bachelor of Technology",
-      "field_of_study": null,
-      "start_date": "2024",
-      "end_date": "2028",
-      "notes": "IEEE MEMBER,KRIYA ,MALAI CLUB MEMBER",
-      "source": "linkedin"
-    }
-  ],
-  "certifications": [
-    {
-      "name": "Certificate of Participation in Round 1: Online Assessment (Participate and earn Participation Certificate) of HP Power Lab 2.0",
-      "authority": "Unstop",
-      "url": "https://unstop.com/certificate-preview/5dd72d99-a246-4470-832d-ead05f00e045",
-      "start_date": "Nov 2025",
-      "end_date": "",
-      "license_number": "5dd72d99-a246-4470-832d-ead05f00e045",
-      "source": "linkedin"
-    }
-  ],
+  "education": [],
+  "certifications": [],
   "conflicts": [],
   "version": "1.1",
-  "last_updated": "2026-11-24T11:07:47.317422+00:00"
+  "last_updated": "2026-11-24T16:09:13.846609+00:00"
 }

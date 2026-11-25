@@ -1,11 +1,3 @@
--> Canonical | Community Engineer (multiple roles and seniority levels)
-  [fill-fail] In which country do you currently work?*: Locator.fill: Timeout 30000ms exceeded.
-Call log:
-  - waiting for locator("[data-aa=\"aa26\"]")
-
-  filled 23 fields, 13 unknown required
-  [warn] Could not deliver email '[Job Agent Action Required] Additional info needed for Canonical - Community Engineer (multiple roles and seniority levels) [JOB-24e0cb57]': Connection unexpectedly closed
-  result: WAITING_ANSWER
 -> Bybit | Animator Intern
   filled 1 fields, 0 unknown required
   result: READY
@@ -45,25 +37,11 @@ Call log:
 -> TGScope | Research Engineer, Multilingual Semantic Search
   filled 0 fields, 0 unknown required
   result: READY
--> Canonical | Embedded & Desktop Linux Systems Engineer - Optimisation
-  [fill-fail] In which country do you currently work?*: Locator.fill: Timeout 30000ms exceeded.
-Call log:
-  - waiting for locator("[data-aa=\"aa24\"]")
-
-  filled 22 fields, 14 unknown required
-  [warn] Could not deliver email '[Job Agent Action Required] Additional info needed for Canonical - Embedded & Desktop Linux Systems Engineer - Optimisation [JOB-1f62a0ab]': Connection unexpectedly closed
-  result: WAITING_ANSWER
--> Canonical | Embedded Devices Software Solution Sales - All Roles
-  [fill-fail] In which country do you currently work?*: Locator.fill: Timeout 30000ms exceeded.
-Call log:
-  - waiting for locator("[data-aa=\"aa27\"]")
-
-  filled 22 fields, 15 unknown required
-  [warn] Could not deliver email '[Job Agent Action Required] Additional info needed for Canonical - Embedded Devices Software Solution Sales - All Roles [JOB-13f33c1a]': Connection unexpectedly closed
-  result: WAITING_ANSWER
 -> Micro1 | ML Engineer
   filled 0 fields, 0 unknown required
-  result: READY
+  [warn] Could not deliver email '[Job Agent] Please finish manually: Micro1 - ML Engineer': Connection unexpectedly closed
+  result: NEEDS_MANUAL
 -> HFT Architecture | Junior Machine Learning Engineer
   filled 0 fields, 0 unknown required
-  result: READY
+  [warn] Could not deliver email '[Job Agent] Please finish manually: HFT Architecture - Junior Machine Learning Engineer': Connection unexpectedly closed
+  result: NEEDS_MANUAL

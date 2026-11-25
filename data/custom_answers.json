@@ -18,5 +18,19 @@
   "gpa": "9.05 / 10",
   "gender": "Male",
   "years_of_experience": "1 year (academic, projects, and club leadership)",
-  "how did you hear about this job": "LinkedIn / Company Careers Page"
+  "how did you hear about this job": "LinkedIn / Company Careers Page",
+  "nationality": "Indian",
+  "please indicate your nationality": "Indian",
+  "in which country do you currently work": "India",
+  "country of residence": "India",
+  "current country": "India",
+  "how did you perform in mathematics at high school": "Achieved distinction (score > 95%) in high school mathematics.",
+  "how did you perform in your native language at high school": "Achieved distinction and fluency in native language.",
+  "during this application process i agree to use only my own words": "Yes, I agree and certify that all answers and materials submitted are my own authentic work.",
+  "we require all colleagues to meet in person 2-4 times a year": "Yes, I am fully willing and able to commit to international travel 2-4 times a year for company events.",
+  "are you willing and able to commit to this": "Yes, I am fully willing and able to commit to international travel for company events.",
+  "please confirm that you have read and agree to canonical recruitment privacy notice and privacy policy": "Yes, I confirm that I have read and agree to Canonical Recruitment Privacy Notice and Privacy Policy.",
+  "which modern linux ubuntu middleware and software stacks are you comfortable developing in": "I have hands-on experience developing in Ubuntu Linux environments with Python backend services, Docker containerization, Shell scripting, Git, and Linux networking middleware.",
+  "describe your experience of the embedded software market": "Academic and practical project experience with embedded C, Linux system APIs, RTOS concepts, and hardware-software interfacing.",
+  "describe your experience with linux": "Extensive experience using Ubuntu Linux for software engineering, terminal scripting, Docker containerization, and backend development."
 }

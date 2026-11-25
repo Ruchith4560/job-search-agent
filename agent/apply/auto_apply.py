@@ -79,6 +79,13 @@ DEFAULTS = {
     "notice_period": "Immediately available",
     "hear_about": "LinkedIn / Company Careers Page",
     "gender": "Male",
+    "nationality": "Indian",
+    "travel_commit": "Yes",
+    "own_words": "Yes",
+    "privacy_consent": "Yes",
+    "math_highschool": "Top performer, achieved distinction (>95%) in high school mathematics.",
+    "language_highschool": "Top performer, fluent and achieved distinction in native language.",
+    "linux_stack": "Hands-on experience in Ubuntu Linux, Docker containerization, Python backend, C/C++, Shell scripting, Git, and Linux networking middleware.",
 }
 
 # label regex -> profile key. Order matters. Deliberately conservative:
@@ -105,7 +112,15 @@ RULES = [
     (r"postal|zip|pin\s*code", "postal_code"),
     (r"\bstate\b|province|region", "state"),
     (r"\bcity\b|current location|where are you (based|located)|current address|street", "location"),
+    (r"nationality", "nationality"),
+    (r"country\s*(do you\s*)?(currently\s*)?(work|live|reside|based)?", "country"),
     (r"\bcountry\b", "country"),
+    (r"meet in person|travel|commit to this|willing.*travel", "travel_commit"),
+    (r"plagiarism|own words|ai generated content", "own_words"),
+    (r"mathematics|math", "math_highschool"),
+    (r"native language", "language_highschool"),
+    (r"recruitment privacy|privacy policy|privacy notice", "privacy_consent"),
+    (r"linux|ubuntu|middleware|software stacks", "linux_stack"),
 ]
 DECLINE = re.compile(r"decline|prefer not|do not wish|don.t wish|not to (say|disclose|answer)", re.I)
 SENSITIVE = re.compile(r"gender|race|ethnic|veteran|disabilit|pronoun|sexual|hispanic|caste|religion", re.I)
@@ -323,6 +338,8 @@ def resolve(f: dict, profile: dict, answers: dict):
     for pat, key in RULES:
         if re.search(pat, low) and profile.get(key):
             return profile[key]
+    if CONSENT.search(low):
+        return "Yes"
     return None
 
 
@@ -356,18 +373,65 @@ def fill_field(page, f: dict, value: str) -> bool:
         return False
 
 
+def extract_external_apply_url(page) -> str | None:
+    """Detect if the page is an aggregator/board and extract direct external application URL."""
+    try:
+        url = page.evaluate(r"""() => {
+            const links = Array.from(document.querySelectorAll('a[href]'));
+            const currentHost = window.location.hostname.toLowerCase();
+            const atsHosts = ['greenhouse.io', 'lever.co', 'smartrecruiters.com', 'myworkdayjobs.com', 'ashbyhq.com', 'workable.com', 'bamboohr.com', 'breezy.hr', 'icims.com', 'phenom'];
+
+            // 1. Direct ATS link on the page
+            for (const a of links) {
+                const h = (a.href || '').toLowerCase();
+                if (atsHosts.some(ats => h.includes(ats))) return a.href;
+            }
+
+            // 2. Links inside apply modals (e.g. Remotive modal)
+            const modal = document.querySelector('[id*="apply-modal"], .apply-modal, [class*="modal"]');
+            if (modal) {
+                for (const a of modal.querySelectorAll('a[href]')) {
+                    const h = a.href || '';
+                    if (h.startsWith('http') && !h.includes(currentHost)) return h;
+                }
+            }
+
+            // 3. Links with text indicating external application
+            for (const a of links) {
+                const txt = ((a.innerText || a.textContent) || '').toLowerCase();
+                const h = a.href || '';
+                if ((txt.includes('apply on company') || txt.includes('apply externally') || txt.includes('original job') || txt.includes('apply for this job') || txt.includes('apply now')) && h.startsWith('http') && !h.includes(currentHost)) {
+                    return h;
+                }
+            }
+            return null;
+        }""")
+        return url
+    except Exception:
+        return None
+
+
 def get_fields(page) -> list[dict]:
-    fields = page.evaluate(EXTRACT_JS)
+    try:
+        fields = page.evaluate(EXTRACT_JS)
+    except Exception:
+        fields = []
     if len([f for f in fields if f["kind"] != "file"]) < 3:   # probably a landing page
         import re as _re
         for role in ("link", "button"):
             btn = page.get_by_role(role, name=_re.compile(r"^\s*apply", _re.I))
             if btn.count():
-                btn.first.click()
-                page.wait_for_load_state("domcontentloaded")
-                page.wait_for_timeout(2500)
-                fields = page.evaluate(EXTRACT_JS)
-                break
+                try:
+                    btn.first.click(force=True, timeout=5000)
+                    page.wait_for_load_state("domcontentloaded", timeout=10000)
+                    page.wait_for_timeout(2500)
+                    # Clear any modal backdrop overlay if present
+                    page.evaluate("() => { const o = document.querySelector('.tw-opacity-75, [class*=\"backdrop\"], [class*=\"overlay\"]'); if (o) o.remove(); }")
+                    fields = page.evaluate(EXTRACT_JS)
+                    break
+                except Exception as e:
+                    print(f"  [nav] Note clicking apply role {role}: {e}")
+                    break
     return fields
 
 
@@ -548,14 +612,24 @@ def login_session(target: str = "google"):
 
 def click_submit(page) -> bool:
     import re as _re
+    try:
+        page.evaluate("() => { const o = document.querySelector('.tw-opacity-75, [class*=\"backdrop\"], [class*=\"overlay\"]'); if (o) o.remove(); }")
+    except Exception:
+        pass
     btn = page.get_by_role("button", name=_re.compile(r"submit( application)?|send application|apply", _re.I))
     if btn.count():
-        btn.last.click()
-        return True
+        try:
+            btn.last.click(force=True, timeout=8000)
+            return True
+        except Exception as e:
+            print(f"  [submit-click] Button click failed: {e}")
     alt = page.locator("button[type=submit], input[type=submit]")
     if alt.count():
-        alt.last.click()
-        return True
+        try:
+            alt.last.click(force=True, timeout=8000)
+            return True
+        except Exception as e:
+            print(f"  [submit-click] Alt submit click failed: {e}")
     return False
 
 
@@ -1021,6 +1095,33 @@ def process(job: dict, submit: bool, headless: bool = True) -> str:
 
                 unknown, filled = fill_form(page, job, profile, answers)
                 print(f"  filled {len(filled)} fields, {len(unknown)} unknown required")
+
+                # If 0 fields filled, check if page is an aggregator/board linking to external ATS
+                if len(filled) == 0:
+                    ext_url = extract_external_apply_url(page)
+                    if ext_url and ext_url != page.url:
+                        print(f"  [redirect] Detected external ATS portal: {ext_url}. Navigating...")
+                        try:
+                            page.goto(ext_url, wait_until="domcontentloaded", timeout=45000)
+                            page.wait_for_timeout(2500)
+                            unknown, filled = fill_form(page, job, profile, answers)
+                            print(f"  filled {len(filled)} fields on destination portal, {len(unknown)} unknown required")
+                        except Exception as e:
+                            print(f"  [redirect-fail] Could not open destination portal {ext_url}: {e}")
+
+                # If STILL 0 fields filled, this is an informational listing, bulletin board, or requires manual apply
+                if len(filled) == 0:
+                    try:
+                        mailto = page.evaluate("() => { const a = document.querySelector('a[href^=\"mailto:\"]'); return a ? a.href.replace('mailto:', '') : null; }")
+                    except Exception:
+                        mailto = None
+                    if mailto:
+                        last_err = f"Email application required: send resume to {mailto}"
+                    else:
+                        last_err = "No application form fields detected on listing page (manual apply or external link required)"
+                    print(f"  [manual] {job['company']}: {last_err}")
+                    set_state(job["job_id"], "NEEDS_MANUAL", last_error=last_err)
+                    return "NEEDS_MANUAL"
 
                 if has_login_wall(page):
                     if STORAGE_STATE_PATH.exists() and handle_oauth_sso(page):

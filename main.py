@@ -1764,9 +1764,31 @@ def run_daily_pipeline(
             except Exception:
                 pass
 
-        eligible = database.get_jobs(status="shortlisted", min_match_score=threshold, limit=max_auto_apply)
-        if not eligible:
-            eligible = database.get_jobs(status="shortlisted", limit=max_auto_apply)
+        def is_direct_portal(job_obj) -> bool:
+            url_low = (getattr(job_obj, "url", "") or "").lower()
+            source_low = (getattr(job_obj, "source", "") or "").lower()
+            ats_indicators = [
+                "greenhouse.io", "lever.co", "smartrecruiters.com",
+                "myworkdayjobs.com", "ashbyhq.com", "careers.mastercard.com",
+                "phenom", "workable.com",
+            ]
+            if any(ind in url_low for ind in ats_indicators):
+                return True
+            if source_low in ("greenhouse", "lever", "enterprise_careers"):
+                return True
+            return False
+
+        all_shortlisted = database.get_jobs(status="shortlisted", min_match_score=threshold, limit=30)
+        if not all_shortlisted:
+            all_shortlisted = database.get_jobs(status="shortlisted", limit=30)
+
+        # Prioritize direct ATS portals first where automated form filling and submission succeed
+        sorted_shortlisted = sorted(
+            all_shortlisted,
+            key=lambda x: (1 if is_direct_portal(x) else 0, x.match_score or 0),
+            reverse=True,
+        )
+        eligible = sorted_shortlisted[:max_auto_apply]
 
         if eligible:
             tailor_pipeline = ApplicationTailorPipeline()

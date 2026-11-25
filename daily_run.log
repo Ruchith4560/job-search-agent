@@ -4,28 +4,28 @@
 =================================================================
 
 Step 0: Checking GitHub (Ruchith4560) & LinkedIn for new projects...
-[16:22:40] INFO     GitHub client initialized with token authentication.        
+[09:01:01] INFO     GitHub client initialized with token authentication.        
            INFO     Fetching public repositories for user 'Ruchith4560'...      
-[16:22:41] INFO     [1] Ingesting repository: job-search-agent                  
-[16:22:42] INFO     [2] Ingesting repository: travel_expense_calculator         
-[16:22:43] INFO     [3] Ingesting repository: NextMail_Ai                       
-[16:22:44] INFO     [4] Ingesting repository: servicedesk-pro                   
-[16:22:45] INFO     [5] Ingesting repository: ai-change-impact-engine           
-[16:22:46] INFO     [6] Ingesting repository:                                   
+[09:01:02] INFO     [1] Ingesting repository: job-search-agent                  
+[09:01:03] INFO     [2] Ingesting repository: travel_expense_calculator         
+[09:01:04] INFO     [3] Ingesting repository: NextMail_Ai                       
+[09:01:05] INFO     [4] Ingesting repository: servicedesk-pro                   
+[09:01:06] INFO     [5] Ingesting repository: ai-change-impact-engine           
+[09:01:07] INFO     [6] Ingesting repository:                                   
                     finiancial-fraud-investigation-platform                     
-[16:22:47] INFO     [7] Ingesting repository: mern-full-stack-task-3            
-[16:22:48] INFO     [8] Ingesting repository: mern-fullstack-task-2             
-[16:22:49] INFO     [9] Ingesting repository: mern-full-stack-task-1            
-[16:22:50] INFO     [10] Ingesting repository: mern-task-manager-backend        
-[16:22:51] INFO     [11] Ingesting repository: DHVANISENSE                      
-[16:22:52] INFO     [12] Ingesting repository: INTELLI-CREDIT                   
-[16:22:53] INFO     [13] Ingesting repository: ai_resume_analyzer               
-[16:22:54] INFO     [14] Ingesting repository: Ai_finance_tracker               
-[16:22:55] INFO     [15] Ingesting repository: smart-ai-healthcare-system       
-[16:22:56] INFO     [16] Ingesting repository: coderefine                       
-[16:22:57] INFO     [17] Ingesting repository: git_course                       
-[16:22:58] INFO     [18] Ingesting repository: devops_course-                   
-[16:22:59] INFO     Master profile is already up-to-date with GitHub and        
+[09:01:08] INFO     [7] Ingesting repository: mern-full-stack-task-3            
+[09:01:09] INFO     [8] Ingesting repository: mern-fullstack-task-2             
+[09:01:10] INFO     [9] Ingesting repository: mern-full-stack-task-1            
+           INFO     [10] Ingesting repository: mern-task-manager-backend        
+[09:01:11] INFO     [11] Ingesting repository: DHVANISENSE                      
+[09:01:12] INFO     [12] Ingesting repository: INTELLI-CREDIT                   
+[09:01:13] INFO     [13] Ingesting repository: ai_resume_analyzer               
+[09:01:14] INFO     [14] Ingesting repository: Ai_finance_tracker               
+[09:01:15] INFO     [15] Ingesting repository: smart-ai-healthcare-system       
+[09:01:16] INFO     [16] Ingesting repository: coderefine                       
+[09:01:17] INFO     [17] Ingesting repository: git_course                       
+[09:01:18] INFO     [18] Ingesting repository: devops_course-                   
+[09:01:19] INFO     Master profile is already up-to-date with GitHub and        
                     LinkedIn.                                                   
            INFO     Resume successfully passed all verification checks against  
                     master profile.                                             
@@ -42,37 +42,35 @@ freshersworld, indian_portals, enterprise_careers, smartrecruiters, remotive,
 arbeitnow, jobicy, himalayas, weworkremotely, python_org, greenhouse, lever...
            INFO     Executing fetcher for 'linkedin' (limit: 30)...             
            INFO     [linkedin] Fetching jobs from LinkedIn public search...     
-           WARNING  [linkedin] HTTP 429 for query Software Engineer Intern      
-           WARNING  [linkedin] HTTP 429 for query SDE Intern                    
-[16:23:00] WARNING  [linkedin] HTTP 429 for query Full Stack Developer Intern   
-           INFO     [linkedin] Successfully retrieved 0 jobs.                   
-           INFO     [linkedin] Ingested 0 raw jobs.                             
+[09:01:20] WARNING  [linkedin] HTTP 429 for query Full Stack Developer Intern   
+           INFO     [linkedin] Successfully retrieved 19 jobs.                  
+           INFO     [linkedin] Ingested 19 raw jobs.                            
            INFO     Executing fetcher for 'internshala' (limit: 30)...          
            INFO     [internshala] Fetching student internships from             
                     Internshala...                                              
-[16:23:02] INFO     [internshala] Successfully retrieved 30 jobs.               
+[09:01:21] INFO     [internshala] Successfully retrieved 30 jobs.               
            INFO     [internshala] Ingested 30 raw jobs.                         
            INFO     Executing fetcher for 'unstop' (limit: 30)...               
            INFO     [unstop] Fetching student internships from Unstop...        
-[16:23:05] INFO     [unstop] Successfully retrieved 21 jobs.                    
+[09:01:23] INFO     [unstop] Successfully retrieved 21 jobs.                    
            INFO     [unstop] Ingested 21 raw jobs.                              
            INFO     Executing fetcher for 'freshersworld' (limit: 30)...        
            INFO     [freshersworld] Fetching fresher jobs from Freshersworld... 
-           INFO     [freshersworld] Successfully retrieved 0 jobs.              
+[09:01:24] INFO     [freshersworld] Successfully retrieved 0 jobs.              
            INFO     [freshersworld] Ingested 0 raw jobs.                        
            INFO     Executing fetcher for 'indian_portals' (limit: 30)...       
            INFO     [indian_portals] Fetching jobs across Indian portals        
                     (Foundit, TimesJobs, WorkIndia, Apna, Hirist)...            
-[16:23:08] INFO     [indian_portals] Successfully retrieved 0 jobs.             
+[09:01:26] INFO     [indian_portals] Successfully retrieved 0 jobs.             
            INFO     [indian_portals] Ingested 0 raw jobs.                       
            INFO     Executing fetcher for 'enterprise_careers' (limit: 30)...   
            INFO     [enterprise_careers] Querying 68 official enterprise career 
                     pages...                                                    
-[16:23:28] INFO     [enterprise_careers] Successfully retrieved 30 jobs.        
+[09:01:29] INFO     [enterprise_careers] Successfully retrieved 30 jobs.        
            INFO     [enterprise_careers] Ingested 30 raw jobs.                  
            INFO     Executing fetcher for 'smartrecruiters' (limit: 30)...      
            INFO     [smartrecruiters] Fetching from 7 company career portals... 
-[16:23:31] INFO     [smartrecruiters] Successfully retrieved 0 jobs.            
+[09:01:31] INFO     [smartrecruiters] Successfully retrieved 0 jobs.            
            INFO     [smartrecruiters] Ingested 0 raw jobs.                      
            INFO     Executing fetcher for 'remotive' (limit: 30)...             
            INFO     [remotive] Fetching jobs from Remotive API...               
@@ -84,9 +82,9 @@ arbeitnow, jobicy, himalayas, weworkremotely, python_org, greenhouse, lever...
            INFO     [arbeitnow] Ingested 30 raw jobs.                           
            INFO     Executing fetcher for 'jobicy' (limit: 30)...               
            INFO     [jobicy] Fetching jobs from Jobicy API...                   
-[16:23:32] WARNING  [jobicy] HTTP 400 received for                              
+[09:01:39] WARNING  [jobicy] HTTP 400 received for                              
                     https://jobicy.com/api/v2/remote-jobs                       
-           INFO     [jobicy] Successfully retrieved 30 jobs.                    
+[09:01:40] INFO     [jobicy] Successfully retrieved 30 jobs.                    
            INFO     [jobicy] Ingested 30 raw jobs.                              
            INFO     Executing fetcher for 'himalayas' (limit: 30)...            
            INFO     [himalayas] Fetching jobs from Himalayas API...             
@@ -94,40 +92,85 @@ arbeitnow, jobicy, himalayas, weworkremotely, python_org, greenhouse, lever...
            INFO     [himalayas] Ingested 20 raw jobs.                           
            INFO     Executing fetcher for 'weworkremotely' (limit: 30)...       
            INFO     [weworkremotely] Fetching jobs from We Work Remotely RSS... 
-           INFO     [weworkremotely] Successfully retrieved 25 jobs.            
-           INFO     [weworkremotely] Ingested 25 raw jobs.                      
+[09:02:00] ERROR    [weworkremotely] Error fetching RSS feed:                   
+                    HTTPSConnectionPool(host='weworkremotely.com', port=443):   
+                    Read timed out. (read timeout=20)                           
+           INFO     [weworkremotely] Ingested 0 raw jobs.                       
            INFO     Executing fetcher for 'python_org' (limit: 30)...           
            INFO     [python_org] Fetching jobs from python.org RSS feed...      
            INFO     [python_org] Successfully retrieved 20 jobs.                
            INFO     [python_org] Ingested 20 raw jobs.                          
            INFO     Executing fetcher for 'greenhouse' (limit: 30)...           
            INFO     [greenhouse] Fetching jobs for company 'canonical'...       
-[16:23:33] INFO     [greenhouse] Successfully retrieved 30 jobs.                
+           INFO     [greenhouse] Successfully retrieved 30 jobs.                
            INFO     [greenhouse] Ingested 30 raw jobs.                          
            INFO     Executing fetcher for 'lever' (limit: 30)...                
            INFO     [lever] Fetching jobs for company 'palantir'...             
-[16:23:34] INFO     [lever] Successfully retrieved 30 jobs.                     
+[09:02:01] INFO     [lever] Successfully retrieved 30 jobs.                     
            INFO     [lever] Ingested 30 raw jobs.                               
-           INFO     Deduplicated 281 raw jobs down to 260 unique postings.      
-           INFO     Hard filtering: 66 accepted, 194 rejected out of 260 jobs.  
-           INFO     Database sync complete: 2 newly inserted, 64 updated. Total 
-                    active: 252                                                 
-          Discovered Opportunities (Accepted: 66 | Filtered Out: 194)           
+           INFO     Deduplicated 275 raw jobs down to 243 unique postings.      
+           INFO     Hard filtering: 70 accepted, 173 rejected out of 243 jobs.  
+           INFO     Database sync complete: 23 newly inserted, 47 updated. Total
+                    active: 275                                                 
+          Discovered Opportunities (Accepted: 70 | Filtered Out: 173)           
 ┏━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━┓
 ┃ Title         ┃ Company       ┃ Location      ┃ Source      ┃ URL            ┃
 ┡━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━┩
+│ Software      │ Bluebex       │ Bengaluru,    │ linkedin    │ https://in.li… │
+│ Engineer      │               │ Karnataka,    │             │                │
+│ Intern        │               │ ...           │             │                │
+│ Software      │ GROWLOC       │ Pune          │ linkedin    │ https://in.li… │
+│ Developer     │               │ Division,     │             │                │
+│ Intern        │               │ Maharas...    │             │                │
+│ Software      │ Isomorph AI   │ Bengaluru,    │ linkedin    │ https://in.li… │
+│ Engineering   │               │ Karnataka,    │             │                │
+│ Intern        │               │ ...           │             │                │
+│ Software      │ Park Place    │ Hyderabad,    │ linkedin    │ https://in.li… │
+│ Development   │ Technologies  │ Telangana,    │             │                │
+│ Intern        │               │ ...           │             │                │
+│ Software      │ Electronic    │ Hyderabad,    │ linkedin    │ https://in.li… │
+│ Engineering   │ Arts (EA)     │ Telangana,    │             │                │
+│ Intern        │               │ ...           │             │                │
+│ Web           │ paverasa pvt  │ Hyderabad,    │ linkedin    │ https://in.li… │
+│ Development   │ ltd           │ Telangana,    │             │                │
+│ Intern        │               │ ...           │             │                │
+│ Software      │ Google        │ Hyderabad,    │ linkedin    │ https://in.li… │
+│ Engineering   │               │ Telangana,    │             │                │
+│ PhD           │               │ ...           │             │                │
+│ Intern,...    │               │               │             │                │
+│ Intern        │ Micron        │ Hyderabad,    │ linkedin    │ https://in.li… │
+│               │ Technology    │ Telangana,    │             │                │
+│               │               │ ...           │             │                │
+│ Software Dev  │ Amazon        │ Hyderabad,    │ linkedin    │ https://in.li… │
+│ Engineer I -  │               │ Telangana,    │             │                │
+│ IIT BH...     │               │ ...           │             │                │
+│ Java Full     │ Clicksoft     │ Hyderabad,    │ linkedin    │ https://in.li… │
+│ Stack         │ Solutions     │ Telangana,    │             │                │
+│ Developer     │               │ ...           │             │                │
+│ (Fresher)     │               │               │             │                │
+│ 2027 Campus   │ Qualcomm      │ Greater       │ linkedin    │ https://in.li… │
+│ Hire_Enginee… │               │ Hyderabad     │             │                │
+│               │               │ Area          │             │                │
+│ Work From     │ Basti Ki      │ Remote / Work │ internshala │ https://inter… │
+│ Home Part     │ Pathshala     │ From Home     │             │                │
+│ Time          │ Foundation    │               │             │                │
+│ Softwar...    │               │               │             │                │
+│ Work From     │ Quickhyre     │ Remote / Work │ internshala │ https://inter… │
+│ Home Software │               │ From Home     │             │                │
+│ Developm...   │               │               │             │                │
 │ Work From     │ The           │ Remote / Work │ internshala │ https://inter… │
 │ Home Software │ Proeducator   │ From Home     │             │                │
+│ Developm...   │               │               │             │                │
+│ Work From     │ River         │ Remote / Work │ internshala │ https://inter… │
+│ Home Part     │ Learning      │ From Home     │             │                │
+│ Time          │               │               │             │                │
+│ Softwar...    │               │               │             │                │
+│ Work From     │ Nayepankh     │ Remote / Work │ internshala │ https://inter… │
+│ Home Software │ Foundation    │ From Home     │             │                │
 │ Developm...   │               │               │             │                │
 │ Work From     │ Women First   │ Remote / Work │ internshala │ https://inter… │
 │ Home Software │ India         │ From Home     │             │                │
 │ Developm...   │ Foundation    │               │             │                │
-│ Work From     │ Nayepankh     │ Remote / Work │ internshala │ https://inter… │
-│ Home Software │ Foundation    │ From Home     │             │                │
-│ Developm...   │               │               │             │                │
-│ Work From     │ Ten           │ Remote / Work │ internshala │ https://inter… │
-│ Home Software │               │ From Home     │             │                │
-│ Developm...   │               │               │             │                │
 │ Work From     │ Hope Behind   │ Remote / Work │ internshala │ https://inter… │
 │ Home Part     │ Tails         │ From Home     │             │                │
 │ Time          │ Foundation    │               │             │                │
@@ -136,65 +179,19 @@ arbeitnow, jobicy, himalayas, weworkremotely, python_org, greenhouse, lever...
 │ Home Part     │ Foundation    │ From Home     │             │                │
 │ Time          │               │               │             │                │
 │ Softwar...    │               │               │             │                │
-│ Work From     │ Basti Ki      │ Remote / Work │ internshala │ https://inter… │
-│ Home Part     │ Pathshala     │ From Home     │             │                │
-│ Time          │ Foundation    │               │             │                │
-│ Softwar...    │               │               │             │                │
-│ Work From     │ Inamigos      │ Remote / Work │ internshala │ https://inter… │
-│ Home Ai Web   │ Foundation    │ From Home     │             │                │
-│ Developmen... │               │               │             │                │
-│ Work From     │ Basti Ki      │ Remote / Work │ internshala │ https://inter… │
-│ Home Java     │ Pathshala     │ From Home     │             │                │
-│ Development   │ Foundation    │               │             │                │
-│ ...           │               │               │             │                │
-│ Work From     │ Pledge India  │ Remote / Work │ internshala │ https://inter… │
-│ Home Java     │ Foundation    │ From Home     │             │                │
-│ Development   │               │               │             │                │
-│ ...           │               │               │             │                │
-│ Work From     │ Women First   │ Remote / Work │ internshala │ https://inter… │
-│ Home Part     │ India         │ From Home     │             │                │
-│ Time          │ Foundation    │               │             │                │
-│ Informa...    │               │               │             │                │
-│ Work From     │ Queens Of     │ Remote / Work │ internshala │ https://inter… │
-│ Home Python   │ Change        │ From Home     │             │                │
-│ Developmen... │ Foundation    │               │             │                │
-│ Work From     │ Opalcode      │ Remote / Work │ internshala │ https://inter… │
-│ Home Part     │               │ From Home     │             │                │
-│ Time          │               │               │             │                │
-│ Backend...    │               │               │             │                │
 │ Work From     │ Echotalk      │ Remote / Work │ internshala │ https://inter… │
-│ Home Python   │               │ From Home     │             │                │
-│ Developmen... │               │               │             │                │
-│ HR Internship │ Ruvellan      │ India /       │ unstop      │ https://unsto… │
-│               │ Technologies  │ Hybrid /      │             │                │
-│               │ Private       │ Remote        │             │                │
-│               │ Limited       │               │             │                │
-│ Inside Sales  │ Pepagora      │ India /       │ unstop      │ https://unsto… │
-│ Associate     │ India Private │ Hybrid /      │             │                │
-│               │ Limited       │ Remote        │             │                │
-│ Social Media  │ GrowthxX      │ India /       │ unstop      │ https://unsto… │
-│ Internship    │               │ Hybrid /      │             │                │
-│               │               │ Remote        │             │                │
-│ Field         │ Planet Force  │ India /       │ unstop      │ https://unsto… │
-│ Operations &  │               │ Hybrid /      │             │                │
-│ Business      │               │ Remote        │             │                │
-│ Deve...       │               │               │             │                │
-│ Sales         │ CYRAACS       │ India /       │ unstop      │ https://unsto… │
-│ Internship    │               │ Hybrid /      │             │                │
-│               │               │ Remote        │             │                │
-│ B2B Sales &   │ Anantnetra    │ India /       │ unstop      │ https://unsto… │
-│ Business      │ Technology    │ Hybrid /      │             │                │
-│ Development.… │               │ Remote        │             │                │
+│ Home Software │               │ From Home     │             │                │
+│ Developm...   │               │               │             │                │
 └───────────────┴───────────────┴───────────────┴─────────────┴────────────────┘
-... and 46 more jobs displayed
+... and 50 more jobs displayed
 
-Sync Summary: 2 new jobs inserted, 64 updated. Total active in SQLite 
-(data/tracker.db): 252.
+Sync Summary: 23 new jobs inserted, 47 updated. Total active in SQLite 
+(data/tracker.db): 275.
 
 Step 2/5: Scoring opportunities against student profile (Threshold 70+)...
-Matching 252 jobs against profile for Ruchith Macha (Shortlist: top 20 by vector
+Matching 275 jobs against profile for Ruchith Macha (Shortlist: top 20 by vector
 similarity | Threshold: 70/100)...
-           INFO     Vector shortlisting complete: evaluated 245 jobs, selected  
+           INFO     Vector shortlisting complete: evaluated 268 jobs, selected  
                     top 20 (score range: 0.06 - 0.03)                           
            INFO     Updated 8 qualified jobs to 'shortlisted' status in         
                     database.                                                   
@@ -208,7 +205,7 @@ similarity | Threshold: 70/100)...
 │   #1 │ 88/100 │ Internet   │ TGScope    │ Docker,   │ None       │ Strong    │
 │      │        │ Measureme… │            │ Python    │            │ Match     │
 │      │        │ Researche  │            │           │            │           │
-│   #2 │ 80/100 │ Research   │ TGScope    │ Python    │ None       │ Strong    │
+│   #2 │ 81/100 │ Research   │ TGScope    │ Python    │ None       │ Strong    │
 │      │        │ Engineer,  │            │           │            │ Match     │
 │      │        │ Multiling… │            │           │            │           │
 │   #3 │ 77/100 │ ML         │ Micro1     │ Python    │ None       │ Strong    │
@@ -217,7 +214,7 @@ similarity | Threshold: 70/100)...
 │      │        │ Machine    │ Architect… │           │            │ Match     │
 │      │        │ Learning   │            │           │            │           │
 │      │        │ Engine     │            │           │            │           │
-│   #5 │ 75/100 │ FullStack  │ Construct… │ Java,     │ None       │ Strong    │
+│   #5 │ 76/100 │ FullStack  │ Construct… │ Java,     │ None       │ Strong    │
 │      │        │ Engineer - │            │ JavaScri… │            │ Match     │
 │      │        │ Prospect   │            │           │            │           │
 │   #6 │ 73/100 │ Backend    │ UNICEF     │ Java,     │ Kafka      │ Good      │
@@ -259,7 +256,7 @@ Engineer - Optimisation...
                     data/output/canonical_embedded_desktop_linux_systems_enginee
                     r_/RuchithMacha_EmbeddedDesktopLinuxSystemsEngineerOptimisat
                     ion_Canonical.docx                                          
-           INFO     Saved DOCX resume to                                        
+[09:02:02] INFO     Saved DOCX resume to                                        
                     data/output/canonical_embedded_desktop_linux_systems_enginee
                     r_/tailored_resume.docx                                     
            INFO     Cover letter PDF saved to:                                  
@@ -435,7 +432,7 @@ and seniority levels)...
            INFO     Cover letter TXT saved to:                                  
                     data/output/simpletiger_web_developer_wordpress_hubspot_u_s_
                     base/cover_letter.txt                                       
-[16:23:35] INFO     Updated status for job 7c26a21c136f2d62 to 'tailored' with  
+           INFO     Updated status for job 7c26a21c136f2d62 to 'tailored' with  
                     ATS score 92%.                                              
   Auto-tailoring resume for #7: Camunda - Forward Deployed Engineer...
            INFO     Preparing tailored application packet in:                   
@@ -499,10 +496,10 @@ Semantic Search...
            INFO     Cover letter TXT saved to:                                  
                     data/output/tgscope_research_engineer_multilingual_semantic_
                     /cover_letter.txt                                           
-[16:23:36] INFO     Updated status for job a929df164acd9827 to 'tailored' with  
+           INFO     Updated status for job a929df164acd9827 to 'tailored' with  
                     ATS score 92%.                                              
   Auto-tailoring resume for #9: Roboflow - Forward Deployed Engineer...
-           INFO     Preparing tailored application packet in:                   
+[09:02:03] INFO     Preparing tailored application packet in:                   
                     data/output/roboflow_forward_deployed_engineer              
            INFO     Resume successfully passed all verification checks against  
                     master profile.                                             
@@ -559,7 +556,7 @@ Semantic Search...
            INFO     Cover letter TXT saved to:                                  
                     data/output/canonical_cloud_support_engineer/cover_letter.tx
                     t                                                           
-[16:23:37] INFO     Updated status for job 398849f285bb9ef1 to 'tailored' with  
+           INFO     Updated status for job 398849f285bb9ef1 to 'tailored' with  
                     ATS score 85%.                                              
            INFO     Saved daily email HTML preview to:                          
                     data/output/daily_email_preview.html                        
@@ -579,13 +576,13 @@ Step 4/5: Generating tracker digest and readying application queue...
            INFO     Daily digest report saved to: data/daily_digest.md          
 
 
-              Daily Job Search Digest - Tuesday, November 24, 2026              
+             Daily Job Search Digest - Wednesday, November 25, 2026             
 
 Candidate: Ruchith Macha                                                        
 
 [PIPELINE] Pipeline Overview                                                    
 
- • Total Opportunities Tracked: 252                                             
+ • Total Opportunities Tracked: 275                                             
  • In Progress (Shortlisted/Tailored): 26                                       
  • Submitted Applications: 0                                                    
  • Active Interviews/Offers: 0                                                  
@@ -597,12 +594,12 @@ Ready for Tailoring:
  • Micro1 - ML Engineer (815a56a6) -> Run python main.py tailor 815a56a6        
  • HFT Architecture - Junior Machine Learning Engineer (a0723191) -> Run python 
    main.py tailor a0723191                                                      
+ • Constructor - FullStack Engineer - Prospect Data Solutions (f71b7794) -> Run 
+   python main.py tailor f71b7794                                               
  • Oportun - Sr. Data Analytics Engineer (R14153) (ff1fdbdf) -> Run python      
    main.py tailor ff1fdbdf                                                      
  • Vertex Marketing Group - Distribution Engineer (789e0f17) -> Run python      
    main.py tailor 789e0f17                                                      
- • Constructor - FullStack Engineer - Prospect Data Solutions (f71b7794) -> Run 
-   python main.py tailor f71b7794                                               
  • UNICEF - Backend Software Engineering (cfec93e9) -> Run python main.py tailor
    cfec93e9                                                                     
  • Canonical - Associate Linux Support Engineer (17d3c2cb) -> Run python main.py
@@ -677,7 +674,7 @@ Completing application for: Micro1 - ML Engineer (Match: 77%)...
 
 Completing application for: HFT Architecture - Junior Machine Learning Engineer 
 (Match: 77%)...
-[16:24:03] INFO     Preparing tailored application packet in:                   
+[09:02:30] INFO     Preparing tailored application packet in:                   
                     data/output/hft_architecture_junior_machine_learning_enginee
                     r                                                           
            INFO     Resume successfully passed all verification checks against  
@@ -717,9 +714,9 @@ portal...
   Application status for HFT Architecture: READY
 
 Additional qualified positions available for manual review:
-  #1 Oportun - Sr. Data Analytics Engineer (R14153) (ID: ff1fdbdf)
-  #2 Vertex Marketing Group - Distribution Engineer (ID: 789e0f17)
-  #3 Constructor - FullStack Engineer - Prospect Data Solutions (ID: f71b7794)
+  #1 Constructor - FullStack Engineer - Prospect Data Solutions (ID: f71b7794)
+  #2 Oportun - Sr. Data Analytics Engineer (R14153) (ID: ff1fdbdf)
+  #3 Vertex Marketing Group - Distribution Engineer (ID: 789e0f17)
   #4 UNICEF - Backend Software Engineering (ID: cfec93e9)
   #5 Canonical - Associate Linux Support Engineer (ID: 17d3c2cb)
 

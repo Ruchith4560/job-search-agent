@@ -112,11 +112,14 @@ class ProfileBuilder:
         from agent.config import load_config
         cfg = load_config()
         name = cfg.student_profile.name or "Ruchith Macha"
-        headline = None
+        headline = "Computer Science & Engineering Student | Full-Stack & AI Systems Developer"
         location = "Hyderabad, Telangana, India"
         email = cfg.student_profile.email or "macharuchith1@gmail.com"
-        phone = "6305239230"
-        links: Dict[str, str] = {}
+        phone = "+91 6305239230"
+        links: Dict[str, str] = {
+            "github": f"https://github.com/{github_data.username}" if github_data else "https://github.com/Ruchith4560",
+            "linkedin": "https://linkedin.com/in/ruchith-macha",
+        }
 
         if linkedin_data and linkedin_data.profile:
             lp = linkedin_data.profile
@@ -133,9 +136,8 @@ class ProfileBuilder:
                 email = lp.email
             if lp.phone:
                 phone = lp.phone
-
-        if github_data:
-            links["github"] = f"https://github.com/{github_data.username}"
+            if getattr(lp, "linkedin_url", None):
+                links["linkedin"] = getattr(lp, "linkedin_url")
 
         return PersonalInfo(
             name=name,
@@ -251,39 +253,62 @@ class ProfileBuilder:
     ) -> List[ExperienceItem]:
         """Convert LinkedIn position records into ExperienceItems."""
         experience: List[ExperienceItem] = []
-        if not linkedin_data:
-            return experience
+        if linkedin_data:
+            for pos in linkedin_data.positions:
+                achievements: List[AchievementItem] = []
+                if pos.description:
+                    if "•" in pos.description:
+                        for b in pos.description.split("•"):
+                            cleaned = b.strip()
+                            if cleaned:
+                                achievements.append(
+                                    AchievementItem(text=cleaned, source="linkedin")
+                                )
+                    else:
+                        for line in pos.description.splitlines():
+                            cleaned = line.strip().lstrip("-*•> ")
+                            if cleaned:
+                                achievements.append(
+                                    AchievementItem(text=cleaned, source="linkedin")
+                                )
 
-        for pos in linkedin_data.positions:
-            achievements: List[AchievementItem] = []
-            if pos.description:
-                if "•" in pos.description:
-                    for b in pos.description.split("•"):
-                        cleaned = b.strip()
-                        if cleaned:
-                            achievements.append(
-                                AchievementItem(text=cleaned, source="linkedin")
-                            )
-                else:
-                    for line in pos.description.splitlines():
-                        cleaned = line.strip().lstrip("-*•> ")
-                        if cleaned:
-                            achievements.append(
-                                AchievementItem(text=cleaned, source="linkedin")
-                            )
+                is_current = not bool(pos.finished_on)
+                item = ExperienceItem(
+                    company=pos.company_name,
+                    title=pos.title,
+                    location=pos.location,
+                    start_date=pos.started_on,
+                    end_date=pos.finished_on,
+                    is_current=is_current,
+                    achievements=achievements,
+                    source="linkedin",
+                )
+                experience.append(item)
 
-            is_current = not bool(pos.finished_on)
-            item = ExperienceItem(
-                company=pos.company_name,
-                title=pos.title,
-                location=pos.location,
-                start_date=pos.started_on,
-                end_date=pos.finished_on,
-                is_current=is_current,
-                achievements=achievements,
-                source="linkedin",
+        if not experience:
+            experience.append(
+                ExperienceItem(
+                    company="Alfido Tech",
+                    title="MERN Stack Web Development Intern",
+                    location="Remote",
+                    start_date="2024",
+                    end_date="2024",
+                    is_current=False,
+                    achievements=[
+                        AchievementItem(
+                            text="Developed production-ready RESTful APIs in Node.js and Express with MongoDB Mongoose ODM, implementing secure JWT authentication and bcrypt password hashing.",
+                            metrics="Built full CRUD API & auth system",
+                            source="manual",
+                        ),
+                        AchievementItem(
+                            text="Engineered responsive React single-page applications with dynamic state management, React Router navigation, input validation, and real-time API integrations.",
+                            metrics="100% responsive SPA with complete CRUD operations",
+                            source="manual",
+                        ),
+                    ],
+                    source="manual",
+                )
             )
-            experience.append(item)
 
         return experience
 
@@ -293,19 +318,30 @@ class ProfileBuilder:
     ) -> List[EducationItem]:
         """Convert LinkedIn education records into EducationItems."""
         education: List[EducationItem] = []
-        if not linkedin_data:
-            return education
+        if linkedin_data:
+            for edu in linkedin_data.education:
+                item = EducationItem(
+                    school=edu.school_name,
+                    degree=edu.degree_name,
+                    start_date=edu.start_date,
+                    end_date=edu.end_date,
+                    notes=edu.notes or edu.activities,
+                    source="linkedin",
+                )
+                education.append(item)
 
-        for edu in linkedin_data.education:
-            item = EducationItem(
-                school=edu.school_name,
-                degree=edu.degree_name,
-                start_date=edu.start_date,
-                end_date=edu.end_date,
-                notes=edu.notes or edu.activities,
-                source="linkedin",
+        if not education:
+            education.append(
+                EducationItem(
+                    school="Anurag University",
+                    degree="Bachelor of Technology (B.Tech)",
+                    field_of_study="Computer Science and Engineering",
+                    start_date="2024",
+                    end_date="2028",
+                    notes="CGPA: 9.05 / 10 | Relevant Coursework: Data Structures & Algorithms, Object-Oriented Programming, Database Management Systems, Operating Systems, Computer Networks",
+                    source="manual",
+                )
             )
-            education.append(item)
 
         return education
 

@@ -27,7 +27,7 @@ def score_project_relevance(project: ProjectItem) -> int:
     score += project.stars * 3
     # Key modern frameworks
     stack_lower = " ".join(project.stack).lower()
-    for tech in ("fastapi", "spring boot", "react", "next.js", "mongodb", "postgresql"):
+    for tech in ("fastapi", "spring boot", "react", "next.js", "mongodb", "postgresql", "playwright", "docker", "python"):
         if tech in stack_lower:
             score += 4
     return score

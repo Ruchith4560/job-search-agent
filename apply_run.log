@@ -1,47 +1,47 @@
--> Bybit | Animator Intern
+-> Canonical | Community Engineer (multiple roles and seniority levels)
+  [fill-fail] In which country do you currently work?*: Locator.fill: Timeout 30000ms exceeded.
+Call log:
+  - waiting for locator("[data-aa=\"aa26\"]")
+
+  [fill-fail] Please indicate your nationality:*: Locator.fill: Timeout 30000ms exceeded.
+Call log:
+  - waiting for locator("[data-aa=\"aa32\"]")
+
+  filled 36 fields, 2 unknown required
+  [warn] Could not deliver email '[Job Agent Action Required] Additional info needed for Canonical - Community Engineer (multiple roles and seniority levels) [JOB-24e0cb57]': Connection unexpectedly closed
+  result: WAITING_ANSWER
+-> Canonical | Embedded & Desktop Linux Systems Engineer - Optimisation
+  [fill-fail] In which country do you currently work?*: Locator.fill: Timeout 30000ms exceeded.
+Call log:
+  - waiting for locator("[data-aa=\"aa24\"]")
+
+  [fill-fail] Please indicate your nationality:*: Locator.fill: Timeout 30000ms exceeded.
+Call log:
+  - waiting for locator("[data-aa=\"aa33\"]")
+
+  filled 37 fields, 2 unknown required
+  [warn] Could not deliver email '[Job Agent Action Required] Additional info needed for Canonical - Embedded & Desktop Linux Systems Engineer - Optimisation [JOB-1f62a0ab]': Connection unexpectedly closed
+  result: WAITING_ANSWER
+-> Canonical | Embedded Devices Software Solution Sales - All Roles
+  [fill-fail] In which country do you currently work?*: Locator.fill: Timeout 30000ms exceeded.
+Call log:
+  - waiting for locator("[data-aa=\"aa27\"]")
+
+  [fill-fail] Please indicate your nationality:*: Locator.fill: Timeout 30000ms exceeded.
+Call log:
+  - waiting for locator("[data-aa=\"aa33\"]")
+
+  filled 36 fields, 3 unknown required
+  [warn] Could not deliver email '[Job Agent Action Required] Additional info needed for Canonical - Embedded Devices Software Solution Sales - All Roles [JOB-13f33c1a]': Connection unexpectedly closed
+  result: WAITING_ANSWER
+-> TGScope | Internet Measurement Researcher (Censorship & Proxies)
+  filled 0 fields, 0 unknown required
+  [manual] TGScope: Email application required: send resume to tgscope.connect%40gmail.com
+  result: NEEDS_MANUAL
+-> SimpleTiger | Web Developer: WordPress & HubSpot (U.S. Based, Remote Contractor)
+  filled 0 fields, 0 unknown required
+  [manual] SimpleTiger: No application form fields detected on listing page (manual apply or external link required)
+  result: NEEDS_MANUAL
+-> Camunda | Forward Deployed Engineer
   filled 1 fields, 0 unknown required
   result: READY
--> UNICEF | Backend Software Engineering
-  filled 0 fields, 0 unknown required
-  result: READY
--> Fluence International, Inc. | Full-Stack Developer
-  filled 0 fields, 0 unknown required
-  [error] Exception in process(Fluence International, Inc.): Locator.click: Timeout 30000ms exceeded.
-Call log:
-  - waiting for get_by_role("button", name=re.compile(r"submit( application)?|send application|apply", re.IGNORECASE)).last
-    - locator resolved to <a role="button" job-id="2091165" job-source="job_detail_page" onclick="processApplyClick(this)" class="remotive-btn-chocolate tw-my-2 tw-relative">…</a>
-  - attempting click action
-    2 × waiting for element to be visible, enabled and stable
-      - element is visible, enabled and stable
-      - scrolling into view if needed
-      - done scrolling
-      - <div class="tw-absolute tw-inset-0 tw-bg-gray-500 tw-opacity-75"></div> from <div id="apply-modal-2091165" class="tw-fixed tw-inset-x-0 tw-bottom-0 tw-z-40 tw-flex tw-px-4 tw-pb-4 sm:tw-inset-0 sm:tw-items-center sm:tw-justify-center">…</div> subtree intercepts pointer events
-    - retrying click action
-    - waiting 20ms
-    2 × waiting for element to be visible, enabled and stable
-      - element is visible, enabled and stable
-      - scrolling into view if needed
-      - done scrolling
-      - <div class="tw-absolute tw-inset-0 tw-bg-gray-500 tw-opacity-75"></div> from <div id="apply-modal-2091165" class="tw-fixed tw-inset-x-0 tw-bottom-0 tw-z-40 tw-flex tw-px-4 tw-pb-4 sm:tw-inset-0 sm:tw-items-center sm:tw-justify-center">…</div> subtree intercepts pointer events
-    - retrying click action
-      - waiting 100ms
-    58 × waiting for element to be visible, enabled and stable
-       - element is visible, enabled and stable
-       - scrolling into view if needed
-       - done scrolling
-       - <div class="tw-absolute tw-inset-0 tw-bg-gray-500 tw-opacity-75"></div> from <div id="apply-modal-2091165" class="tw-fixed tw-inset-x-0 tw-bottom-0 tw-z-40 tw-flex tw-px-4 tw-pb-4 sm:tw-inset-0 sm:tw-items-center sm:tw-justify-center">…</div> subtree intercepts pointer events
-     - retrying click action
-       - waiting 500ms
-
-  result: ERROR
--> TGScope | Research Engineer, Multilingual Semantic Search
-  filled 0 fields, 0 unknown required
-  result: READY
--> Micro1 | ML Engineer
-  filled 0 fields, 0 unknown required
-  [warn] Could not deliver email '[Job Agent] Please finish manually: Micro1 - ML Engineer': Connection unexpectedly closed
-  result: NEEDS_MANUAL
--> HFT Architecture | Junior Machine Learning Engineer
-  filled 0 fields, 0 unknown required
-  [warn] Could not deliver email '[Job Agent] Please finish manually: HFT Architecture - Junior Machine Learning Engineer': Connection unexpectedly closed
-  result: NEEDS_MANUAL

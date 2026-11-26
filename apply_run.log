@@ -1,3 +1,39 @@
+-> Canonical | Embedded & Desktop Linux Systems Engineer - Optimisation
+  filled 39 fields, 0 unknown required
+  [warn] Could not deliver email '[Job Agent] Please finish manually: Canonical - Embedded & Desktop Linux Systems Engineer - Optimisation': Connection unexpectedly closed
+  result: NEEDS_MANUAL
+-> Canonical | Embedded Devices Software Solution Sales - All Roles
+  filled 38 fields, 1 unknown required
+  [warn] Could not deliver email '[Job Agent Action Required] Additional info needed for Canonical - Embedded Devices Software Solution Sales - All Roles [JOB-13f33c1a]': Connection unexpectedly closed
+  result: WAITING_ANSWER
+-> Canonical | Community Engineer (multiple roles and seniority levels)
+  filled 38 fields, 0 unknown required
+  [warn] Could not deliver email '[Job Agent] Please finish manually: Canonical - Community Engineer (multiple roles and seniority levels)': Connection unexpectedly closed
+  result: NEEDS_MANUAL
+-> Bybit | Animator Intern
+  filled 1 fields, 0 unknown required
+  [warn] Could not deliver email '[Job Agent] Please finish manually: Bybit - Animator Intern': Connection unexpectedly closed
+  result: NEEDS_MANUAL
+-> UNICEF | Backend Software Engineering
+  filled 0 fields, 0 unknown required
+  [manual] UNICEF: Email application required: send resume to hawilson%40unicef.org
+  result: NEEDS_MANUAL
+-> Fluence International, Inc. | Full-Stack Developer
+  filled 0 fields, 0 unknown required
+  [manual] Fluence International, Inc.: Email application required: send resume to techjobs@fluencetraining.com
+  result: NEEDS_MANUAL
+-> TGScope | Internet Measurement Researcher (Censorship & Proxies)
+  filled 0 fields, 0 unknown required
+  [manual] TGScope: Email application required: send resume to tgscope.connect%40gmail.com
+  result: NEEDS_MANUAL
+-> SimpleTiger | Web Developer: WordPress & HubSpot (U.S. Based, Remote Contractor)
+  filled 0 fields, 0 unknown required
+  [manual] SimpleTiger: No application form fields detected on listing page (manual apply or external link required)
+  result: NEEDS_MANUAL
+-> Camunda | Forward Deployed Engineer
+  filled 1 fields, 0 unknown required
+  [warn] Could not deliver email '[Job Agent] Please finish manually: Camunda - Forward Deployed Engineer': Connection unexpectedly closed
+  result: NEEDS_MANUAL
 -> Constructor | FullStack Engineer - Prospect Data Solutions
   filled 1 fields, 0 unknown required
   result: READY

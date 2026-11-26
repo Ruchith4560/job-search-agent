@@ -262,7 +262,7 @@ EXTRACT_JS = r"""
     const type = (el.type || '').toLowerCase();
     if (['hidden','submit','button','image','reset','password'].includes(type)) return;
     if (el.disabled) return;
-    if (!['file','radio','checkbox'].includes(type) && !vis(el)) return;
+    if (!['file','radio','checkbox'].includes(type) && el.tagName !== 'SELECT' && !vis(el)) return;
     const aa = 'aa' + (n++); el.setAttribute('data-aa', aa);
     const label = labelOf(el);
     if (type === 'file') { out.push({aa, kind:'file', label, required:isReq(el,label), options:[]}); return; }
@@ -351,20 +351,59 @@ def fill_field(page, f: dict, value: str) -> bool:
             if not opt:
                 return False
             aa = next(o["aa"] for o in f["options"] if o["label"] == opt)
-            page.locator(f'[data-aa="{aa}"]').check(force=True)
+            page.locator(f'[data-aa="{aa}"]').check(force=True, timeout=3000)
             return True
         loc = page.locator(f'[data-aa="{f["aa"]}"]')
         if kind == "select":
             opt = pick_option(value, [o["label"] for o in f["options"]])
-            if not opt:
+            try:
+                if opt:
+                    loc.select_option(label=opt, timeout=3000, force=True)
+                    return True
+            except Exception:
+                pass
+            # JavaScript fallback on underlying select element
+            try:
+                page.evaluate(
+                    """([aa, val, optLabel]) => {
+                        const sel = document.querySelector(`[data-aa='${aa}']`);
+                        if (sel && sel.tagName === 'SELECT') {
+                            for (const o of sel.options) {
+                                if ((optLabel && o.text.trim() === optLabel.trim()) || o.text.toLowerCase().includes(val.toLowerCase()) || o.value.toLowerCase().includes(val.toLowerCase())) {
+                                    sel.value = o.value;
+                                    sel.dispatchEvent(new Event('input', {bubbles: true}));
+                                    sel.dispatchEvent(new Event('change', {bubbles: true}));
+                                    return true;
+                                }
+                            }
+                        }
+                        return false;
+                    }""",
+                    [f["aa"], str(value), opt or ""],
+                )
+                return True
+            except Exception:
                 return False
-            loc.select_option(label=opt)
         elif kind == "checkbox":
-            loc.check(force=True)
+            loc.check(force=True, timeout=3000)
         else:
-            loc.fill(str(value))
+            try:
+                loc.fill(str(value), timeout=3000)
+            except Exception:
+                # JavaScript fallback for offscreen/covered inputs (Select2/React)
+                page.evaluate(
+                    """([aa, val]) => {
+                        const el = document.querySelector(`[data-aa='${aa}']`);
+                        if (el) {
+                            el.value = val;
+                            el.dispatchEvent(new Event('input', {bubbles: true}));
+                            el.dispatchEvent(new Event('change', {bubbles: true}));
+                        }
+                    }""",
+                    [f["aa"], str(value)],
+                )
             if f.get("combo"):            # react-select style dropdowns
-                page.wait_for_timeout(500)
+                page.wait_for_timeout(300)
                 page.keyboard.press("ArrowDown")
                 page.keyboard.press("Enter")
         return True
@@ -508,7 +547,7 @@ def fill_form(page, job, profile, answers):
         ok = value is not None and fill_field(page, f, value)
         if ok:
             filled.append(label)
-        elif f["required"]:
+        elif value is None and f["required"]:
             unknown.append({"label": label, "options": [o["label"] for o in f["options"]]})
         time.sleep(random.uniform(0.2, 0.7))
     return unknown, filled
@@ -1036,6 +1075,75 @@ def check_replies() -> int:
     return updated
 
 
+def check_digest_approval_replies() -> list[str]:
+    """Check Gmail inbox via IMAP for replies from candidate approving digest jobs (e.g. 'APPLY 1, 2, 3').
+    Approves the jobs in JobDatabase, enqueues them into apply_state, and returns the list of approved job IDs.
+    """
+    if not APP_PASSWORD:
+        return []
+    approved_ids = []
+    try:
+        M = imaplib.IMAP4_SSL("imap.gmail.com", 993, timeout=10)
+        M.login(USER, APP_PASSWORD)
+        M.select("INBOX")
+
+        status, ids = M.search(None, "(UNSEEN)")
+        if status != "OK" or not ids or not ids[0]:
+            M.logout()
+            return []
+
+        digest_file = DATA / "output" / "latest_digest.json"
+        rank_map = {}
+        if digest_file.is_file():
+            try:
+                records = json.loads(digest_file.read_text(encoding="utf-8"))
+                for rec in records:
+                    rank_map[str(rec.get("rank"))] = rec.get("job_id")
+            except Exception:
+                pass
+
+        for i in ids[0].split():
+            _, data = M.fetch(i, "(BODY.PEEK[])")
+            msg = email.message_from_bytes(data[0][1])
+            sender_email = email.utils.parseaddr(msg.get("From", ""))[1].lower()
+            if sender_email != USER.lower():
+                continue
+
+            body = _plain_body(msg)
+            # Match "APPLY 1, 2, 3" or "APPLY 1,2,3,4,5,6,7,8,9,10" or "APPLY all"
+            m = re.search(r"\bAPPLY\s+([0-9\s,]+|all)\b", body, re.IGNORECASE)
+            if not m:
+                continue
+
+            val = m.group(1).strip()
+            tokens = [t.strip().strip(",") for t in val.replace(",", " ").split() if t.strip().strip(",")]
+            selected_ids = []
+            if "all" in [t.lower() for t in tokens]:
+                selected_ids = list(rank_map.values())
+            else:
+                for tok in tokens:
+                    if tok in rank_map:
+                        selected_ids.append(rank_map[tok])
+
+            if selected_ids:
+                print(f"  [email-approval] Received approval reply from {USER}: {m.group(0)}")
+                from agent.jobs.db import JobDatabase
+                db_inst = JobDatabase(DB_PATH)
+                for jid in selected_ids:
+                    db_inst.update_status(jid, "approved")
+                    j = db_inst.get_job_by_id(jid)
+                    if j:
+                        job_url = getattr(j, "url", getattr(j, "link", getattr(j, "apply_url", "")))
+                        enqueue(j.id, j.company, j.title, job_url, "")
+                        set_state(j.id, "APPROVED", pending="[]", last_error=None)
+                        approved_ids.append(jid)
+                M.store(i, "+FLAGS", "\\Seen")
+        M.logout()
+    except Exception as e:
+        print(f"  [warn] IMAP digest approval check failed ({e})")
+    return approved_ids
+
+
 # ------------------------------------------------------------------ main worker
 
 
@@ -1194,6 +1302,7 @@ def submitted_today() -> int:
 def run_queue(submit=False, headless=True, limit=10):
     if APP_PASSWORD:
         check_replies()
+        check_digest_approval_replies()
     with db() as c:
         # Reset any stale FILLING states from prior interrupted/crashed runs back to APPROVED
         c.execute("UPDATE apply_state SET state='APPROVED' WHERE state='FILLING'")

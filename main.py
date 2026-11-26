@@ -1566,10 +1566,11 @@ def login_session_command(
 def check_replies_command(
     db: str = typer.Option("data/tracker.db", "--db", "-d", help="Path to tracker.db"),
 ) -> None:
-    """Check Gmail inbox via IMAP for replies to application questions, learn answers, and complete submissions."""
+    """Check Gmail inbox via IMAP for replies to application questions and digest approvals."""
     from agent.notify.email_listener import EmailReplyListener
+    from agent.apply.auto_apply import check_digest_approval_replies
 
-    console.print("\n[bold cyan]Checking Gmail inbox for replies to pending application questions...[/bold cyan]")
+    console.print("\n[bold cyan]Checking Gmail inbox for replies to pending application questions and digest approvals...[/bold cyan]")
     target_db = Path(db)
     database = JobDatabase(db_path=target_db)
     listener = EmailReplyListener(db=database)
@@ -1583,7 +1584,13 @@ def check_replies_command(
                 console.print(f"      {qid}: [cyan]{ans}[/cyan]")
             console.print(f"    [dim]Application confirmation email dispatched to inbox.[/dim]\n")
     else:
-        console.print("[dim]No new replies or pending inquiries found in inbox.[/dim]\n")
+        console.print("[dim]No new question inquiries waiting in inbox.[/dim]\n")
+
+    approved = check_digest_approval_replies()
+    if approved:
+        console.print(f"[bold green][SUCCESS] Processed digest approval email for {len(approved)} job(s): {approved}[/bold green]\n")
+    else:
+        console.print("[dim]No new digest approval emails found in inbox.[/dim]\n")
 
 
 @app.command("inquiries")

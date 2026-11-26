@@ -1,3 +1,4 @@
 -> Camunda | Forward Deployed Engineer
   filled 1 fields, 0 unknown required
-  result: READY
+  [warn] Could not deliver email '[Job Agent] Please finish manually: Camunda - Forward Deployed Engineer': Connection unexpectedly closed
+  result: NEEDS_MANUAL

@@ -4,33 +4,68 @@
 =================================================================
 
 Step 0: Checking GitHub (Ruchith4560) & LinkedIn for new projects...
-[16:24:41] INFO     GitHub client initialized with token authentication.        
+[08:50:16] INFO     GitHub client initialized with token authentication.        
            INFO     Fetching public repositories for user 'Ruchith4560'...      
-[16:24:42] INFO     [1] Ingesting repository: job-search-agent                  
-[16:24:43] INFO     [2] Ingesting repository: travel_expense_calculator         
-[16:24:44] INFO     [3] Ingesting repository: NextMail_Ai                       
-[16:24:45] INFO     [4] Ingesting repository: servicedesk-pro                   
-[16:24:46] INFO     [5] Ingesting repository: ai-change-impact-engine           
-[16:24:47] INFO     [6] Ingesting repository:                                   
+[08:50:18] INFO     [1] Ingesting repository: job-search-agent                  
+[08:50:19] INFO     [2] Ingesting repository: ruchith_portfolio                 
+[08:50:20] INFO     [3] Ingesting repository: travel_expense_calculator         
+[08:50:21] INFO     [4] Ingesting repository: NextMail_Ai                       
+[08:50:22] INFO     [5] Ingesting repository: servicedesk-pro                   
+[08:50:23] INFO     [6] Ingesting repository: ai-change-impact-engine           
+[08:50:24] INFO     [7] Ingesting repository:                                   
                     finiancial-fraud-investigation-platform                     
-[16:24:48] INFO     [7] Ingesting repository: mern-full-stack-task-3            
-[16:24:49] INFO     [8] Ingesting repository: mern-fullstack-task-2             
-[16:24:50] INFO     [9] Ingesting repository: mern-full-stack-task-1            
-[16:24:51] INFO     [10] Ingesting repository: mern-task-manager-backend        
-[16:24:52] INFO     [11] Ingesting repository: DHVANISENSE                      
-           INFO     [12] Ingesting repository: INTELLI-CREDIT                   
-[16:24:53] INFO     [13] Ingesting repository: ai_resume_analyzer               
-[16:24:54] INFO     [14] Ingesting repository: Ai_finance_tracker               
-[16:24:55] INFO     [15] Ingesting repository: smart-ai-healthcare-system       
-[16:24:56] INFO     [16] Ingesting repository: coderefine                       
-[16:24:57] INFO     [17] Ingesting repository: git_course                       
-[16:24:58] INFO     [18] Ingesting repository: devops_course-                   
-[16:24:59] INFO     Master profile is already up-to-date with GitHub and        
-                    LinkedIn.                                                   
+[08:50:25] INFO     [8] Ingesting repository: mern-full-stack-task-3            
+[08:50:26] INFO     [9] Ingesting repository: mern-fullstack-task-2             
+[08:50:27] INFO     [10] Ingesting repository: mern-full-stack-task-1           
+[08:50:28] INFO     [11] Ingesting repository: mern-task-manager-backend        
+[08:50:29] INFO     [12] Ingesting repository: DHVANISENSE                      
+[08:50:30] INFO     [13] Ingesting repository: INTELLI-CREDIT                   
+[08:50:31] INFO     [14] Ingesting repository: ai_resume_analyzer               
+[08:50:32] INFO     [15] Ingesting repository: Ai_finance_tracker               
+[08:50:33] INFO     [16] Ingesting repository: smart-ai-healthcare-system       
+[08:50:34] INFO     [17] Ingesting repository: coderefine                       
+[08:50:35] INFO     [18] Ingesting repository: git_course                       
+           INFO     [19] Ingesting repository: devops_course-                   
+[08:50:36] INFO     Synchronizing profile: 1 new repo(s), 0 updated repo(s),    
+                    LinkedIn updated=False.                                     
+           INFO     Fetching public repositories for user 'Ruchith4560'...      
+[08:50:37] INFO     [1] Ingesting repository: job-search-agent                  
+[08:50:39] INFO     [2] Ingesting repository: ruchith_portfolio                 
+[08:50:41] INFO     [3] Ingesting repository: travel_expense_calculator         
+[08:50:42] INFO     [4] Ingesting repository: NextMail_Ai                       
+[08:50:44] INFO     [5] Ingesting repository: servicedesk-pro                   
+[08:50:45] INFO     [6] Ingesting repository: ai-change-impact-engine           
+[08:50:47] INFO     [7] Ingesting repository:                                   
+                    finiancial-fraud-investigation-platform                     
+[08:50:49] INFO     [8] Ingesting repository: mern-full-stack-task-3            
+[08:50:50] INFO     [9] Ingesting repository: mern-fullstack-task-2             
+[08:50:52] INFO     [10] Ingesting repository: mern-full-stack-task-1           
+[08:50:53] INFO     [11] Ingesting repository: mern-task-manager-backend        
+[08:50:55] INFO     [12] Ingesting repository: DHVANISENSE                      
+[08:50:56] INFO     [13] Ingesting repository: INTELLI-CREDIT                   
+[08:50:58] INFO     [14] Ingesting repository: ai_resume_analyzer               
+[08:50:59] INFO     [15] Ingesting repository: Ai_finance_tracker               
+[08:51:01] INFO     [16] Ingesting repository: smart-ai-healthcare-system       
+[08:51:02] INFO     [17] Ingesting repository: coderefine                       
+[08:51:04] INFO     [18] Ingesting repository: git_course                       
+[08:51:06] INFO     [19] Ingesting repository: devops_course-                   
+[08:51:07] INFO     Successfully saved 19 repositories to data/raw/github.json  
+           INFO     Ingested 19 repositories for Ruchith4560.                   
+           INFO     Master profile successfully saved to master_profile.json    
+           INFO     Saved synchronized master profile v1.1 to                   
+                    master_profile.json                                         
            INFO     Resume successfully passed all verification checks against  
                     master profile.                                             
            INFO     Master resume ATS check passed: 100% (Target >85% met).     
-  Profile is up-to-date with GitHub & LinkedIn (Master Resume ATS: 100%).
+           INFO     Saved PDF resume to                                         
+                    data/output/RuchithMacha_Master_Resume.pdf                  
+           INFO     Saved PDF resume to data/output/resume.pdf                  
+           INFO     Saved DOCX resume to                                        
+                    data/output/RuchithMacha_Master_Resume.docx                 
+           INFO     Saved DOCX resume to data/output/resume.docx                
+           INFO     Master resume re-compiled and optimized! ATS Score: 100%    
+                    (Target >85% met: True).                                    
+  Synced new projects (ruchith_portfolio)! Resume ATS Score: 100%
 
 Step 0.5: Checking inbox for candidate replies to pending inquiries...
            INFO     IMAP check skipped: GMAIL_APP_PASSWORD is not set.          
@@ -42,36 +77,35 @@ freshersworld, indian_portals, enterprise_careers, smartrecruiters, remotive,
 arbeitnow, jobicy, himalayas, weworkremotely, python_org, greenhouse, lever...
            INFO     Executing fetcher for 'linkedin' (limit: 30)...             
            INFO     [linkedin] Fetching jobs from LinkedIn public search...     
-           WARNING  [linkedin] HTTP 429 for query SDE Intern                    
-           WARNING  [linkedin] HTTP 429 for query Full Stack Developer Intern   
-           INFO     [linkedin] Successfully retrieved 10 jobs.                  
-           INFO     [linkedin] Ingested 10 raw jobs.                            
+[08:51:08] WARNING  [linkedin] HTTP 429 for query Full Stack Developer Intern   
+           INFO     [linkedin] Successfully retrieved 20 jobs.                  
+           INFO     [linkedin] Ingested 20 raw jobs.                            
            INFO     Executing fetcher for 'internshala' (limit: 30)...          
            INFO     [internshala] Fetching student internships from             
                     Internshala...                                              
-[16:25:00] INFO     [internshala] Successfully retrieved 30 jobs.               
+[08:51:09] INFO     [internshala] Successfully retrieved 30 jobs.               
            INFO     [internshala] Ingested 30 raw jobs.                         
            INFO     Executing fetcher for 'unstop' (limit: 30)...               
            INFO     [unstop] Fetching student internships from Unstop...        
-[16:25:04] INFO     [unstop] Successfully retrieved 20 jobs.                    
+[08:51:12] INFO     [unstop] Successfully retrieved 20 jobs.                    
            INFO     [unstop] Ingested 20 raw jobs.                              
            INFO     Executing fetcher for 'freshersworld' (limit: 30)...        
            INFO     [freshersworld] Fetching fresher jobs from Freshersworld... 
-[16:25:05] INFO     [freshersworld] Successfully retrieved 30 jobs.             
-           INFO     [freshersworld] Ingested 30 raw jobs.                       
+           INFO     [freshersworld] Successfully retrieved 0 jobs.              
+           INFO     [freshersworld] Ingested 0 raw jobs.                        
            INFO     Executing fetcher for 'indian_portals' (limit: 30)...       
            INFO     [indian_portals] Fetching jobs across Indian portals        
                     (Foundit, TimesJobs, WorkIndia, Apna, Hirist)...            
-[16:25:07] INFO     [indian_portals] Successfully retrieved 0 jobs.             
+[08:51:15] INFO     [indian_portals] Successfully retrieved 0 jobs.             
            INFO     [indian_portals] Ingested 0 raw jobs.                       
            INFO     Executing fetcher for 'enterprise_careers' (limit: 30)...   
            INFO     [enterprise_careers] Querying 68 official enterprise career 
                     pages...                                                    
-[16:25:09] INFO     [enterprise_careers] Successfully retrieved 30 jobs.        
+[08:51:17] INFO     [enterprise_careers] Successfully retrieved 30 jobs.        
            INFO     [enterprise_careers] Ingested 30 raw jobs.                  
            INFO     Executing fetcher for 'smartrecruiters' (limit: 30)...      
            INFO     [smartrecruiters] Fetching from 7 company career portals... 
-[16:25:11] INFO     [smartrecruiters] Successfully retrieved 0 jobs.            
+[08:51:19] INFO     [smartrecruiters] Successfully retrieved 0 jobs.            
            INFO     [smartrecruiters] Ingested 0 raw jobs.                      
            INFO     Executing fetcher for 'remotive' (limit: 30)...             
            INFO     [remotive] Fetching jobs from Remotive API...               
@@ -79,13 +113,13 @@ arbeitnow, jobicy, himalayas, weworkremotely, python_org, greenhouse, lever...
            INFO     [remotive] Ingested 16 raw jobs.                            
            INFO     Executing fetcher for 'arbeitnow' (limit: 30)...            
            INFO     [arbeitnow] Fetching jobs from Arbeitnow API...             
-[16:25:12] INFO     [arbeitnow] Successfully retrieved 30 jobs.                 
+[08:51:20] INFO     [arbeitnow] Successfully retrieved 30 jobs.                 
            INFO     [arbeitnow] Ingested 30 raw jobs.                           
            INFO     Executing fetcher for 'jobicy' (limit: 30)...               
            INFO     [jobicy] Fetching jobs from Jobicy API...                   
            WARNING  [jobicy] HTTP 400 received for                              
                     https://jobicy.com/api/v2/remote-jobs                       
-[16:25:13] INFO     [jobicy] Successfully retrieved 30 jobs.                    
+           INFO     [jobicy] Successfully retrieved 30 jobs.                    
            INFO     [jobicy] Ingested 30 raw jobs.                              
            INFO     Executing fetcher for 'himalayas' (limit: 30)...            
            INFO     [himalayas] Fetching jobs from Himalayas API...             
@@ -101,17 +135,17 @@ arbeitnow, jobicy, himalayas, weworkremotely, python_org, greenhouse, lever...
            INFO     [python_org] Ingested 20 raw jobs.                          
            INFO     Executing fetcher for 'greenhouse' (limit: 30)...           
            INFO     [greenhouse] Fetching jobs for company 'canonical'...       
-           INFO     [greenhouse] Successfully retrieved 30 jobs.                
+[08:51:21] INFO     [greenhouse] Successfully retrieved 30 jobs.                
            INFO     [greenhouse] Ingested 30 raw jobs.                          
            INFO     Executing fetcher for 'lever' (limit: 30)...                
            INFO     [lever] Fetching jobs for company 'palantir'...             
-[16:25:14] INFO     [lever] Successfully retrieved 30 jobs.                     
+           INFO     [lever] Successfully retrieved 30 jobs.                     
            INFO     [lever] Ingested 30 raw jobs.                               
-           INFO     Deduplicated 321 raw jobs down to 289 unique postings.      
-           INFO     Hard filtering: 83 accepted, 206 rejected out of 289 jobs.  
-           INFO     Database sync complete: 26 newly inserted, 57 updated. Total
-                    active: 301                                                 
-          Discovered Opportunities (Accepted: 83 | Filtered Out: 206)           
+           INFO     Deduplicated 301 raw jobs down to 280 unique postings.      
+           INFO     Hard filtering: 72 accepted, 208 rejected out of 280 jobs.  
+           INFO     Database sync complete: 25 newly inserted, 47 updated. Total
+                    active: 326                                                 
+          Discovered Opportunities (Accepted: 72 | Filtered Out: 208)           
 ┏━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━┓
 ┃ Title         ┃ Company       ┃ Location      ┃ Source      ┃ URL            ┃
 ┡━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━┩
@@ -121,15 +155,42 @@ arbeitnow, jobicy, himalayas, weworkremotely, python_org, greenhouse, lever...
 │ Software      │ GROWLOC       │ Pune          │ linkedin    │ https://in.li… │
 │ Developer     │               │ Division,     │             │                │
 │ Intern        │               │ Maharas...    │             │                │
+│ Software      │ IntellTermin… │ Pune/Pimpri-… │ linkedin    │ https://in.li… │
+│ Engineer      │ by            │ ...           │             │                │
+│               │ RAGnitionai   │               │             │                │
+│               │ Private       │               │             │                │
+│               │ Limited       │               │             │                │
 │ Software      │ Isomorph AI   │ Bengaluru,    │ linkedin    │ https://in.li… │
 │ Engineering   │               │ Karnataka,    │             │                │
 │ Intern        │               │ ...           │             │                │
-│ Software      │ Weekday (YC   │ Bengaluru,    │ linkedin    │ https://in.li… │
-│ Engineer      │ W21)          │ Karnataka,    │             │                │
+│ Software      │ Park Place    │ Hyderabad,    │ linkedin    │ https://in.li… │
+│ Development   │ Technologies  │ Telangana,    │             │                │
 │ Intern        │               │ ...           │             │                │
-│ Work From     │ Echotalk      │ Remote / Work │ internshala │ https://inter… │
-│ Home Software │               │ From Home     │             │                │
-│ Developm...   │               │               │             │                │
+│ Software      │ Electronic    │ Hyderabad,    │ linkedin    │ https://in.li… │
+│ Engineering   │ Arts (EA)     │ Telangana,    │             │                │
+│ Intern        │               │ ...           │             │                │
+│ Intern-1      │ GE Vernova    │ Greater       │ linkedin    │ https://in.li… │
+│               │               │ Hyderabad     │             │                │
+│               │               │ Area          │             │                │
+│ Digital       │ GE Vernova    │ Greater       │ linkedin    │ https://in.li… │
+│ Technology    │               │ Hyderabad     │             │                │
+│ Intern        │               │ Area          │             │                │
+│ Software      │ Google        │ Hyderabad,    │ linkedin    │ https://in.li… │
+│ Engineering   │               │ Telangana,    │             │                │
+│ PhD           │               │ ...           │             │                │
+│ Intern,...    │               │               │             │                │
+│ AI Engineer   │ RecruitBots   │ Hyderabad,    │ linkedin    │ https://in.li… │
+│ Intern        │ AI            │ Telangana,    │             │                │
+│               │               │ ...           │             │                │
+│ Software Dev  │ Amazon        │ Hyderabad,    │ linkedin    │ https://in.li… │
+│ Engineer I,   │               │ Telangana,    │             │                │
+│ Amazon ...    │               │ ...           │             │                │
+│ Intern        │ Micron        │ Hyderabad,    │ linkedin    │ https://in.li… │
+│               │ Technology    │ Telangana,    │             │                │
+│               │               │ ...           │             │                │
+│ Engineer-PPAT │ Qualcomm      │ Greater       │ linkedin    │ https://in.li… │
+│               │               │ Hyderabad     │             │                │
+│               │               │ Area          │             │                │
 │ Work From     │ The           │ Remote / Work │ internshala │ https://inter… │
 │ Home Software │ Proeducator   │ From Home     │             │                │
 │ Developm...   │               │               │             │                │
@@ -137,12 +198,12 @@ arbeitnow, jobicy, himalayas, weworkremotely, python_org, greenhouse, lever...
 │ Home Part     │ Tails         │ From Home     │             │                │
 │ Time          │ Foundation    │               │             │                │
 │ Softwar...    │               │               │             │                │
-│ Work From     │ Nayepankh     │ Remote / Work │ internshala │ https://inter… │
-│ Home Software │ Foundation    │ From Home     │             │                │
-│ Developm...   │               │               │             │                │
 │ Work From     │ Quickhyre     │ Remote / Work │ internshala │ https://inter… │
 │ Home Software │               │ From Home     │             │                │
 │ Developm...   │               │               │             │                │
+│ Work From     │ Oblytech      │ Remote / Work │ internshala │ https://inter… │
+│ Home Software │ India Private │ From Home     │             │                │
+│ Developm...   │ Limited       │               │             │                │
 │ Work From     │ Women First   │ Remote / Work │ internshala │ https://inter… │
 │ Home Software │ India         │ From Home     │             │                │
 │ Developm...   │ Foundation    │               │             │                │
@@ -150,103 +211,54 @@ arbeitnow, jobicy, himalayas, weworkremotely, python_org, greenhouse, lever...
 │ Home Part     │ Foundation    │ From Home     │             │                │
 │ Time          │               │               │             │                │
 │ Softwar...    │               │               │             │                │
-│ Work From     │ Basti Ki      │ Remote / Work │ internshala │ https://inter… │
-│ Home Java     │ Pathshala     │ From Home     │             │                │
-│ Development   │ Foundation    │               │             │                │
-│ ...           │               │               │             │                │
-│ Work From     │ Inamigos      │ Remote / Work │ internshala │ https://inter… │
-│ Home Ai Web   │ Foundation    │ From Home     │             │                │
-│ Developmen... │               │               │             │                │
-│ Work From     │ Basti Ki      │ Remote / Work │ internshala │ https://inter… │
-│ Home Part     │ Pathshala     │ From Home     │             │                │
-│ Time          │ Foundation    │               │             │                │
-│ Softwar...    │               │               │             │                │
-│ Work From     │ Ten           │ Remote / Work │ internshala │ https://inter… │
-│ Home Software │               │ From Home     │             │                │
+│ Work From     │ Nayepankh     │ Remote / Work │ internshala │ https://inter… │
+│ Home Software │ Foundation    │ From Home     │             │                │
 │ Developm...   │               │               │             │                │
-│ Work From     │ Iesoft        │ Remote / Work │ internshala │ https://inter… │
-│ Home Java     │ Technologies  │ From Home     │             │                │
-│ Development   │ Private       │               │             │                │
-│ ...           │ Limited       │               │             │                │
-│ Work From     │ Hope Behind   │ Remote / Work │ internshala │ https://inter… │
-│ Home Part     │ Tails         │ From Home     │             │                │
-│ Time Python   │ Foundation    │               │             │                │
-│ ...           │               │               │             │                │
-│ Work From     │ Women First   │ Remote / Work │ internshala │ https://inter… │
-│ Home Part     │ India         │ From Home     │             │                │
-│ Time Python   │ Foundation    │               │             │                │
-│ ...           │               │               │             │                │
-│ Work From     │ Echotalk      │ Remote / Work │ internshala │ https://inter… │
-│ Home          │               │ From Home     │             │                │
-│ Blockchain    │               │               │             │                │
-│ Develo...     │               │               │             │                │
-│ Work From     │ Women First   │ Remote / Work │ internshala │ https://inter… │
-│ Home Full     │ India         │ From Home     │             │                │
-│ Stack         │ Foundation    │               │             │                │
-│ Develo...     │               │               │             │                │
 └───────────────┴───────────────┴───────────────┴─────────────┴────────────────┘
-... and 63 more jobs displayed
+... and 52 more jobs displayed
 
-Sync Summary: 26 new jobs inserted, 57 updated. Total active in SQLite 
-(data/tracker.db): 301.
+Sync Summary: 25 new jobs inserted, 47 updated. Total active in SQLite 
+(data/tracker.db): 326.
 
 Step 2/5: Scoring opportunities against student profile (Threshold 70+)...
-Matching 301 jobs against profile for Macha Ruchith (Shortlist: top 20 by vector
+Matching 326 jobs against profile for Ruchith Macha (Shortlist: top 20 by vector
 similarity | Threshold: 70/100)...
-           INFO     Vector shortlisting complete: evaluated 294 jobs, selected  
-                    top 20 (score range: 0.08 - 0.04)                           
-           INFO     Updated 12 qualified jobs to 'shortlisted' status in        
+[08:51:22] INFO     Vector shortlisting complete: evaluated 319 jobs, selected  
+                    top 20 (score range: 0.07 - 0.03)                           
+           INFO     Updated 7 qualified jobs to 'shortlisted' status in         
                     database.                                                   
-           INFO     Matching complete: 20 evaluated, 12 qualified above         
-                    threshold 70.                                               
+           INFO     Matching complete: 20 evaluated, 7 qualified above threshold
+                    70.                                                         
                  Ranked Matches Above Score Threshold (70/100)                  
 ┏━━━━━━┳━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━━┓
 ┃      ┃        ┃            ┃            ┃ Matched   ┃            ┃           ┃
 ┃ Rank ┃  Score ┃ Job Title  ┃ Company    ┃ Skills    ┃ Skill Gaps ┃ Recommen… ┃
 ┡━━━━━━╇━━━━━━━━╇━━━━━━━━━━━━╇━━━━━━━━━━━━╇━━━━━━━━━━━╇━━━━━━━━━━━━╇━━━━━━━━━━━┩
-│   #1 │ 86/100 │ Research   │ TGScope    │ C,        │ None       │ Strong    │
-│      │        │ Engineer,  │            │ FastAPI,  │            │ Match     │
-│      │        │ Multiling… │            │ PostgreS… │            │           │
-│      │        │            │            │ Python    │            │           │
-│   #2 │ 85/100 │ Software   │ Askable    │ C, C++,   │ Go, Rust   │ Strong    │
-│      │        │ Engineer,  │            │ Docker,   │            │ Match     │
-│      │        │ AI Coding  │            │ Git       │            │           │
-│      │        │ T          │            │           │            │           │
-│   #3 │ 83/100 │ Full-Stack │ Fluence    │ C,        │ AWS,       │ Strong    │
-│      │        │ Developer  │ Internati… │ Docker,   │ Next.Js    │ Match     │
-│      │        │            │ Inc.       │ Git, Java │            │           │
-│   #4 │ 83/100 │ Backend    │ UNICEF     │ C, Java,  │ Kafka      │ Strong    │
-│      │        │ Software   │            │ Python,   │            │ Match     │
-│      │        │ Engineeri… │            │ REST API  │            │           │
-│   #5 │ 82/100 │ Cryptogra… │ Toptal     │ C,        │ None       │ Strong    │
-│      │        │ Specialist │            │ Docker,   │            │ Match     │
-│      │        │ for AI     │            │ Git,      │            │           │
-│      │        │            │            │ Linux     │            │           │
-│   #6 │ 81/100 │ ML         │ Micro1     │ C, Python │ None       │ Strong    │
+│   #1 │ 80/100 │ Research   │ TGScope    │ Python    │ None       │ Strong    │
+│      │        │ Engineer,  │            │           │            │ Match     │
+│      │        │ Multiling… │            │           │            │           │
+│   #2 │ 78/100 │ ML         │ Micro1     │ Python    │ None       │ Strong    │
 │      │        │ Engineer   │            │           │            │ Match     │
-│   #7 │ 79/100 │ Backend    │ Rackner    │ C,        │ Kubernetes │ Strong    │
-│      │        │ Software   │            │ FastAPI,  │            │ Match     │
-│      │        │ Engineer — │            │ Git,      │            │           │
-│      │        │ Se         │            │ PostgreS… │            │           │
-│   #8 │ 78/100 │ Software   │ PolicyMe   │ C, Git,   │ AWS        │ Strong    │
-│      │        │ Engineer   │            │ PostgreS… │            │ Match     │
-│      │        │            │            │ Python    │            │           │
-│   #9 │ 77/100 │ Content    │ Bask       │ C         │ None       │ Strong    │
-│      │        │ Designer,  │ Health     │           │            │ Match     │
-│      │        │ AI         │            │           │            │           │
-│      │        │ Experienc  │            │           │            │           │
-│  #10 │ 76/100 │ Full Stack │ Brafton    │ C, CSS,   │ AWS,       │ Strong    │
-│      │        │ Developer  │            │ Docker,   │ Angular    │ Match     │
-│      │        │ (Frontend  │            │ Git       │            │           │
-│  #11 │ 73/100 │ Distribut… │ Canonical  │ C, Linux, │ Go, Kafka  │ Good      │
-│      │        │ Systems    │            │ Python,   │            │ Match     │
-│      │        │ Engineer   │            │ REST API  │            │           │
-│  #12 │ 71/100 │ Full Stack │ BetterHelp │ Algorith… │ Redis,     │ Good      │
-│      │        │ Software   │            │ C, CSS,   │ Next.Js    │ Match     │
-│      │        │ Engineer   │            │ HTML      │            │           │
+│   #3 │ 77/100 │ Junior     │ HFT        │ Python    │ None       │ Strong    │
+│      │        │ Machine    │ Architect… │           │            │ Match     │
+│      │        │ Learning   │            │           │            │           │
+│      │        │ Engine     │            │           │            │           │
+│   #4 │ 76/100 │ ML         │ micro1     │ Python    │ None       │ Strong    │
+│      │        │ Engineer   │            │           │            │ Match     │
+│   #5 │ 75/100 │ Backend    │ UNICEF     │ Java,     │ Kafka      │ Strong    │
+│      │        │ Software   │            │ Python,   │            │ Match     │
+│      │        │ Engineeri… │            │ TypeScri… │            │           │
+│   #6 │ 72/100 │ Full-Stack │ Fluence    │ Docker,   │ AWS,       │ Good      │
+│      │        │ Developer  │ Internati… │ Java,     │ Next.Js    │ Match     │
+│      │        │            │ Inc.       │ JavaScri… │            │           │
+│      │        │            │            │ TypeScri… │            │           │
+│   #7 │ 72/100 │ Software   │ Askable    │ Docker,   │ Go, Rust   │ Good      │
+│      │        │ Engineer,  │            │ Java,     │            │ Match     │
+│      │        │ AI Coding  │            │ Python,   │            │           │
+│      │        │ T          │            │ TypeScri… │            │           │
 └──────┴────────┴────────────┴────────────┴───────────┴────────────┴───────────┘
 
-Matching Summary: 12 jobs met the 70+ score threshold and were marked as 
+Matching Summary: 7 jobs met the 70+ score threshold and were marked as 
 'shortlisted' in SQLite.
 
 Step 3/5: Generating daily HTML email digest and attaching tailored resumes...
@@ -259,18 +271,18 @@ Engineer - Optimisation...
            INFO     Resume successfully passed all verification checks against  
                     master profile.                                             
            INFO     Tailored resume generated for Canonical - Embedded & Desktop
-                    Linux Systems Engineer - Optimisation (ATS Score: 100%, 6   
+                    Linux Systems Engineer - Optimisation (ATS Score: 85%, 1    
                     matched skills).                                            
            INFO     Saved PDF resume to                                         
                     data/output/canonical_embedded_desktop_linux_systems_enginee
-                    r_/MachaRuchith_EmbeddedDesktopLinuxSystemsEngineerOptimisat
+                    r_/RuchithMacha_EmbeddedDesktopLinuxSystemsEngineerOptimisat
                     ion_Canonical.pdf                                           
            INFO     Saved PDF resume to                                         
                     data/output/canonical_embedded_desktop_linux_systems_enginee
                     r_/tailored_resume.pdf                                      
            INFO     Saved DOCX resume to                                        
                     data/output/canonical_embedded_desktop_linux_systems_enginee
-                    r_/MachaRuchith_EmbeddedDesktopLinuxSystemsEngineerOptimisat
+                    r_/RuchithMacha_EmbeddedDesktopLinuxSystemsEngineerOptimisat
                     ion_Canonical.docx                                          
            INFO     Saved DOCX resume to                                        
                     data/output/canonical_embedded_desktop_linux_systems_enginee
@@ -285,27 +297,27 @@ Engineer - Optimisation...
                     data/output/canonical_embedded_desktop_linux_systems_enginee
                     r_/cover_letter.txt                                         
            INFO     Updated status for job a0eb7f4bde2f9755 to 'tailored' with  
-                    ATS score 100%.                                             
+                    ATS score 85%.                                              
   Auto-tailoring resume for #2: Canonical - Embedded Devices Software Solution 
 Sales - All Roles...
            INFO     Preparing tailored application packet in:                   
                     data/output/canonical_embedded_devices_software_solution_sal
                     es                                                          
-[16:25:15] INFO     Resume successfully passed all verification checks against  
+           INFO     Resume successfully passed all verification checks against  
                     master profile.                                             
            INFO     Tailored resume generated for Canonical - Embedded Devices  
-                    Software Solution Sales - All Roles (ATS Score: 100%, 2     
+                    Software Solution Sales - All Roles (ATS Score: 85%, 0      
                     matched skills).                                            
            INFO     Saved PDF resume to                                         
                     data/output/canonical_embedded_devices_software_solution_sal
-                    es/MachaRuchith_EmbeddedDevicesSoftwareSolutionSalesAllRoles
+                    es/RuchithMacha_EmbeddedDevicesSoftwareSolutionSalesAllRoles
                     _Canonical.pdf                                              
            INFO     Saved PDF resume to                                         
                     data/output/canonical_embedded_devices_software_solution_sal
                     es/tailored_resume.pdf                                      
            INFO     Saved DOCX resume to                                        
                     data/output/canonical_embedded_devices_software_solution_sal
-                    es/MachaRuchith_EmbeddedDevicesSoftwareSolutionSalesAllRoles
+                    es/RuchithMacha_EmbeddedDevicesSoftwareSolutionSalesAllRoles
                     _Canonical.docx                                             
            INFO     Saved DOCX resume to                                        
                     data/output/canonical_embedded_devices_software_solution_sal
@@ -320,7 +332,7 @@ Sales - All Roles...
                     data/output/canonical_embedded_devices_software_solution_sal
                     es/cover_letter.txt                                         
            INFO     Updated status for job 9136c672df9f9c92 to 'tailored' with  
-                    ATS score 100%.                                             
+                    ATS score 85%.                                              
   Auto-tailoring resume for #3: Canonical - Community Engineer (multiple roles 
 and seniority levels)...
            INFO     Preparing tailored application packet in:                   
@@ -329,18 +341,18 @@ and seniority levels)...
            INFO     Resume successfully passed all verification checks against  
                     master profile.                                             
            INFO     Tailored resume generated for Canonical - Community Engineer
-                    (multiple roles and seniority levels) (ATS Score: 100%, 3   
+                    (multiple roles and seniority levels) (ATS Score: 85%, 0    
                     matched skills).                                            
            INFO     Saved PDF resume to                                         
                     data/output/canonical_community_engineer_multiple_roles_and_
-                    se/MachaRuchith_CommunityEngineerMultipleRolesAndSeniorityLe
+                    se/RuchithMacha_CommunityEngineerMultipleRolesAndSeniorityLe
                     vels_Canonical.pdf                                          
            INFO     Saved PDF resume to                                         
                     data/output/canonical_community_engineer_multiple_roles_and_
                     se/tailored_resume.pdf                                      
            INFO     Saved DOCX resume to                                        
                     data/output/canonical_community_engineer_multiple_roles_and_
-                    se/MachaRuchith_CommunityEngineerMultipleRolesAndSeniorityLe
+                    se/RuchithMacha_CommunityEngineerMultipleRolesAndSeniorityLe
                     vels_Canonical.docx                                         
            INFO     Saved DOCX resume to                                        
                     data/output/canonical_community_engineer_multiple_roles_and_
@@ -355,21 +367,21 @@ and seniority levels)...
                     data/output/canonical_community_engineer_multiple_roles_and_
                     se/cover_letter.txt                                         
            INFO     Updated status for job 73cf7af2e4867370 to 'tailored' with  
-                    ATS score 100%.                                             
+                    ATS score 85%.                                              
   Auto-tailoring resume for #4: Bybit - Animator Intern...
            INFO     Preparing tailored application packet in:                   
                     data/output/bybit_animator_intern                           
            INFO     Resume successfully passed all verification checks against  
                     master profile.                                             
            INFO     Tailored resume generated for Bybit - Animator Intern (ATS  
-                    Score: 100%, 0 matched skills).                             
+                    Score: 85%, 0 matched skills).                              
            INFO     Saved PDF resume to                                         
-                    data/output/bybit_animator_intern/MachaRuchith_AnimatorInter
+                    data/output/bybit_animator_intern/RuchithMacha_AnimatorInter
                     n_Bybit.pdf                                                 
            INFO     Saved PDF resume to                                         
                     data/output/bybit_animator_intern/tailored_resume.pdf       
            INFO     Saved DOCX resume to                                        
-                    data/output/bybit_animator_intern/MachaRuchith_AnimatorInter
+                    data/output/bybit_animator_intern/RuchithMacha_AnimatorInter
                     n_Bybit.docx                                                
            INFO     Saved DOCX resume to                                        
                     data/output/bybit_animator_intern/tailored_resume.docx      
@@ -380,7 +392,7 @@ and seniority levels)...
            INFO     Cover letter TXT saved to:                                  
                     data/output/bybit_animator_intern/cover_letter.txt          
            INFO     Updated status for job ea61979de66030d3 to 'tailored' with  
-                    ATS score 100%.                                             
+                    ATS score 85%.                                              
   Auto-tailoring resume for #5: TGScope - Internet Measurement Researcher 
 (Censorship & Proxies)...
            INFO     Preparing tailored application packet in:                   
@@ -388,18 +400,18 @@ and seniority levels)...
            INFO     Resume successfully passed all verification checks against  
                     master profile.                                             
            INFO     Tailored resume generated for TGScope - Internet Measurement
-                    Researcher (Censorship & Proxies) (ATS Score: 100%, 4       
+                    Researcher (Censorship & Proxies) (ATS Score: 100%, 2       
                     matched skills).                                            
            INFO     Saved PDF resume to                                         
                     data/output/tgscope_internet_measurement_researcher_censorsh
-                    /MachaRuchith_InternetMeasurementResearcherCensorshipProxies
+                    /RuchithMacha_InternetMeasurementResearcherCensorshipProxies
                     _Tgscope.pdf                                                
            INFO     Saved PDF resume to                                         
                     data/output/tgscope_internet_measurement_researcher_censorsh
                     /tailored_resume.pdf                                        
            INFO     Saved DOCX resume to                                        
                     data/output/tgscope_internet_measurement_researcher_censorsh
-                    /MachaRuchith_InternetMeasurementResearcherCensorshipProxies
+                    /RuchithMacha_InternetMeasurementResearcherCensorshipProxies
                     _Tgscope.docx                                               
            INFO     Saved DOCX resume to                                        
                     data/output/tgscope_internet_measurement_researcher_censorsh
@@ -415,71 +427,7 @@ and seniority levels)...
                     /cover_letter.txt                                           
            INFO     Updated status for job 024e327480081350 to 'tailored' with  
                     ATS score 100%.                                             
-  Auto-tailoring resume for #6: TGScope - Research Engineer, Multilingual 
-Semantic Search...
-           INFO     Preparing tailored application packet in:                   
-                    data/output/tgscope_research_engineer_multilingual_semantic_
-           INFO     Resume successfully passed all verification checks against  
-                    master profile.                                             
-           INFO     Tailored resume generated for TGScope - Research Engineer,  
-                    Multilingual Semantic Search (ATS Score: 100%, 3 matched    
-                    skills).                                                    
-           INFO     Saved PDF resume to                                         
-                    data/output/tgscope_research_engineer_multilingual_semantic_
-                    /MachaRuchith_ResearchEngineerMultilingualSemanticSearch_Tgs
-                    cope.pdf                                                    
-           INFO     Saved PDF resume to                                         
-                    data/output/tgscope_research_engineer_multilingual_semantic_
-                    /tailored_resume.pdf                                        
-           INFO     Saved DOCX resume to                                        
-                    data/output/tgscope_research_engineer_multilingual_semantic_
-                    /MachaRuchith_ResearchEngineerMultilingualSemanticSearch_Tgs
-                    cope.docx                                                   
-           INFO     Saved DOCX resume to                                        
-                    data/output/tgscope_research_engineer_multilingual_semantic_
-                    /tailored_resume.docx                                       
-           INFO     Cover letter PDF saved to:                                  
-                    data/output/tgscope_research_engineer_multilingual_semantic_
-                    /cover_letter.pdf                                           
-           INFO     Cover letter DOCX saved to:                                 
-                    data/output/tgscope_research_engineer_multilingual_semantic_
-                    /cover_letter.docx                                          
-           INFO     Cover letter TXT saved to:                                  
-                    data/output/tgscope_research_engineer_multilingual_semantic_
-                    /cover_letter.txt                                           
-           INFO     Updated status for job a929df164acd9827 to 'tailored' with  
-                    ATS score 100%.                                             
-  Auto-tailoring resume for #7: Askable - Software Engineer, AI Coding Tasks...
-           INFO     Preparing tailored application packet in:                   
-                    data/output/askable_software_engineer_ai_coding_tasks       
-           INFO     Resume successfully passed all verification checks against  
-                    master profile.                                             
-           INFO     Tailored resume generated for Askable - Software Engineer,  
-                    AI Coding Tasks (ATS Score: 100%, 8 matched skills).        
-           INFO     Saved PDF resume to                                         
-                    data/output/askable_software_engineer_ai_coding_tasks/MachaR
-                    uchith_SoftwareEngineerAiCodingTasks_Askable.pdf            
-           INFO     Saved PDF resume to                                         
-                    data/output/askable_software_engineer_ai_coding_tasks/tailor
-                    ed_resume.pdf                                               
-           INFO     Saved DOCX resume to                                        
-                    data/output/askable_software_engineer_ai_coding_tasks/MachaR
-                    uchith_SoftwareEngineerAiCodingTasks_Askable.docx           
-           INFO     Saved DOCX resume to                                        
-                    data/output/askable_software_engineer_ai_coding_tasks/tailor
-                    ed_resume.docx                                              
-           INFO     Cover letter PDF saved to:                                  
-                    data/output/askable_software_engineer_ai_coding_tasks/cover_
-                    letter.pdf                                                  
-           INFO     Cover letter DOCX saved to:                                 
-                    data/output/askable_software_engineer_ai_coding_tasks/cover_
-                    letter.docx                                                 
-           INFO     Cover letter TXT saved to:                                  
-                    data/output/askable_software_engineer_ai_coding_tasks/cover_
-                    letter.txt                                                  
-           INFO     Updated status for job cfcd986521d5d8e1 to 'tailored' with  
-                    ATS score 100%.                                             
-  Auto-tailoring resume for #8: SimpleTiger - Web Developer: WordPress & HubSpot
+  Auto-tailoring resume for #6: SimpleTiger - Web Developer: WordPress & HubSpot
 (U.S. Based, Remote Contractor)...
            INFO     Preparing tailored application packet in:                   
                     data/output/simpletiger_web_developer_wordpress_hubspot_u_s_
@@ -488,17 +436,17 @@ Semantic Search...
                     master profile.                                             
            INFO     Tailored resume generated for SimpleTiger - Web Developer:  
                     WordPress & HubSpot (U.S. Based, Remote Contractor) (ATS    
-                    Score: 100%, 6 matched skills).                             
+                    Score: 100%, 3 matched skills).                             
            INFO     Saved PDF resume to                                         
                     data/output/simpletiger_web_developer_wordpress_hubspot_u_s_
-                    base/MachaRuchith_WebDeveloperWordpressHubspotUSBasedRemoteC
+                    base/RuchithMacha_WebDeveloperWordpressHubspotUSBasedRemoteC
                     ontractor_Simpletiger.pdf                                   
            INFO     Saved PDF resume to                                         
                     data/output/simpletiger_web_developer_wordpress_hubspot_u_s_
                     base/tailored_resume.pdf                                    
            INFO     Saved DOCX resume to                                        
                     data/output/simpletiger_web_developer_wordpress_hubspot_u_s_
-                    base/MachaRuchith_WebDeveloperWordpressHubspotUSBasedRemoteC
+                    base/RuchithMacha_WebDeveloperWordpressHubspotUSBasedRemoteC
                     ontractor_Simpletiger.docx                                  
            INFO     Saved DOCX resume to                                        
                     data/output/simpletiger_web_developer_wordpress_hubspot_u_s_
@@ -514,67 +462,130 @@ Semantic Search...
                     base/cover_letter.txt                                       
            INFO     Updated status for job 7c26a21c136f2d62 to 'tailored' with  
                     ATS score 100%.                                             
-  Auto-tailoring resume for #9: UNICEF - Backend Software Engineering...
+  Auto-tailoring resume for #7: Toptal - Cryptography Specialist for AI lab...
            INFO     Preparing tailored application packet in:                   
-                    data/output/unicef_backend_software_engineering             
+                    data/output/toptal_cryptography_specialist_for_ai_lab       
            INFO     Resume successfully passed all verification checks against  
                     master profile.                                             
-           INFO     Tailored resume generated for UNICEF - Backend Software     
-                    Engineering (ATS Score: 97%, 5 matched skills).             
+           INFO     Tailored resume generated for Toptal - Cryptography         
+                    Specialist for AI lab (ATS Score: 85%, 2 matched skills).   
            INFO     Saved PDF resume to                                         
-                    data/output/unicef_backend_software_engineering/MachaRuchith
-                    _BackendSoftwareEngineering_Unicef.pdf                      
+                    data/output/toptal_cryptography_specialist_for_ai_lab/Ruchit
+                    hMacha_CryptographySpecialistForAiLab_Toptal.pdf            
            INFO     Saved PDF resume to                                         
-                    data/output/unicef_backend_software_engineering/tailored_res
-                    ume.pdf                                                     
+                    data/output/toptal_cryptography_specialist_for_ai_lab/tailor
+                    ed_resume.pdf                                               
            INFO     Saved DOCX resume to                                        
-                    data/output/unicef_backend_software_engineering/MachaRuchith
-                    _BackendSoftwareEngineering_Unicef.docx                     
+                    data/output/toptal_cryptography_specialist_for_ai_lab/Ruchit
+                    hMacha_CryptographySpecialistForAiLab_Toptal.docx           
            INFO     Saved DOCX resume to                                        
-                    data/output/unicef_backend_software_engineering/tailored_res
-                    ume.docx                                                    
+                    data/output/toptal_cryptography_specialist_for_ai_lab/tailor
+                    ed_resume.docx                                              
            INFO     Cover letter PDF saved to:                                  
-                    data/output/unicef_backend_software_engineering/cover_letter
-                    .pdf                                                        
+                    data/output/toptal_cryptography_specialist_for_ai_lab/cover_
+                    letter.pdf                                                  
            INFO     Cover letter DOCX saved to:                                 
-                    data/output/unicef_backend_software_engineering/cover_letter
-                    .docx                                                       
+                    data/output/toptal_cryptography_specialist_for_ai_lab/cover_
+                    letter.docx                                                 
            INFO     Cover letter TXT saved to:                                  
-                    data/output/unicef_backend_software_engineering/cover_letter
-                    .txt                                                        
-           INFO     Updated status for job cfec93e99b2941a1 to 'tailored' with  
-                    ATS score 97%.                                              
-  Auto-tailoring resume for #10: Fluence International, Inc. - Full-Stack 
-Developer...
+                    data/output/toptal_cryptography_specialist_for_ai_lab/cover_
+                    letter.txt                                                  
+           INFO     Updated status for job 38a7053e1be5c04e to 'tailored' with  
+                    ATS score 85%.                                              
+  Auto-tailoring resume for #8: Camunda - Forward Deployed Engineer...
            INFO     Preparing tailored application packet in:                   
-                    data/output/fluence_international_inc_full_stack_developer  
+                    data/output/camunda_forward_deployed_engineer               
            INFO     Resume successfully passed all verification checks against  
                     master profile.                                             
-           INFO     Tailored resume generated for Fluence International, Inc. - 
-                    Full-Stack Developer (ATS Score: 100%, 7 matched skills).   
+           INFO     Tailored resume generated for Camunda - Forward Deployed    
+                    Engineer (ATS Score: 100%, 1 matched skills).               
            INFO     Saved PDF resume to                                         
-                    data/output/fluence_international_inc_full_stack_developer/M
-                    achaRuchith_FullStackDeveloper_FluenceInternationalInc.pdf  
+                    data/output/camunda_forward_deployed_engineer/RuchithMacha_F
+                    orwardDeployedEngineer_Camunda.pdf                          
            INFO     Saved PDF resume to                                         
-                    data/output/fluence_international_inc_full_stack_developer/t
-                    ailored_resume.pdf                                          
+                    data/output/camunda_forward_deployed_engineer/tailored_resum
+                    e.pdf                                                       
            INFO     Saved DOCX resume to                                        
-                    data/output/fluence_international_inc_full_stack_developer/M
-                    achaRuchith_FullStackDeveloper_FluenceInternationalInc.docx 
+                    data/output/camunda_forward_deployed_engineer/RuchithMacha_F
+                    orwardDeployedEngineer_Camunda.docx                         
            INFO     Saved DOCX resume to                                        
-                    data/output/fluence_international_inc_full_stack_developer/t
-                    ailored_resume.docx                                         
+                    data/output/camunda_forward_deployed_engineer/tailored_resum
+                    e.docx                                                      
            INFO     Cover letter PDF saved to:                                  
-                    data/output/fluence_international_inc_full_stack_developer/c
-                    over_letter.pdf                                             
+                    data/output/camunda_forward_deployed_engineer/cover_letter.p
+                    df                                                          
            INFO     Cover letter DOCX saved to:                                 
-                    data/output/fluence_international_inc_full_stack_developer/c
-                    over_letter.docx                                            
+                    data/output/camunda_forward_deployed_engineer/cover_letter.d
+                    ocx                                                         
            INFO     Cover letter TXT saved to:                                  
-                    data/output/fluence_international_inc_full_stack_developer/c
-                    over_letter.txt                                             
-           INFO     Updated status for job f48b2fd34491e17f to 'tailored' with  
+                    data/output/camunda_forward_deployed_engineer/cover_letter.t
+                    xt                                                          
+           INFO     Updated status for job fe9c57036a3891da to 'tailored' with  
                     ATS score 100%.                                             
+  Auto-tailoring resume for #9: TGScope - Research Engineer, Multilingual 
+Semantic Search...
+           INFO     Preparing tailored application packet in:                   
+                    data/output/tgscope_research_engineer_multilingual_semantic_
+           INFO     Resume successfully passed all verification checks against  
+                    master profile.                                             
+           INFO     Tailored resume generated for TGScope - Research Engineer,  
+                    Multilingual Semantic Search (ATS Score: 100%, 1 matched    
+                    skills).                                                    
+           INFO     Saved PDF resume to                                         
+                    data/output/tgscope_research_engineer_multilingual_semantic_
+                    /RuchithMacha_ResearchEngineerMultilingualSemanticSearch_Tgs
+                    cope.pdf                                                    
+           INFO     Saved PDF resume to                                         
+                    data/output/tgscope_research_engineer_multilingual_semantic_
+                    /tailored_resume.pdf                                        
+           INFO     Saved DOCX resume to                                        
+                    data/output/tgscope_research_engineer_multilingual_semantic_
+                    /RuchithMacha_ResearchEngineerMultilingualSemanticSearch_Tgs
+                    cope.docx                                                   
+[08:51:23] INFO     Saved DOCX resume to                                        
+                    data/output/tgscope_research_engineer_multilingual_semantic_
+                    /tailored_resume.docx                                       
+           INFO     Cover letter PDF saved to:                                  
+                    data/output/tgscope_research_engineer_multilingual_semantic_
+                    /cover_letter.pdf                                           
+           INFO     Cover letter DOCX saved to:                                 
+                    data/output/tgscope_research_engineer_multilingual_semantic_
+                    /cover_letter.docx                                          
+           INFO     Cover letter TXT saved to:                                  
+                    data/output/tgscope_research_engineer_multilingual_semantic_
+                    /cover_letter.txt                                           
+           INFO     Updated status for job a929df164acd9827 to 'tailored' with  
+                    ATS score 100%.                                             
+  Auto-tailoring resume for #10: Roboflow - Forward Deployed Engineer...
+           INFO     Preparing tailored application packet in:                   
+                    data/output/roboflow_forward_deployed_engineer              
+           INFO     Resume successfully passed all verification checks against  
+                    master profile.                                             
+           INFO     Tailored resume generated for Roboflow - Forward Deployed   
+                    Engineer (ATS Score: 98%, 0 matched skills).                
+           INFO     Saved PDF resume to                                         
+                    data/output/roboflow_forward_deployed_engineer/RuchithMacha_
+                    ForwardDeployedEngineer_Roboflow.pdf                        
+           INFO     Saved PDF resume to                                         
+                    data/output/roboflow_forward_deployed_engineer/tailored_resu
+                    me.pdf                                                      
+           INFO     Saved DOCX resume to                                        
+                    data/output/roboflow_forward_deployed_engineer/RuchithMacha_
+                    ForwardDeployedEngineer_Roboflow.docx                       
+           INFO     Saved DOCX resume to                                        
+                    data/output/roboflow_forward_deployed_engineer/tailored_resu
+                    me.docx                                                     
+           INFO     Cover letter PDF saved to:                                  
+                    data/output/roboflow_forward_deployed_engineer/cover_letter.
+                    pdf                                                         
+           INFO     Cover letter DOCX saved to:                                 
+                    data/output/roboflow_forward_deployed_engineer/cover_letter.
+                    docx                                                        
+           INFO     Cover letter TXT saved to:                                  
+                    data/output/roboflow_forward_deployed_engineer/cover_letter.
+                    txt                                                         
+           INFO     Updated status for job 176d9351253760d1 to 'tailored' with  
+                    ATS score 98%.                                              
            INFO     Saved daily email HTML preview to:                          
                     data/output/daily_email_preview.html                        
 [DIGEST] Email preview saved to: data/output/daily_email_preview.html
@@ -593,14 +604,14 @@ Step 4/5: Generating tracker digest and readying application queue...
            INFO     Daily digest report saved to: data/daily_digest.md          
 
 
-             Daily Job Search Digest - Wednesday, November 25, 2026             
+             Daily Job Search Digest - Thursday, November 26, 2026              
 
-Candidate: Macha Ruchith                                                        
+Candidate: Ruchith Macha                                                        
 
 [PIPELINE] Pipeline Overview                                                    
 
- • Total Opportunities Tracked: 301                                             
- • In Progress (Shortlisted/Tailored): 26                                       
+ • Total Opportunities Tracked: 326                                             
+ • In Progress (Shortlisted/Tailored): 27                                       
  • Submitted Applications: 0                                                    
  • Active Interviews/Offers: 0                                                  
 
@@ -608,24 +619,24 @@ Candidate: Macha Ruchith
 
 Ready for Tailoring:                                                            
 
- • Toptal - Cryptography Specialist for AI lab (38a7053e) -> Run python main.py 
-   tailor 38a7053e                                                              
  • Micro1 - ML Engineer (815a56a6) -> Run python main.py tailor 815a56a6        
- • Rackner - Backend Software Engineer — Secure Mission Systems (7a62743d) ->   
-   Run python main.py tailor 7a62743d                                           
- • PolicyMe - Software Engineer (604cd763) -> Run python main.py tailor 604cd763
- • Bask Health - Content Designer, AI Experiences (c0d61cd4) -> Run python      
-   main.py tailor c0d61cd4                                                      
+ • HFT Architecture - Junior Machine Learning Engineer (a0723191) -> Run python 
+   main.py tailor a0723191                                                      
  • Constructor - FullStack Engineer - Prospect Data Solutions (f71b7794) -> Run 
    python main.py tailor f71b7794                                               
  • Oportun - Sr. Data Analytics Engineer (R14153) (ff1fdbdf) -> Run python      
    main.py tailor ff1fdbdf                                                      
- • Brafton - Full Stack Developer (Frontend-Focused) - Mexico (9a99eb28) -> Run 
-   python main.py tailor 9a99eb28                                               
+ • micro1 - ML Engineer (1af903d9) -> Run python main.py tailor 1af903d9        
  • Vertex Marketing Group - Distribution Engineer (789e0f17) -> Run python      
    main.py tailor 789e0f17                                                      
- • Canonical - Distributed Systems Engineer (ca97c171) -> Run python main.py    
-   tailor ca97c171                                                              
+ • UNICEF - Backend Software Engineering (cfec93e9) -> Run python main.py tailor
+   cfec93e9                                                                     
+ • Askable - Software Engineer, AI Coding Tasks (cfcd9865) -> Run python main.py
+   tailor cfcd9865                                                              
+ • Fluence International, Inc. - Full-Stack Developer (f48b2fd3) -> Run python  
+   main.py tailor f48b2fd3                                                      
+ • Toptal - ML Inference Engineer – Terminal-Bench Task Designer (c48c4be7) ->  
+   Run python main.py tailor c48c4be7                                           
 
 Tailored & Ready for Pre-fill / Review:                                         
 
@@ -638,16 +649,16 @@ Tailored & Ready for Pre-fill / Review:
  • Bybit - Animator Intern (ea61979d) -> Run python main.py prefill ea61979d    
  • TGScope - Internet Measurement Researcher (Censorship & Proxies) (024e3274)  
    -> Run python main.py prefill 024e3274                                       
- • TGScope - Research Engineer, Multilingual Semantic Search (a929df16) -> Run  
-   python main.py prefill a929df16                                              
- • Askable - Software Engineer, AI Coding Tasks (cfcd9865) -> Run python main.py
-   prefill cfcd9865                                                             
  • SimpleTiger - Web Developer: WordPress & HubSpot (U.S. Based, Remote         
    Contractor) (7c26a21c) -> Run python main.py prefill 7c26a21c                
- • UNICEF - Backend Software Engineering (cfec93e9) -> Run python main.py       
-   prefill cfec93e9                                                             
- • Fluence International, Inc. - Full-Stack Developer (f48b2fd3) -> Run python  
-   main.py prefill f48b2fd3                                                     
+ • Toptal - Cryptography Specialist for AI lab (38a7053e) -> Run python main.py 
+   prefill 38a7053e                                                             
+ • Camunda - Forward Deployed Engineer (fe9c5703) -> Run python main.py prefill 
+   fe9c5703                                                                     
+ • TGScope - Research Engineer, Multilingual Semantic Search (a929df16) -> Run  
+   python main.py prefill a929df16                                              
+ • Roboflow - Forward Deployed Engineer (176d9351) -> Run python main.py prefill
+   176d9351                                                                     
 
 [APPLICATIONS] Active Submitted Applications                                    
 
@@ -658,104 +669,87 @@ Daily digest saved to:
 Step 5/5: Executing autonomous job application process (Target: top 2 
 positions)...
 
-Completing application for: Canonical - Distributed Systems Engineer (Match: 
-73%)...
-[16:25:16] INFO     Preparing tailored application packet in:                   
-                    data/output/canonical_distributed_systems_engineer          
+Completing application for: Micro1 - ML Engineer (Match: 78%)...
+           INFO     Preparing tailored application packet in:                   
+                    data/output/micro1_ml_engineer                              
            INFO     Resume successfully passed all verification checks against  
                     master profile.                                             
-           INFO     Tailored resume generated for Canonical - Distributed       
-                    Systems Engineer (ATS Score: 95%, 4 matched skills).        
+           INFO     Tailored resume generated for Micro1 - ML Engineer (ATS     
+                    Score: 100%, 1 matched skills).                             
            INFO     Saved PDF resume to                                         
-                    data/output/canonical_distributed_systems_engineer/MachaRuch
-                    ith_DistributedSystemsEngineer_Canonical.pdf                
+                    data/output/micro1_ml_engineer/RuchithMacha_MlEngineer_Micro
+                    1.pdf                                                       
            INFO     Saved PDF resume to                                         
-                    data/output/canonical_distributed_systems_engineer/tailored_
-                    resume.pdf                                                  
+                    data/output/micro1_ml_engineer/tailored_resume.pdf          
            INFO     Saved DOCX resume to                                        
-                    data/output/canonical_distributed_systems_engineer/MachaRuch
-                    ith_DistributedSystemsEngineer_Canonical.docx               
+                    data/output/micro1_ml_engineer/RuchithMacha_MlEngineer_Micro
+                    1.docx                                                      
            INFO     Saved DOCX resume to                                        
-                    data/output/canonical_distributed_systems_engineer/tailored_
-                    resume.docx                                                 
+                    data/output/micro1_ml_engineer/tailored_resume.docx         
            INFO     Cover letter PDF saved to:                                  
-                    data/output/canonical_distributed_systems_engineer/cover_let
-                    ter.pdf                                                     
+                    data/output/micro1_ml_engineer/cover_letter.pdf             
            INFO     Cover letter DOCX saved to:                                 
-                    data/output/canonical_distributed_systems_engineer/cover_let
-                    ter.docx                                                    
+                    data/output/micro1_ml_engineer/cover_letter.docx            
            INFO     Cover letter TXT saved to:                                  
-                    data/output/canonical_distributed_systems_engineer/cover_let
-                    ter.txt                                                     
-           INFO     Updated status for job ca97c17128abbcd2 to 'tailored' with  
-                    ATS score 95%.                                              
-  Tailored ATS resume (>85%) and cover letter generated for Canonical.
-  Executing automated browser application on Canonical's official portal...
-  [fill-fail] In which country do you currently work?*: Locator.fill: Timeout 30000ms exceeded.
-Call log:
-  - waiting for locator("[data-aa=\"aa24\"]")
-
-  [fill-fail] Please indicate your nationality:*: Locator.fill: Timeout 30000ms exceeded.
-Call log:
-  - waiting for locator("[data-aa=\"aa30\"]")
-
-  filled 31 fields, 5 unknown required
-  [warn] Could not deliver email '[Job Agent Action Required] Additional info needed for Canonical - Distributed Systems Engineer [JOB-5ba4745e]': Connection unexpectedly closed
-  [WAITING ANSWER] Unknown required questions encountered for Canonical. Sent 
-inquiry to inbox.
-
-Completing application for: Canonical - Associate Linux Support Engineer (Match:
-73%)...
-[16:26:45] INFO     Preparing tailored application packet in:                   
-                    data/output/canonical_associate_linux_support_engineer      
-           INFO     Resume successfully passed all verification checks against  
-                    master profile.                                             
-           INFO     Tailored resume generated for Canonical - Associate Linux   
-                    Support Engineer (ATS Score: 100%, 6 matched skills).       
-           INFO     Saved PDF resume to                                         
-                    data/output/canonical_associate_linux_support_engineer/Macha
-                    Ruchith_AssociateLinuxSupportEngineer_Canonical.pdf         
-           INFO     Saved PDF resume to                                         
-                    data/output/canonical_associate_linux_support_engineer/tailo
-                    red_resume.pdf                                              
-[16:26:46] INFO     Saved DOCX resume to                                        
-                    data/output/canonical_associate_linux_support_engineer/Macha
-                    Ruchith_AssociateLinuxSupportEngineer_Canonical.docx        
-           INFO     Saved DOCX resume to                                        
-                    data/output/canonical_associate_linux_support_engineer/tailo
-                    red_resume.docx                                             
-           INFO     Cover letter PDF saved to:                                  
-                    data/output/canonical_associate_linux_support_engineer/cover
-                    _letter.pdf                                                 
-           INFO     Cover letter DOCX saved to:                                 
-                    data/output/canonical_associate_linux_support_engineer/cover
-                    _letter.docx                                                
-           INFO     Cover letter TXT saved to:                                  
-                    data/output/canonical_associate_linux_support_engineer/cover
-                    _letter.txt                                                 
-           INFO     Updated status for job 17d3c2cb9a03daf8 to 'tailored' with  
+                    data/output/micro1_ml_engineer/cover_letter.txt             
+           INFO     Updated status for job 815a56a64e8228cc to 'tailored' with  
                     ATS score 100%.                                             
-  Tailored ATS resume (>85%) and cover letter generated for Canonical.
-  Executing automated browser application on Canonical's official portal...
-  [fill-fail] In which country do you currently work?*: Locator.fill: Timeout 30000ms exceeded.
-Call log:
-  - waiting for locator("[data-aa=\"aa38\"]")
+  Tailored ATS resume (>85%) and cover letter generated for Micro1.
+  Executing automated browser application on Micro1's official portal...
+  filled 0 fields, 0 unknown required
+  [manual] Micro1: Email application required: send resume to hiring%40black.com
+  [NEEDS MANUAL] Micro1 requires manual candidate action (login wall / CAPTCHA).
+Direct portal link: https://www.python.org/jobs/8136/
 
-  [fill-fail] Please indicate your nationality:*: Locator.fill: Timeout 30000ms exceeded.
-Call log:
-  - waiting for locator("[data-aa=\"aa44\"]")
-
-  filled 37 fields, 13 unknown required
-  [warn] Could not deliver email '[Job Agent Action Required] Additional info needed for Canonical - Associate Linux Support Engineer [JOB-b803d29c]': Connection unexpectedly closed
-  [WAITING ANSWER] Unknown required questions encountered for Canonical. Sent 
-inquiry to inbox.
+Completing application for: HFT Architecture - Junior Machine Learning Engineer 
+(Match: 77%)...
+[08:51:27] INFO     Preparing tailored application packet in:                   
+                    data/output/hft_architecture_junior_machine_learning_enginee
+                    r                                                           
+           INFO     Resume successfully passed all verification checks against  
+                    master profile.                                             
+           INFO     Tailored resume generated for HFT Architecture - Junior     
+                    Machine Learning Engineer (ATS Score: 100%, 1 matched       
+                    skills).                                                    
+           INFO     Saved PDF resume to                                         
+                    data/output/hft_architecture_junior_machine_learning_enginee
+                    r/RuchithMacha_JuniorMachineLearningEngineer_HftArchitecture
+                    .pdf                                                        
+           INFO     Saved PDF resume to                                         
+                    data/output/hft_architecture_junior_machine_learning_enginee
+                    r/tailored_resume.pdf                                       
+           INFO     Saved DOCX resume to                                        
+                    data/output/hft_architecture_junior_machine_learning_enginee
+                    r/RuchithMacha_JuniorMachineLearningEngineer_HftArchitecture
+                    .docx                                                       
+           INFO     Saved DOCX resume to                                        
+                    data/output/hft_architecture_junior_machine_learning_enginee
+                    r/tailored_resume.docx                                      
+           INFO     Cover letter PDF saved to:                                  
+                    data/output/hft_architecture_junior_machine_learning_enginee
+                    r/cover_letter.pdf                                          
+           INFO     Cover letter DOCX saved to:                                 
+                    data/output/hft_architecture_junior_machine_learning_enginee
+                    r/cover_letter.docx                                         
+           INFO     Cover letter TXT saved to:                                  
+                    data/output/hft_architecture_junior_machine_learning_enginee
+                    r/cover_letter.txt                                          
+           INFO     Updated status for job a0723191ec7f93b0 to 'tailored' with  
+                    ATS score 100%.                                             
+  Tailored ATS resume (>85%) and cover letter generated for HFT Architecture.
+  Executing automated browser application on HFT Architecture's official 
+portal...
+  filled 0 fields, 0 unknown required
+  [manual] HFT Architecture: Email application required: send resume to contact%40hftarchitecture.com
+  [NEEDS MANUAL] HFT Architecture requires manual candidate action (login wall /
+CAPTCHA). Direct portal link: https://www.python.org/jobs/8176/
 
 Additional qualified positions available for manual review:
-  #1 Toptal - Cryptography Specialist for AI lab (ID: 38a7053e)
-  #2 Micro1 - ML Engineer (ID: 815a56a6)
-  #3 Rackner - Backend Software Engineer — Secure Mission Systems (ID: 7a62743d)
-  #4 PolicyMe - Software Engineer (ID: 604cd763)
-  #5 Bask Health - Content Designer, AI Experiences (ID: c0d61cd4)
+  #1 Constructor - FullStack Engineer - Prospect Data Solutions (ID: f71b7794)
+  #2 Oportun - Sr. Data Analytics Engineer (R14153) (ID: ff1fdbdf)
+  #3 micro1 - ML Engineer (ID: 1af903d9)
+  #4 Vertex Marketing Group - Distribution Engineer (ID: 789e0f17)
+  #5 UNICEF - Backend Software Engineering (ID: cfec93e9)
 
 Review your email digest or status report anytime with: python main.py status
 

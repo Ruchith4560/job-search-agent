@@ -1,6 +1,6 @@
 {
   "personal_info": {
-    "name": "Macha Ruchith",
+    "name": "Ruchith Macha",
     "headline": "Computer Science & Engineering Student | Full-Stack & AI Systems Developer",
     "email": "macharuchith1@gmail.com",
     "phone": "+91 6305239230",
@@ -11,184 +11,82 @@
     }
   },
   "summary": {
-    "text": "High-performing Computer Science and Engineering undergraduate at Anurag University (CGPA: 9.05/10) with extensive hands-on experience building enterprise-grade full-stack and AI-driven applications. Proficient in Python, Java (Spring Boot), TypeScript, React, Docker, and PostgreSQL. Proven ability to design modular monoliths, autonomous browser agents, and scalable RESTful architectures.",
-    "metrics": "CGPA: 9.05/10 | 10+ Production Repositories",
-    "source": "manual"
+    "text": "Computer Science & Engineering Student | Full-Stack & AI Systems Developer",
+    "metrics": null,
+    "source": "linkedin"
   },
   "skills": [
     {
-      "name": "Python",
-      "category": "Languages",
-      "evidence": "Used across multiple production repositories including job-search-agent, ai-change-impact-engine, and backend APIs",
-      "source": "manual"
-    },
-    {
-      "name": "Java",
-      "category": "Languages",
-      "evidence": "Core Java, Java 21 Virtual Threads, Spring Boot backend development",
-      "source": "manual"
-    },
-    {
-      "name": "TypeScript",
-      "category": "Languages",
-      "evidence": "Enterprise React applications, type-safe full-stack architectures",
-      "source": "manual"
-    },
-    {
-      "name": "JavaScript",
-      "category": "Languages",
-      "evidence": "Modern ES6+, Node.js, Express, and React development",
-      "source": "manual"
-    },
-    {
-      "name": "SQL",
-      "category": "Languages",
-      "evidence": "Relational database schema design, indexing, and complex queries",
-      "source": "manual"
-    },
-    {
-      "name": "C",
-      "category": "Languages",
-      "evidence": "Systems programming, data structures, and memory management",
-      "source": "manual"
-    },
-    {
-      "name": "C++",
-      "category": "Languages",
-      "evidence": "Object-oriented systems, algorithmic problem solving",
-      "source": "manual"
-    },
-    {
-      "name": "HTML",
-      "category": "Languages",
-      "evidence": "Semantic HTML5, accessible web structures, vector templates",
-      "source": "manual"
+      "name": "Docker",
+      "category": "Databases & Cloud",
+      "evidence": "Used in 5 GitHub repositories (travel_expense_calculator, NextMail_Ai, servicedesk-pro (+2 more)) with 14,349 bytes of code",
+      "source": "github"
     },
     {
       "name": "CSS",
       "category": "Languages",
-      "evidence": "Modern CSS3, responsive layouts, Tailwind CSS styling",
-      "source": "manual"
+      "evidence": "Used in 9 GitHub repositories (ruchith_portfolio, travel_expense_calculator, NextMail_Ai (+6 more)) with 30,473 bytes of code",
+      "source": "github"
+    },
+    {
+      "name": "HTML",
+      "category": "Languages",
+      "evidence": "Used in 10 GitHub repositories (ruchith_portfolio, travel_expense_calculator, NextMail_Ai (+7 more)) with 10,459 bytes of code",
+      "source": "github"
+    },
+    {
+      "name": "Java",
+      "category": "Languages",
+      "evidence": "Used in 3 GitHub repositories (ruchith_portfolio, travel_expense_calculator, NextMail_Ai) with 591,717 bytes of code",
+      "source": "github"
+    },
+    {
+      "name": "JavaScript",
+      "category": "Languages",
+      "evidence": "Used in 11 GitHub repositories (ruchith_portfolio, travel_expense_calculator, NextMail_Ai (+8 more)) with 232,549 bytes of code",
+      "source": "github"
+    },
+    {
+      "name": "Python",
+      "category": "Languages",
+      "evidence": "Used in 8 GitHub repositories (job-search-agent, servicedesk-pro, ai-change-impact-engine (+5 more)) with 1,505,990 bytes of code",
+      "source": "github"
     },
     {
       "name": "Shell",
       "category": "Languages",
-      "evidence": "Bash scripting, Linux automation, environment configuration",
-      "source": "manual"
+      "evidence": "Used in 2 GitHub repositories (ai_resume_analyzer, smart-ai-healthcare-system) with 3,282 bytes of code",
+      "source": "github"
     },
     {
-      "name": "Spring Boot",
-      "category": "Frameworks & Libraries",
-      "evidence": "RESTful microservices, Spring Boot 3.3, JPA/Hibernate, Virtual Threads",
-      "source": "manual"
+      "name": "TypeScript",
+      "category": "Languages",
+      "evidence": "Used in 6 GitHub repositories (ruchith_portfolio, travel_expense_calculator, NextMail_Ai (+3 more)) with 1,815,875 bytes of code",
+      "source": "github"
     },
     {
-      "name": "React",
-      "category": "Frameworks & Libraries",
-      "evidence": "React 18/19, component lifecycles, hooks, single-page application architectures",
-      "source": "manual"
+      "name": "Batchfile",
+      "category": "Specialized & Domain Skills",
+      "evidence": "Used in 2 GitHub repositories (job-search-agent, smart-ai-healthcare-system) with 2,351 bytes of code",
+      "source": "github"
     },
     {
-      "name": "FastAPI",
-      "category": "Frameworks & Libraries",
-      "evidence": "High-performance asynchronous Python REST APIs and AI model endpoints",
-      "source": "manual"
+      "name": "Jinja",
+      "category": "Specialized & Domain Skills",
+      "evidence": "Used in 1 GitHub repositories (job-search-agent) with 6,467 bytes of code",
+      "source": "github"
     },
     {
-      "name": "Node.js",
-      "category": "Frameworks & Libraries",
-      "evidence": "Server-side JavaScript runtimes, event-driven microservices",
-      "source": "manual"
+      "name": "PowerShell",
+      "category": "Specialized & Domain Skills",
+      "evidence": "Used in 2 GitHub repositories (job-search-agent, ai_resume_analyzer) with 3,761 bytes of code",
+      "source": "github"
     },
     {
-      "name": "Express",
-      "category": "Frameworks & Libraries",
-      "evidence": "Backend REST APIs, middleware pipelines, JWT auth",
-      "source": "manual"
-    },
-    {
-      "name": "Vite",
-      "category": "Frameworks & Libraries",
-      "evidence": "Modern frontend bundling and development toolchain",
-      "source": "manual"
-    },
-    {
-      "name": "Tailwind CSS",
-      "category": "Frameworks & Libraries",
-      "evidence": "Utility-first modern responsive web styling",
-      "source": "manual"
-    },
-    {
-      "name": "Playwright",
-      "category": "Frameworks & Libraries",
-      "evidence": "End-to-end browser automation and portal interaction testing",
-      "source": "manual"
-    },
-    {
-      "name": "Pydantic",
-      "category": "Frameworks & Libraries",
-      "evidence": "Strict data modeling, runtime schema validation, and serialization",
-      "source": "manual"
-    },
-    {
-      "name": "PostgreSQL",
-      "category": "Databases & Cloud",
-      "evidence": "Relational data modeling, ACID transactions, relational indexing",
-      "source": "manual"
-    },
-    {
-      "name": "MongoDB",
-      "category": "Databases & Cloud",
-      "evidence": "NoSQL document storage, aggregation pipelines, Mongoose ODM",
-      "source": "manual"
-    },
-    {
-      "name": "Docker",
-      "category": "Databases & Cloud",
-      "evidence": "Containerization, multi-stage Dockerfiles, Docker Compose service orchestration",
-      "source": "manual"
-    },
-    {
-      "name": "Git",
-      "category": "Databases & Cloud",
-      "evidence": "Branching workflows, version control, rebase, merge strategies",
-      "source": "manual"
-    },
-    {
-      "name": "GitHub Actions",
-      "category": "Databases & Cloud",
-      "evidence": "Continuous integration, automated testing pipelines, scheduled workflows",
-      "source": "manual"
-    },
-    {
-      "name": "Linux",
-      "category": "Databases & Cloud",
-      "evidence": "Ubuntu Linux environment, system administration, package management",
-      "source": "manual"
-    },
-    {
-      "name": "REST API",
-      "category": "Developer Tools & Practices",
-      "evidence": "RESTful API contract design, HTTP semantics, JSON payloads",
-      "source": "manual"
-    },
-    {
-      "name": "Microservices",
-      "category": "Developer Tools & Practices",
-      "evidence": "Decoupled services, modular monoliths, distributed system architecture",
-      "source": "manual"
-    },
-    {
-      "name": "Data Structures",
-      "category": "Developer Tools & Practices",
-      "evidence": "Trees, graphs, dynamic programming, algorithmic complexity analysis",
-      "source": "manual"
-    },
-    {
-      "name": "Algorithms",
-      "category": "Developer Tools & Practices",
-      "evidence": "Sorting, searching, graph traversal, greedy techniques",
-      "source": "manual"
+      "name": "Procfile",
+      "category": "Specialized & Domain Skills",
+      "evidence": "Used in 2 GitHub repositories (ai-change-impact-engine, smart-ai-healthcare-system) with 89 bytes of code",
+      "source": "github"
     }
   ],
   "experience": [
@@ -219,28 +117,41 @@
       "name": "job-search-agent",
       "url": "https://github.com/Ruchith4560/job-search-agent",
       "stack": [
-        "Python",
-        "Playwright",
-        "SQLite",
-        "ReportLab",
-        "Pydantic",
-        "Docker",
-        "GitHub Actions"
+        "Batchfile",
+        "Jinja",
+        "PowerShell",
+        "Python"
       ],
       "description": "A semi-automatic AI agent that turns your GitHub and LinkedIn data into a validated master profile, generates tailored resumes, searches legal job feeds, scores match fitness, and pre-fills applications under explicit human review and approval. --- ## Architecture & Phased Roadmap | Phase |...",
       "highlights": [
         {
-          "text": "Architected an autonomous job application pipeline using Python, Playwright, and SQLite, automating multi-step ATS form submissions with 95%+ field accuracy.",
+          "text": "A semi-automatic AI agent that turns your GitHub and LinkedIn data into a validated master profile, generates tailored resumes, searches legal job feeds, scores match fitness, and pre-fills applications under explicit human review and approval. --- ## Architecture & Phased Roadmap | Phase |...",
           "metrics": null,
           "source": "github"
-        },
+        }
+      ],
+      "stars": 0,
+      "source": "github"
+    },
+    {
+      "name": "ruchith_portfolio",
+      "url": "https://github.com/Ruchith4560/ruchith_portfolio",
+      "stack": [
+        "CSS",
+        "HTML",
+        "Java",
+        "JavaScript",
+        "PostgreSQL",
+        "React",
+        "Spring Boot",
+        "Tailwind CSS",
+        "TypeScript",
+        "Vite"
+      ],
+      "description": "A full-stack developer portfolio and dynamic content management platform engineered with React 18 + TypeScript + Vite + Tailwind CSS on the frontend, and Java 21 + Spring Boot 3.3 + Spring Security + JPA / Hibernate on the backend, backed by PostgreSQL. Inspired by an editorial dark aesthetic...",
+      "highlights": [
         {
-          "text": "Engineered an ATS compliance scoring engine (>85% target), dynamic resume tailoring, and strict profile verification to prevent hallucinations.",
-          "metrics": null,
-          "source": "github"
-        },
-        {
-          "text": "Implemented secure IMAP/SMTP notification workflows and GitHub Actions scheduled CI/CD runners for daily autonomous pipeline execution.",
+          "text": "A full-stack developer portfolio and dynamic content management platform engineered with React 18 + TypeScript + Vite + Tailwind CSS on the frontend, and Java 21 + Spring Boot 3.3 + Spring Security + JPA / Hibernate on the backend, backed by PostgreSQL. Inspired by an editorial dark aesthetic...",
           "metrics": null,
           "source": "github"
         }
@@ -252,23 +163,23 @@
       "name": "travel_expense_calculator",
       "url": "https://github.com/Ruchith4560/travel_expense_calculator",
       "stack": [
-        "Java",
-        "Spring Boot",
-        "React",
-        "TypeScript",
-        "PostgreSQL",
+        "CSS",
         "Docker",
-        "Tailwind CSS"
+        "HTML",
+        "Java",
+        "JavaScript",
+        "PostgreSQL",
+        "REST API",
+        "React",
+        "Spring Boot",
+        "Tailwind CSS",
+        "TypeScript",
+        "Vite"
       ],
       "description": "> A modern, production-grade full-stack travel budgeting and expense planning application built with React 18, TypeScript, Tailwind CSS, and Java 21 Spring Boot 3.3 REST API with PostgreSQL. GitHub Repository: https://github.com/Ruchith4560/travelexpensecalculator.git --- ## 📖 Overview The Travel...",
       "highlights": [
         {
-          "text": "Developed full-stack travel budgeting platform with React 18, TypeScript, Tailwind CSS, and Java 21 Spring Boot REST APIs backed by PostgreSQL.",
-          "metrics": null,
-          "source": "github"
-        },
-        {
-          "text": "Containerized application with Docker Compose, implementing multi-currency budget tracking and real-time expense calculations.",
+          "text": "> A modern, production-grade full-stack travel budgeting and expense planning application built with React 18, TypeScript, Tailwind CSS, and Java 21 Spring Boot 3.3 REST API with PostgreSQL. GitHub Repository: https://github.com/Ruchith4560/travelexpensecalculator.git --- ## 📖 Overview The Travel...",
           "metrics": null,
           "source": "github"
         }
@@ -280,23 +191,20 @@
       "name": "NextMail_Ai",
       "url": "https://github.com/Ruchith4560/NextMail_Ai",
       "stack": [
-        "Java",
-        "Spring Boot",
-        "React",
-        "TypeScript",
-        "PostgreSQL",
+        "CSS",
         "Docker",
-        "Tailwind CSS"
+        "HTML",
+        "Java",
+        "JavaScript",
+        "PostgreSQL",
+        "React",
+        "Spring Boot",
+        "TypeScript"
       ],
       "description": "NextMail AI is an enterprise-grade, portfolio-defining email collaboration platform built from first principles as a Disciplined Modular Monolith. It pairs a high-throughput Spring Boot 3.3.4 (Java 21 LTS Virtual Threads) backend with a modern React 19 + TypeScript + Vite frontend, fully integrated...",
       "highlights": [
         {
-          "text": "Designed enterprise email collaboration platform pairing a Spring Boot 3.3 (Java 21 Virtual Threads) backend with a modern React 19 + TypeScript frontend.",
-          "metrics": null,
-          "source": "github"
-        },
-        {
-          "text": "Engineered high-throughput PostgreSQL persistence, full Docker containerization, and zero-trust authentication pipelines.",
+          "text": "NextMail AI is an enterprise-grade, portfolio-defining email collaboration platform built from first principles as a Disciplined Modular Monolith. It pairs a high-throughput Spring Boot 3.3.4 (Java 21 LTS Virtual Threads) backend with a modern React 19 + TypeScript + Vite frontend, fully integrated...",
           "metrics": null,
           "source": "github"
         }
@@ -308,22 +216,20 @@
       "name": "servicedesk-pro",
       "url": "https://github.com/Ruchith4560/servicedesk-pro",
       "stack": [
-        "TypeScript",
-        "React",
+        "CSS",
+        "Docker",
+        "HTML",
+        "JavaScript",
+        "MongoDB",
         "Node.js",
         "Python",
-        "MongoDB",
-        "Docker"
+        "React",
+        "TypeScript"
       ],
       "description": "> Enterprise AI-Powered IT Service Management (ITSM) & Asset Intelligence Platform ServiceDesk Pro is a mission-critical, enterprise-grade IT Service Management (ITSM) and Asset Intelligence platform engineered for zero-trust environments. It seamlessly bridges employee incident intake,...",
       "highlights": [
         {
-          "text": "Engineered enterprise AI-powered IT service management (ITSM) and asset intelligence platform designed for zero-trust environments.",
-          "metrics": null,
-          "source": "github"
-        },
-        {
-          "text": "Implemented real-time employee incident intake, role-based access control, and automated ticket triaging workflows.",
+          "text": "> Enterprise AI-Powered IT Service Management (ITSM) & Asset Intelligence Platform ServiceDesk Pro is a mission-critical, enterprise-grade IT Service Management (ITSM) and Asset Intelligence platform engineered for zero-trust environments. It seamlessly bridges employee incident intake,...",
           "metrics": null,
           "source": "github"
         }
@@ -335,22 +241,21 @@
       "name": "ai-change-impact-engine",
       "url": "https://github.com/Ruchith4560/ai-change-impact-engine",
       "stack": [
-        "Python",
-        "FastAPI",
-        "React",
-        "TypeScript",
+        "CSS",
         "Docker",
-        "Git"
+        "Express",
+        "FastAPI",
+        "HTML",
+        "JavaScript",
+        "Procfile",
+        "Python",
+        "React",
+        "TypeScript"
       ],
       "description": "> AI-Powered Code Change Risk Analysis, Downstream Blast Radius & Intelligent Test Planning Platform > Transforming two-dimensional Git line diffs into deterministic dependency graphs, calibrated risk scores, and evidence-grounded review checklists. --- > 🚀 Live Production Deployments: > - Render...",
       "highlights": [
         {
-          "text": "Built intelligent code change risk analyzer transforming Git line diffs into deterministic dependency graphs with calibrated risk scores.",
-          "metrics": null,
-          "source": "github"
-        },
-        {
-          "text": "Engineered high-performance FastAPI backend with React/TypeScript UI, Dockerized deployments, and automated blast-radius evaluation.",
+          "text": "> AI-Powered Code Change Risk Analysis, Downstream Blast Radius & Intelligent Test Planning Platform > Transforming two-dimensional Git line diffs into deterministic dependency graphs, calibrated risk scores, and evidence-grounded review checklists. --- > 🚀 Live Production Deployments: > - Render...",
           "metrics": null,
           "source": "github"
         }
@@ -468,22 +373,17 @@
       "name": "INTELLI-CREDIT",
       "url": "https://github.com/Ruchith4560/INTELLI-CREDIT",
       "stack": [
-        "Python",
+        "CSS",
         "FastAPI",
-        "React",
-        "XGBoost",
-        "FAISS",
-        "JWT"
+        "HTML",
+        "JavaScript",
+        "Python",
+        "React"
       ],
       "description": "> Automates corporate loan appraisal from 2-3 weeks to under 5 minutes ## Tech Stack Python · FastAPI · React.js · XGBoost · OpenAI GPT · FAISS · JWT ## Quick Start ### Backend bash cd backend python -m venv venv venv\\Scripts\\activate        # Windows pip install -r requirements.txt uvicorn...",
       "highlights": [
         {
-          "text": "Developed automated corporate loan appraisal engine accelerating credit evaluation from 2-3 weeks to under 5 minutes.",
-          "metrics": null,
-          "source": "github"
-        },
-        {
-          "text": "Integrated FastAPI backend with React dashboard, XGBoost risk classification, FAISS vector search, and JWT security.",
+          "text": "> Automates corporate loan appraisal from 2-3 weeks to under 5 minutes ## Tech Stack Python · FastAPI · React.js · XGBoost · OpenAI GPT · FAISS · JWT ## Quick Start ### Backend bash cd backend python -m venv venv venv\\Scripts\\activate        # Windows pip install -r requirements.txt uvicorn...",
           "metrics": null,
           "source": "github"
         }
@@ -596,5 +496,5 @@
   "certifications": [],
   "conflicts": [],
   "version": "1.1",
-  "last_updated": "2026-11-24T16:09:13.846609+00:00"
+  "last_updated": "2026-11-26T08:51:07.753715+00:00"
 }

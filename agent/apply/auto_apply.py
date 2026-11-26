@@ -153,8 +153,9 @@ def enqueue(job_id, company, role, url, resume, cover=None):
     """Call this from your existing `approve` command."""
     with db() as c:
         c.execute(
-            "INSERT OR IGNORE INTO apply_state(job_id,company,role,url,resume,cover,state,updated_at)"
-            " VALUES(?,?,?,?,?,?,'APPROVED',?)",
+            "INSERT INTO apply_state(job_id,company,role,url,resume,cover,state,updated_at)"
+            " VALUES(?,?,?,?,?,?,'APPROVED',?)"
+            " ON CONFLICT(job_id) DO UPDATE SET state='APPROVED', updated_at=excluded.updated_at, last_error=NULL, pending='[]'",
             (str(job_id), company, role, url, str(resume), str(cover) if cover else None, _now()),
         )
 

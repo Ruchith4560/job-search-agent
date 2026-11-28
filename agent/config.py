@@ -200,6 +200,30 @@ class JobDiscoveryConfig(BaseModel):
     )
 
 
+class AutonomousApplicationConfig(BaseModel):
+    """Configuration for autonomous browser job application workflow."""
+    enabled: bool = True
+    autonomous_mode: bool = False
+    max_daily_submissions: int = Field(default_factory=lambda: int(os.getenv("AGENT_MAX_SUBMITS", "10")))
+    max_retry_attempts: int = 3
+    min_match_threshold: int = 70
+    auto_apply_min_match_score: int = 85
+    supported_portals: List[str] = Field(
+        default_factory=lambda: [
+            "greenhouse",
+            "lever",
+            "smartrecruiters",
+            "phenom",
+            "workday",
+            "generic",
+        ]
+    )
+    dry_run: bool = False
+    allow_custom_questions: bool = True
+    capture_screenshots: bool = True
+    delay_between_applications_seconds: int = 5
+
+
 class AppConfig(BaseModel):
     """Root configuration for the application."""
     profile: StudentProfileConfig = Field(default_factory=StudentProfileConfig)
@@ -209,6 +233,7 @@ class AppConfig(BaseModel):
     llm: LLMConfig = Field(default_factory=LLMConfig)
     paths: PathsConfig = Field(default_factory=PathsConfig)
     jobs: JobDiscoveryConfig = Field(default_factory=JobDiscoveryConfig)
+    autonomous_application: AutonomousApplicationConfig = Field(default_factory=AutonomousApplicationConfig)
 
     @property
     def student_profile(self) -> StudentProfileConfig:

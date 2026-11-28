@@ -39,6 +39,19 @@ from datetime import datetime
 from email.message import EmailMessage
 from pathlib import Path
 
+from agent.config import load_config
+from agent.apply.adapters import (
+    BasePortalAdapter,
+    FormFillResult,
+    SubmissionResult,
+    GreenhouseAdapter,
+    LeverAdapter,
+    SmartRecruitersAdapter,
+    PhenomAdapter,
+    GenericAdapter,
+    get_adapter,
+)
+
 DATA = Path(os.getenv("AGENT_DATA_DIR", "data"))
 DB_PATH = Path(os.getenv("AGENT_DB_PATH", DATA / "tracker.db"))
 PROFILE_PATH = Path(os.getenv("AGENT_PROFILE_PATH", "master_profile.json" if Path("master_profile.json").exists() else DATA / "master_profile.json"))
@@ -50,8 +63,9 @@ USER_DATA_DIR = DATA / "browser_profile"
 USER = os.getenv("GMAIL_USER", "macharuchith1@gmail.com")
 APP_PASSWORD = os.getenv("GMAIL_APP_PASSWORD", "")
 
-MAX_SUBMITS_PER_DAY = 10
-MAX_ATTEMPTS = 3
+_CFG = load_config()
+MAX_SUBMITS_PER_DAY = int(os.getenv("AGENT_MAX_SUBMITS", str(_CFG.autonomous_application.max_daily_submissions)))
+MAX_ATTEMPTS = _CFG.autonomous_application.max_retry_attempts
 
 # ---- Fixed facts (single source of truth; overrides stale values in the JSON) ----
 CGPA = "9.05"
@@ -166,6 +180,23 @@ def set_state(job_id, state, **fields):
     cols = ", ".join(f"{k}=?" for k in fields)
     with db() as c:
         c.execute(f"UPDATE apply_state SET {cols} WHERE job_id=?", [*fields.values(), job_id])
+
+    # Sync state with main jobs table in tracker.db
+    try:
+        from agent.jobs.db import JobDatabase
+        db_inst = JobDatabase(DB_PATH)
+        if state == "SUBMITTED":
+            db_inst.update_status(job_id, "applied")
+            with db_inst._get_connection() as conn:
+                conn.cursor().execute("UPDATE jobs SET applied_at = ? WHERE id = ?", (_now(), str(job_id)))
+                conn.commit()
+        elif state == "NEEDS_MANUAL":
+            db_inst.update_status(job_id, "needs_manual")
+        elif state == "WAITING_ANSWER":
+            db_inst.update_status(job_id, "waiting_answer")
+    except Exception as e:
+        logger_err = str(e)
+        pass
 
 
 def _now():
@@ -413,13 +444,36 @@ def fill_field(page, f: dict, value: str) -> bool:
         return False
 
 
+AGGREGATOR_HOSTS = [
+    "arbeitnow.com",
+    "remotive.com",
+    "jobicy.com",
+    "himalayas.app",
+    "weworkremotely.com",
+    "python.org",
+    "freshersworld.com",
+    "unstop.com",
+    "internshala.com",
+]
+
+
+def is_aggregator_url(url: str) -> bool:
+    """Return True if the URL belongs to a known job board/aggregator instead of an official employer ATS."""
+    url_lower = (url or "").lower()
+    return any(h in url_lower for h in AGGREGATOR_HOSTS)
+
+
 def extract_external_apply_url(page) -> str | None:
     """Detect if the page is an aggregator/board and extract direct external application URL."""
     try:
         url = page.evaluate(r"""() => {
             const links = Array.from(document.querySelectorAll('a[href]'));
             const currentHost = window.location.hostname.toLowerCase();
-            const atsHosts = ['greenhouse.io', 'lever.co', 'smartrecruiters.com', 'myworkdayjobs.com', 'ashbyhq.com', 'workable.com', 'bamboohr.com', 'breezy.hr', 'icims.com', 'phenom'];
+            const atsHosts = [
+                'greenhouse.io', 'lever.co', 'smartrecruiters.com', 'myworkdayjobs.com',
+                'ashbyhq.com', 'workable.com', 'bamboohr.com', 'breezy.hr', 'icims.com',
+                'phenom', 'oraclecloud.com', 'taleo.net', 'jobvite.com', 'successfactors.com'
+            ];
 
             // 1. Direct ATS link on the page
             for (const a of links) {
@@ -440,7 +494,7 @@ def extract_external_apply_url(page) -> str | None:
             for (const a of links) {
                 const txt = ((a.innerText || a.textContent) || '').toLowerCase();
                 const h = a.href || '';
-                if ((txt.includes('apply on company') || txt.includes('apply externally') || txt.includes('original job') || txt.includes('apply for this job') || txt.includes('apply now')) && h.startsWith('http') && !h.includes(currentHost)) {
+                if ((txt.includes('apply on company') || txt.includes('apply externally') || txt.includes('original job') || txt.includes('apply for this job') || txt.includes('apply now') || txt.includes('view job')) && h.startsWith('http') && !h.includes(currentHost)) {
                     return h;
                 }
             }
@@ -694,269 +748,34 @@ def _poll_step(page, step_str: str, timeout: int = 30) -> bool:
 
 
 def is_phenom_portal(page, job_url: str = "") -> bool:
-    url_lower = (page.url + " " + job_url).lower()
-    if "phenompeople.com" in url_lower or "careers.mastercard.com" in url_lower:
-        return True
-    try:
-        if page.locator("#phoneWidget, #previousworker, input[name*='cntryFields']").count() > 0:
-            return True
-    except Exception:
-        pass
-    return False
+    return PhenomAdapter().can_handle(page, job_url)
 
 
 def fill_phenom_portal(page, job: dict, profile: dict, answers: dict, submit: bool, out_dir: Path) -> str:
     """Specialized driver for Phenom People ATS (e.g. Mastercard Launch Program)."""
-    # 1. Landing page check: If URL has /job/ or an Apply Now link/button
-    if "/job/" in page.url.lower():
-        apply_btn = page.get_by_role("link", name=re.compile(r"apply(\s*now)?", re.I))
-        if apply_btn.count():
-            print("  [phenom] Clicking Apply Now on landing page...")
-            apply_btn.first.click()
-            page.wait_for_load_state("domcontentloaded")
-            page.wait_for_timeout(3000)
-
-    # 2. Wait for form controls or file upload input (which is attached, often visually hidden)
-    try:
-        page.wait_for_selector("input[type=file]", state="attached", timeout=25000)
-    except Exception:
-        page.wait_for_selector("select#country", timeout=15000)
-    page.wait_for_timeout(2000)
-    page.evaluate("() => { const el = document.getElementById('onetrust-consent-sdk'); if (el) el.remove(); }")
-
-    # Step 1: Upload resume
-    file_inp = page.locator("input[type=file]")
-    resume_file = resolve_resume_path(job)
-    if file_inp.count() and resume_file and resume_file.exists():
-        print(f"  [phenom] Uploading resume: {resume_file}...")
-        file_inp.first.set_input_files(str(resume_file.resolve()))
-        page.wait_for_timeout(7000)
-    page.evaluate("() => { const el = document.getElementById('onetrust-consent-sdk'); if (el) el.remove(); }")
-
-    # Step 1: Fill required fields
-    print("  [phenom] Filling Step 1 (Personal Information)...")
-    page.select_option("#country", label="India")
-    page.locator("#country").dispatch_event("change")
-    page.wait_for_timeout(3000)
-
-    phone_code = page.locator("#phoneWidget\\.countryPhoneCode, select[id*='countryPhoneCode']")
-    if phone_code.count():
-        try:
-            phone_code.first.select_option(value="IND_91")
-        except Exception:
-            phone_code.first.select_option(label="India (+91)")
-        phone_code.first.dispatch_event("change")
-
-    dt_sel = page.locator("#deviceType")
-    if dt_sel.count():
-        dt_sel.select_option(value="Mobile")
-        dt_sel.dispatch_event("change")
-
-    src_sel = page.locator("#sourceType")
-    if src_sel.count():
-        src_sel.select_option(value="Job Board")
-        src_sel.dispatch_event("change")
-        page.wait_for_timeout(1000)
-
-    app_src = page.locator("#applicantSource, select[name='applicantSource']")
-    if app_src.count():
-        app_src.first.select_option(label="LinkedIn")
-        app_src.first.dispatch_event("change")
-
-    pw_no = page.locator("#previousworker-No-label")
-    if pw_no.count():
-        pw_no.click(force=True)
-        page.wait_for_timeout(500)
-
-    cb = page.locator("label:has(#emailAgreement), #emailAgreement")
-    if cb.count():
-        cb.first.click(force=True)
-
-    phone_inp = page.locator("input[id='phoneWidget.phoneNumber'], input[name='phoneWidget.phoneNumber']")
-    if phone_inp.count() and not phone_inp.first.input_value():
-        phone_inp.first.fill(profile.get("phone", "6305239230"))
-        phone_inp.first.dispatch_event("input")
-        phone_inp.first.dispatch_event("change")
-
-    fn_inp = page.locator("input[name='cntryFields.firstName'], input#firstName")
-    if fn_inp.count() and not fn_inp.first.input_value():
-        fn_inp.first.fill(profile.get("first_name", "Ruchith"))
-        fn_inp.first.dispatch_event("input")
-        fn_inp.first.dispatch_event("change")
-
-    ln_inp = page.locator("input[name='cntryFields.lastName'], input#lastName")
-    if ln_inp.count() and not ln_inp.first.input_value():
-        ln_inp.first.fill(profile.get("last_name", "Macha"))
-        ln_inp.first.dispatch_event("input")
-        ln_inp.first.dispatch_event("change")
-
-    em_inp = page.locator("input[name='email'], input#email")
-    if em_inp.count() and not em_inp.first.input_value():
-        em_inp.first.fill(profile.get("email", "macharuchith1@gmail.com"))
-        em_inp.first.dispatch_event("input")
-        em_inp.first.dispatch_event("change")
-
-    addr = page.locator("input[name='cntryFields.addressLine1'], input#addressLine1")
-    if addr.count() and not addr.first.input_value():
-        addr.first.fill("Hyderabad, Telangana")
-        addr.first.dispatch_event("input")
-        addr.first.dispatch_event("change")
-
-    page.wait_for_timeout(2000)
-
-    # Next: Step 1 -> Step 2
-    print("  [phenom] Advancing Step 1 -> Step 2...")
-    page.locator("button#next").click(force=True)
-    _poll_step(page, "step=2", timeout=30)
-    page.wait_for_timeout(2000)
-    page.evaluate("() => { const el = document.getElementById('onetrust-consent-sdk'); if (el) el.remove(); }")
-
-    # Step 2: Work & Education
-    print("  [phenom] Filling Step 2 (Work & Education)...")
-    exp1_comp = page.locator("input[id='experienceData[1].companyName']")
-    if exp1_comp.count() and not exp1_comp.input_value():
-        exp1_comp.fill("Malai Club")
-        exp1_comp.dispatch_event("input")
-        exp1_comp.dispatch_event("change")
-
-    deg_sel = page.locator("select[id='educationData[0].degree']")
-    if deg_sel.count():
-        deg_sel.select_option(label="Bachelors")
-        deg_sel.dispatch_event("input")
-        deg_sel.dispatch_event("change")
-        deg_sel.dispatch_event("blur")
-
-    field_sel = page.locator("select[id='educationData[0].fieldOfStudy']")
-    if field_sel.count():
-        try:
-            field_sel.select_option(label="Computer Science")
-            field_sel.dispatch_event("input")
-            field_sel.dispatch_event("change")
-            field_sel.dispatch_event("blur")
-        except Exception:
-            pass
-
-    gpa_inp = page.locator("input[id='educationData[0].gradeAverage']")
-    if gpa_inp.count() and not gpa_inp.input_value():
-        gpa_inp.fill(CGPA)
-        gpa_inp.dispatch_event("input")
-        gpa_inp.dispatch_event("change")
-
-    start_date = page.locator("input[id='educationData[0].fromTo.startDate']")
-    if start_date.count() and not start_date.input_value():
-        start_date.fill("08/2024")
-        start_date.dispatch_event("input")
-        start_date.dispatch_event("change")
-
-    end_date = page.locator("input[id='educationData[0].fromTo.endDate']")
-    if end_date.count() and not end_date.input_value():
-        end_date.fill("06/2028")
-        end_date.dispatch_event("input")
-        end_date.dispatch_event("change")
-
-    page.wait_for_timeout(2000)
-
-    # Next: Step 2 -> Step 3
-    print("  [phenom] Advancing Step 2 -> Step 3...")
-    page.locator("button#next").click(force=True)
-    _poll_step(page, "step=3", timeout=30)
-    page.wait_for_timeout(2000)
-    page.evaluate("() => { const el = document.getElementById('onetrust-consent-sdk'); if (el) el.remove(); }")
-
-    # Step 3: Job specific questions
-    print("  [phenom] Filling Step 3 (Job Specific Questions)...")
-    for q_id, q_val in [
-        ("jsqData.QUESTIONNAIRE-3-308.a", "Yes"),
-        ("jsqData.QUESTIONNAIRE-3-308.b", "No"),
-        ("jsqData.QUESTIONNAIRE-3-308.c", "No"),
-        ("jsqData.QUESTIONNAIRE-3-308.d", "Prefer Not To Self-Identify"),
-        ("jsqData.QUESTIONNAIRE-3-308.e", "No"),
-    ]:
-        sel = page.locator(f"select[id='{q_id}']")
-        if sel.count():
-            sel.select_option(label=q_val)
-            sel.dispatch_event("change")
-
-    page.wait_for_timeout(2000)
-
-    # Next: Step 3 -> Step 4
-    print("  [phenom] Advancing Step 3 -> Step 4...")
-    page.locator("button#next").click(force=True)
-    _poll_step(page, "step=4", timeout=30)
-    page.wait_for_timeout(2000)
-    page.evaluate("() => { const el = document.getElementById('onetrust-consent-sdk'); if (el) el.remove(); }")
-
-    # Step 4: Conflict questionnaire
-    print("  [phenom] Filling Step 4 (Conflict Questionnaire)...")
-    for q_id in [
-        "secondaryJsqData.QUESTIONNAIRE-3-321.a",
-        "secondaryJsqData.QUESTIONNAIRE-3-321.b",
-        "secondaryJsqData.QUESTIONNAIRE-3-321.c",
-        "secondaryJsqData.QUESTIONNAIRE-3-321.d",
-        "secondaryJsqData.QUESTIONNAIRE-3-321.e",
-        "secondaryJsqData.QUESTIONNAIRE-3-321.f",
-    ]:
-        sel = page.locator(f"select[id='{q_id}']")
-        if sel.count():
-            sel.select_option(label="No")
-            sel.dispatch_event("change")
-
-    page.wait_for_timeout(2000)
-
-    # Next: Step 4 -> Step 5
-    print("  [phenom] Advancing Step 4 -> Step 5...")
-    page.locator("button#next").click(force=True)
-    _poll_step(page, "step=5", timeout=30)
-    page.wait_for_timeout(2000)
-    page.evaluate("() => { const el = document.getElementById('onetrust-consent-sdk'); if (el) el.remove(); }")
-
-    # Step 5: Applicant acknowledgment
-    print("  [phenom] Filling Step 5 (Applicant Acknowledgment)...")
-    ack_cb = page.locator("label:has(#termConditions_non_us\\.agreementCheck), #termConditions_non_us\\.agreementCheck")
-    if ack_cb.count():
-        ack_cb.first.click(force=True)
-    page.wait_for_timeout(2000)
-
-    # Next: Step 5 -> Step 6 (Review)
-    print("  [phenom] Advancing Step 5 -> Step 6 (Review)...")
-    page.locator("button#next").click(force=True)
-    _poll_step(page, "step=6", timeout=30)
-    page.wait_for_timeout(4000)
-    page.evaluate("() => { const el = document.getElementById('onetrust-consent-sdk'); if (el) el.remove(); }")
-
-    # Step 6: Review & Final Submission
+    adapter = PhenomAdapter()
+    adapter.navigate_to_form(page, page.url)
+    fill_res = adapter.fill(page, job, profile, answers)
     before = out_dir / "before_submit.png"
     page.screenshot(path=str(before), full_page=True)
-    print(f"  [phenom] Reached Step 6 (Review). Proof screenshot saved: {before}")
+    print(f"  [phenom] Reached Review. Proof screenshot saved: {before}")
 
     if not submit:
         set_state(job["job_id"], "READY", last_error="dry-run: filled, not submitted")
         print("  [phenom dry-run] Reached Step 6 Review successfully without submitting.")
         return "DRY_RUN_OK"
 
-    # Submit
-    submit_btn = page.locator("button[atm-id='submit-button'], button.btn-submit:not(#ph-search-backdrop), button:has-text('Submit'):not(#ph-search-backdrop)")
-    if not submit_btn.count():
-        submit_btn = page.locator("button#next")
-    if not submit_btn.count():
-        set_state(job["job_id"], "NEEDS_MANUAL", last_error="submit button not found on step 6")
-        return "NEEDS_MANUAL"
-
-    print("  [phenom submit] Clicking final Submit button on Step 6...")
-    submit_btn.first.click(force=True)
-    ok = wait_confirmation(page, timeout=30)
+    sub_res = adapter.submit(page)
     after = out_dir / "after_submit.png"
     page.screenshot(path=str(after), full_page=True)
 
-    if ok or "thank" in page.url.lower() or "applythankyou" in page.url.lower() or "thank" in page.inner_text("body").lower() or "received" in page.inner_text("body").lower():
+    if sub_res.status == "SUBMITTED":
         set_state(job["job_id"], "SUBMITTED", last_error=None)
-        # Suppress synthetic agent emails: the official confirmation email is dispatched
-        # directly by the employer (e.g. Mastercard, Workday, Greenhouse) to candidate's inbox.
         print(f"  [phenom] Application SUBMITTED successfully and confirmed! Official confirmation dispatched by {job['company']} directly to {profile.get('email', USER)}.")
         return "SUBMITTED"
 
-    state = "NEEDS_MANUAL" if job["attempts"] + 1 >= MAX_ATTEMPTS else "READY"
-    set_state(job["job_id"], state, last_error="confirmation not detected after submit")
+    state = "NEEDS_MANUAL" if (job.get("attempts") or 0) + 1 >= MAX_ATTEMPTS else "READY"
+    set_state(job["job_id"], state, last_error=sub_res.error or "confirmation not detected after submit")
     return state
 
 
@@ -983,7 +802,7 @@ def send_mail(subject: str, html: str, attachments: list[str] | None = None):
                 main, sub = "text", "plain"
             msg.add_attachment(p.read_bytes(), maintype=main, subtype=sub, filename=p.name)
     try:
-        with smtplib.SMTP("smtp.gmail.com", 587) as s:
+        with smtplib.SMTP("smtp.gmail.com", 587, timeout=30) as s:
             s.starttls()
             s.login(USER, APP_PASSWORD)
             s.send_message(msg)
@@ -1191,6 +1010,18 @@ def process(job: dict, submit: bool, headless: bool = True) -> str:
             try:
                 page.goto(job["url"], wait_until="domcontentloaded", timeout=45000)
                 page.wait_for_timeout(2500)
+
+                # Proactive Aggregator Check: if on an aggregator site, immediately check for external ATS link
+                if is_aggregator_url(page.url):
+                    ext_url = extract_external_apply_url(page)
+                    if ext_url and ext_url != page.url:
+                        print(f"  [redirect] Detected external ATS URL from aggregator {page.url} -> {ext_url}. Navigating...")
+                        try:
+                            page.goto(ext_url, wait_until="domcontentloaded", timeout=45000)
+                            page.wait_for_timeout(2500)
+                        except Exception as e:
+                            print(f"  [redirect-error] Failed to navigate to {ext_url}: {e}")
+
                 if has_login_wall(page):
                     if STORAGE_STATE_PATH.exists() and handle_oauth_sso(page):
                         page.wait_for_timeout(3000)
@@ -1198,22 +1029,29 @@ def process(job: dict, submit: bool, headless: bool = True) -> str:
                         set_state(job["job_id"], "NEEDS_MANUAL", last_error="login required: OAuth (Google / LinkedIn / account login)")
                         return "NEEDS_MANUAL"
 
-                if is_phenom_portal(page, job.get("url", "")):
-                    print(f"  [portal] Detected Phenom People ATS for {job['company']}. Executing multi-step flow...")
-                    return fill_phenom_portal(page, job, profile, answers, submit, out_dir)
+                # Choose best matching portal adapter
+                adapter = get_adapter(page, page.url)
+                print(f"  [adapter] Using '{adapter.name}' adapter for {job['company']} ({page.url[:60]}...)")
+                adapter.navigate_to_form(page, page.url)
 
-                unknown, filled = fill_form(page, job, profile, answers)
+                fill_res = adapter.fill(page, job, profile, answers)
+                filled = fill_res.filled
+                unknown = fill_res.unknown
                 print(f"  filled {len(filled)} fields, {len(unknown)} unknown required")
 
-                # If 0 fields filled, check if page is an aggregator/board linking to external ATS
+                # If 0 fields filled, fallback aggregator check (in case domain wasn't in AGGREGATOR_HOSTS)
                 if len(filled) == 0:
                     ext_url = extract_external_apply_url(page)
                     if ext_url and ext_url != page.url:
-                        print(f"  [redirect] Detected external ATS portal: {ext_url}. Navigating...")
+                        print(f"  [redirect] Fallback detected external ATS portal: {ext_url}. Navigating...")
                         try:
                             page.goto(ext_url, wait_until="domcontentloaded", timeout=45000)
                             page.wait_for_timeout(2500)
-                            unknown, filled = fill_form(page, job, profile, answers)
+                            adapter = get_adapter(page, page.url)
+                            adapter.navigate_to_form(page, page.url)
+                            fill_res = adapter.fill(page, job, profile, answers)
+                            filled = fill_res.filled
+                            unknown = fill_res.unknown
                             print(f"  filled {len(filled)} fields on destination portal, {len(unknown)} unknown required")
                         except Exception as e:
                             print(f"  [redirect-fail] Could not open destination portal {ext_url}: {e}")
@@ -1221,7 +1059,7 @@ def process(job: dict, submit: bool, headless: bool = True) -> str:
                 # If STILL 0 fields filled, this is an informational listing, bulletin board, or requires manual apply
                 if len(filled) == 0:
                     try:
-                        mailto = page.evaluate("() => { const a = document.querySelector('a[href^=\"mailto:\"]'); return a ? a.href.replace('mailto:', '') : null; }")
+                        mailto = page.evaluate(r"() => { const a = document.querySelector('a[href^=\"mailto:\"]'); return a ? a.href.replace('mailto:', '') : null; }")
                     except Exception:
                         mailto = None
                     if mailto:
@@ -1231,14 +1069,6 @@ def process(job: dict, submit: bool, headless: bool = True) -> str:
                     print(f"  [manual] {job['company']}: {last_err}")
                     set_state(job["job_id"], "NEEDS_MANUAL", last_error=last_err)
                     return "NEEDS_MANUAL"
-
-                if has_login_wall(page):
-                    if STORAGE_STATE_PATH.exists() and handle_oauth_sso(page):
-                        page.wait_for_timeout(3000)
-                        unknown, filled = fill_form(page, job, profile, answers)
-                    if has_login_wall(page):
-                        set_state(job["job_id"], "NEEDS_MANUAL", last_error="login required: OAuth (Google / LinkedIn / account login)")
-                        return "NEEDS_MANUAL"
 
                 if unknown:
                     token = job["token"] or uuid.uuid4().hex[:8]
@@ -1250,25 +1080,26 @@ def process(job: dict, submit: bool, headless: bool = True) -> str:
                 page.screenshot(path=str(before), full_page=True)
                 if not submit:
                     set_state(job["job_id"], "READY", last_error="dry-run: filled, not submitted")
+                    print(f"  [{adapter.name} dry-run] Reached final review. Proof screenshot saved to: {before}")
                     return "DRY_RUN_OK"
 
-                if not click_submit(page):
-                    set_state(job["job_id"], "NEEDS_MANUAL", last_error="submit button not found")
-                    return "NEEDS_MANUAL"
-
-                ok = wait_confirmation(page)
+                sub_res = adapter.submit(page)
                 after = out_dir / "after_submit.png"
                 page.screenshot(path=str(after), full_page=True)
-                if ok:
+
+                if sub_res.status == "SUBMITTED":
                     set_state(job["job_id"], "SUBMITTED", last_error=None)
-                    # Suppress synthetic agent emails: the official confirmation email is dispatched
-                    # directly by the employer to candidate's inbox.
-                    print(f"  [submit] Application SUBMITTED and confirmed by {job['company']}! Official confirmation email dispatched by {job['company']} directly to {profile.get('email', USER)}.")
+                    print(f"  [{adapter.name} submit] Application SUBMITTED and confirmed by {job['company']}! Official confirmation: {sub_res.confirmation_text}")
                     return "SUBMITTED"
+
+                if sub_res.status == "SUBMISSION_UNKNOWN":
+                    set_state(job["job_id"], "SUBMISSION_UNKNOWN", last_error=sub_res.error)
+                    print(f"  [{adapter.name} warn] Submission performed but confirmation receipt was unverified: {sub_res.error}")
+                    return "SUBMISSION_UNKNOWN"
 
                 blocker = "captcha/verification" if page.locator(
                     "iframe[src*='captcha'], iframe[src*='turnstile'], .g-recaptcha, .h-captcha"
-                ).count() else "no confirmation detected (validation error?)"
+                ).count() else (sub_res.error or "no confirmation detected (validation error?)")
                 state = "NEEDS_MANUAL" if cur_attempts >= MAX_ATTEMPTS else "READY"
                 set_state(job["job_id"], state, last_error=blocker)
                 if state == "NEEDS_MANUAL":

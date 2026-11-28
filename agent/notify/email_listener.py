@@ -191,33 +191,33 @@ class EmailReplyListener:
                         ans_val = parsed_answers[qid]
                         self.answers_store.save_answer(q_key, ans_val)
 
-                # Mark inquiry answered
+                # Mark inquiry answered and queue for real browser submission
                 self.inquiry_mgr.record_answers(target_job_id, parsed_answers)
+                self.db.update_status(target_job_id, "approved")
 
-                # Complete Application Workflow:
-                # Update status in SQLite to 'applied'
-                self.db.update_status(target_job_id, "applied")
-                self.inquiry_mgr.mark_applied(target_job_id)
-
-                job = self.db.get_job_by_id(target_job_id)
-                if job:
-                    # Dispatch application confirmation email!
-                    try:
-                        sender = EmailDigestSender(config=self.config, db=self.db)
-                        sender.dispatch_application_confirmation(
-                            job=job,
-                            candidate_name="Ruchith Macha",
+                # Update apply_state to READY so auto-apply worker submits the form
+                try:
+                    import sqlite3
+                    with sqlite3.connect("data/tracker.db") as conn:
+                        conn.execute(
+                            "UPDATE apply_state SET state='READY', pending='[]', last_error=NULL, updated_at=CURRENT_TIMESTAMP WHERE job_id=?",
+                            (target_job_id,)
                         )
-                        logger.info(f"Dispatched application confirmation for {job.company} following candidate reply.")
-                    except Exception as e:
-                        logger.warning(f"Failed to dispatch confirmation email ({e})")
+                        conn.commit()
+                except Exception:
+                    pass
+
+                logger.info(
+                    f"Candidate answers learned for {inquiry.company}. Application transitioned to READY for automated submission. "
+                    "Artificial confirmation suppressed; authentic confirmation email will be delivered directly by employer."
+                )
 
                 processed.append({
                     "job_id": target_job_id,
                     "company": inquiry.company,
                     "title": inquiry.title,
                     "answers": parsed_answers,
-                    "status": "applied",
+                    "status": "ready",
                 })
 
                 # Remove from local pending list so we don't re-process in the same pass

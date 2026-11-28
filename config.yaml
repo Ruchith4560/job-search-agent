@@ -153,3 +153,22 @@ paths:
   linkedin_raw_file: "data/raw/linkedin.json"
   master_profile_file: "master_profile.json"
   tracker_db_file: "data/tracker.db"
+
+autonomous_application:
+  enabled: true
+  autonomous_mode: false # Set to true to automatically apply to jobs with match score >= 85%
+  max_daily_submissions: 10
+  max_retry_attempts: 3
+  min_match_threshold: 70
+  auto_apply_min_match_score: 85
+  supported_portals:
+    - "greenhouse"
+    - "lever"
+    - "smartrecruiters"
+    - "phenom"
+    - "workday"
+    - "generic"
+  dry_run: false
+  allow_custom_questions: true
+  capture_screenshots: true
+  delay_between_applications_seconds: 5
